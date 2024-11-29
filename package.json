@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "yarn workspace @cstu-fork/ali-react-table build",
     "start:website": "yarn workspace website start",
     "start:demo": "yarn workspace demo start",
     "deploy:website": "GIT_USER=shinima yarn workspace website deploy"
