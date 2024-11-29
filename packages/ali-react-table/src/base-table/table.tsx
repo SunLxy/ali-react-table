@@ -584,6 +584,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   componentWillUnmount() {
     this.rootSubscription.unsubscribe()
+    this.rootSubscription = new Subscription()
   }
 
   /** 更新 DOM 节点的引用，方便其他方法直接操作 DOM */

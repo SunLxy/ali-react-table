@@ -1,11 +1,11 @@
 {
-  "name": "ali-react-table",
-  "version": "2.6.1",
+  "name": "@cstu-fork/ali-react-table",
+  "version": "0.0.1",
   "description": "高性能 React 表格组件",
   "sideEffects": false,
-  "module": "dist/ali-react-table.esm.js",
-  "main": "dist/ali-react-table.js",
-  "types": "dist/ali-react-table.d.ts",
+  "module": "esm/ali-react-table.js",
+  "main": "cjs/ali-react-table.js",
+  "types": "esm/ali-react-table.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -17,13 +17,17 @@
     "email": "842351815@qq.com"
   },
   "scripts": {
-    "watch": "rollup --config rollup.config.js --watch",
-    "build": "rimraf dist/ && rollup --config rollup.config.js",
+    "watch": "tsc --watch",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc",
+    "build:esm": "tsc --project tsconfig.esm.json",
     "preversion": "npm run build",
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist",
+    "esm",
+    "cjs",
+    "src",
     "pivot"
   ],
   "dependencies": {
@@ -33,9 +37,6 @@
     "resize-observer-polyfill": "^1.5.1",
     "rxjs": "^6.5.4",
     "styled-components": "^3.4.10 || ^5.0.1"
-  },
-  "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -49,9 +50,7 @@
     "react-dom": "^16.13.1",
     "react-is": "^16.13.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.3.1",
-    "rollup-plugin-typescript2": "^0.31.0",
-    "typescript": "~4.2",
+    "typescript": "~5.7.2",
     "xlsx": "^0.16.0"
   }
 }
