@@ -1,5 +1,5 @@
 {
-  "name": "ali-react-table/pivot",
+  "name": "@cstu-fork/ali-react-table/pivot",
   "private": true,
   "sideEffects": false,
   "module": "../ems/ali-react-table-pivot.esm.js",
