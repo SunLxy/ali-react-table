@@ -38,6 +38,12 @@ export interface TreeModeFeatureOptions {
 
   /** 指定表格每一行元信息的记录字段 */
   treeMetaKey?: string | symbol
+
+  /**
+   * 展开符号添加的位置
+   * 默认第一项
+  */
+  positionKey?: string | number;
 }
 
 export function treeMode(opts: TreeModeFeatureOptions = {}) {
@@ -79,6 +85,7 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
     const iconIndent = opts.iconIndent ?? ctx.indents.iconIndent
     const iconGap = opts.iconGap ?? ctx.indents.iconGap
     const indentSize = opts.indentSize ?? ctx.indents.indentSize
+    const positionKey = opts.positionKey;
 
     return pipeline.mapDataSource(processDataSource).mapColumns(processColumns)
 
@@ -110,7 +117,22 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
       if (columns.length === 0) {
         return columns
       }
-      const [firstCol, ...others] = columns
+      let [firstCol, ...others] = columns
+      let positionIndex = 0;
+
+      if (typeof positionKey === "string") {
+        const colItemIndex = columns.findIndex((ite) => ite.code === positionKey);
+        if (colItemIndex >= 0) {
+          positionIndex = colItemIndex
+          firstCol = columns[colItemIndex]
+        }
+      } else if (typeof positionKey === 'number') {
+        const colItem = columns[positionKey]
+        if (colItem) {
+          positionIndex = positionKey
+          firstCol = colItem
+        }
+      }
 
       const render = (value: any, record: any, recordIndex: number) => {
         const content = internals.safeRender(firstCol, record, recordIndex)
@@ -183,18 +205,15 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           style: { cursor: 'pointer' },
         })
       }
-
-      return [
-        {
-          ...firstCol,
-          title: (
-            <span style={{ marginLeft: iconIndent + iconWidth + iconGap }}>{internals.safeRenderHeader(firstCol)}</span>
-          ),
-          render,
-          getCellProps: clickArea === 'cell' ? getCellProps : firstCol.getCellProps,
-        },
-        ...others,
-      ]
+      const newItem = {
+        ...firstCol,
+        title: (
+          <span style={{ marginLeft: iconIndent + iconWidth + iconGap }}>{internals.safeRenderHeader(firstCol)}</span>
+        ),
+        render,
+        getCellProps: clickArea === 'cell' ? getCellProps : firstCol.getCellProps,
+      }
+      return [...columns].splice(positionIndex, 1, newItem)
     }
   }
 }
