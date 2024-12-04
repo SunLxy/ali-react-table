@@ -117,23 +117,23 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
       if (columns.length === 0) {
         return columns
       }
-      let [firstCol, ...others] = columns
+      const newColumns = [...columns]
+      let [firstCol] = newColumns
       let positionIndex = 0;
 
       if (typeof positionKey === "string") {
-        const colItemIndex = columns.findIndex((ite) => ite.code === positionKey);
+        const colItemIndex = newColumns.findIndex((ite) => ite.code === positionKey);
         if (colItemIndex >= 0) {
           positionIndex = colItemIndex
-          firstCol = columns[colItemIndex]
+          firstCol = newColumns[colItemIndex]
         }
       } else if (typeof positionKey === 'number') {
-        const colItem = columns[positionKey]
+        const colItem = newColumns[positionKey]
         if (colItem) {
           positionIndex = positionKey
           firstCol = colItem
         }
       }
-
       const render = (value: any, record: any, recordIndex: number) => {
         const content = internals.safeRender(firstCol, record, recordIndex)
         if (record[treeMetaKey] == null) {
@@ -182,7 +182,6 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           </ExpansionCell>
         )
       }
-
       const getCellProps = (value: any, record: any, rowIndex: number) => {
         const prevProps = internals.safeGetCellProps(firstCol, record, rowIndex)
         if (record[treeMetaKey] == null) {
@@ -205,6 +204,7 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           style: { cursor: 'pointer' },
         })
       }
+
       const newItem = {
         ...firstCol,
         title: (
@@ -213,7 +213,8 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
         render,
         getCellProps: clickArea === 'cell' ? getCellProps : firstCol.getCellProps,
       }
-      return [...columns].splice(positionIndex, 1, newItem)
+      newColumns[positionIndex] = { ...newItem }
+      return [...newColumns];
     }
   }
 }
