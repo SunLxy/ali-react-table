@@ -1,8 +1,8 @@
-import { BaseTable, BaseTableProps, getTreeDepth, LoadingContentWrapperProps } from 'ali-react-table'
+import { BaseTable, BaseTableProps, getTreeDepth, LoadingContentWrapperProps } from '@cstu-fork/ali-react-table'
 import cx from 'classnames'
 import React, { useEffect, useState } from 'react'
 import styled, { keyframes } from 'styled-components'
-import { icons } from 'ali-react-table/src/common-views'
+import { icons } from '@cstu-fork/ali-react-table/src/common-views'
 
 const loadingIconRotate = keyframes`
   from {

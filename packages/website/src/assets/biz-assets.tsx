@@ -2,7 +2,7 @@ import { Dropdown, Menu } from '@alifd/next'
 import { ArtColumn, proto } from 'ali-react-table'
 import React from 'react'
 import styled from 'styled-components'
-import { icons } from 'ali-react-table/src/common-views'
+import { icons } from '@cstu-fork/ali-react-table/src/common-views'
 
 export function repeat<T>(arr: T[], n: number) {
   let result: T[] = []
