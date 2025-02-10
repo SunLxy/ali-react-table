@@ -145,6 +145,7 @@ const CheckBoxGroupItemBase = styled.div<{ $checked: boolean }>`
   align-items: center;
   box-sizing: border-box;
   padding: 2px 5px;
+  cursor: pointer;
   ${props => props.$checked && css`
     background-color: #e6f4ff;
     border-radius: 4px;  
@@ -184,7 +185,7 @@ export const CheckBoxGroup = (props: CheckBoxGroupProps) => {
       const checked = value.includes(isStringOrNumber ? item : item?.[valueField])
       const text = isStringOrNumber ? item : item?.[labelField]
       const newText = typeof formate === 'function' ? formate(text) : text
-      return <CheckBoxGroupItemBase $checked={checked} className="ali-simple-table-check-box-group-list-item" key={key} >
+      return <CheckBoxGroupItemBase onClick={() => onClick(checked, item, isStringOrNumber)} $checked={checked} className="ali-simple-table-check-box-group-list-item" key={key} >
         <CheckBox onClick={() => onClick(checked, item, isStringOrNumber)} checked={checked} />
         <CheckBoxGroupItemTextBase className="ali-simple-table-check-box-group-list-item-text">{newText}</CheckBoxGroupItemTextBase>
       </CheckBoxGroupItemBase>
