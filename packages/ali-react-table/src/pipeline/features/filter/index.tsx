@@ -6,7 +6,6 @@ import styled from "styled-components"
 import { HTMLAttributes, useMemo, useState } from "react"
 import Tooltip from "rc-tooltip"
 import "rc-tooltip/assets/bootstrap.css"
-// import "./index.css";
 import { CheckBoxGroup } from "../../../components/CheckBox"
 
 const ListGroupBase = styled.div`
