@@ -2,8 +2,8 @@
   "name": "@cstu-fork/ali-react-table/pivot",
   "private": true,
   "sideEffects": false,
-  "module": "../ems/ali-react-table-pivot.esm.js",
+  "module": "../esm/ali-react-table-pivot.esm.js",
   "main": "../cjs/ali-react-table-pivot.js",
-  "types": "../ems/ali-react-table-pivot.d.ts",
+  "types": "../esm/ali-react-table-pivot.d.ts",
   "license": "MIT"
 }

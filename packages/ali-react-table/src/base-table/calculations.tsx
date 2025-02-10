@@ -73,7 +73,7 @@ function processColumns(columns: ArtColumn[], defaultColumnWidth: number) {
   return dfs(columns)
 }
 
-function getLeftNestedLockCount(columns: ArtColumn[]) {
+export function getLeftNestedLockCount(columns: ArtColumn[]) {
   let nestedCount = 0
 
   for (const col of columns) {

@@ -1,4 +1,4 @@
-import { ArtColumn, BaseTable } from 'ali-react-table'
+import { ArtColumn, BaseTable, useTablePipeline, features } from 'ali-react-table'
 import { Button, Radio, Switch, Typography } from 'antd'
 import cx from 'classnames'
 import numeral from 'numeral'
@@ -36,31 +36,31 @@ function repeat<T>(arr: T[], n: number) {
 
 // prettier-ignore
 const dataSource = [
-  { provinceName: '湖北省', cityName: '武汉', confirmedCount: 37914, curedCount: 2519, deadCount: 1123, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '孝感', confirmedCount: 3114, curedCount: 313, deadCount: 62, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '黄冈', confirmedCount: 2817, curedCount: 611, deadCount: 68, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '荆州', confirmedCount: 1478, curedCount: 193, deadCount: 32, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '随州', confirmedCount: 1232, curedCount: 96, deadCount: 19, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '襄阳', confirmedCount: 1128, curedCount: 85, deadCount: 18, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '鄂州', confirmedCount: 1192, curedCount: 199, deadCount: 33, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '宜昌', confirmedCount: 906, curedCount: 92, deadCount: 15, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '黄石', confirmedCount: 980, curedCount: 170, deadCount: 13, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '荆门', confirmedCount: 902, curedCount: 112, deadCount: 28, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '咸宁', confirmedCount: 840, curedCount: 127, deadCount: 8, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '十堰', confirmedCount: 597, curedCount: 101, deadCount: 2, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '仙桃', confirmedCount: 514, curedCount: 63, deadCount: 17, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '天门', confirmedCount: 422, curedCount: 21, deadCount: 10, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '恩施州', confirmedCount: 244, curedCount: 71, deadCount: 4, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '潜江', confirmedCount: 116, curedCount: 12, deadCount: 5, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '神农架林区', confirmedCount: 10, curedCount: 8, deadCount: 0, updateTime: '2020-02-15' },
-  { provinceName: '湖北省', cityName: '待明确地区', confirmedCount: 0, curedCount: 18, deadCount: 0, updateTime: '2020-02-06' },
-  { provinceName: '湖北省', cityName: '未知地区', confirmedCount: 0, curedCount: 35, deadCount: 0, updateTime: '2020-02-02' },
-  { provinceName: '湖北省', cityName: '恩施', confirmedCount: 87, curedCount: 0, deadCount: 0, updateTime: '2020-02-01' },
-  { provinceName: '广东省', cityName: '深圳', confirmedCount: 406, curedCount: 115, deadCount: 0, updateTime: '2020-02-15' },
-  { provinceName: '广东省', cityName: '广州', confirmedCount: 335, curedCount: 106, deadCount: 0, updateTime: '2020-02-15' },
-  { provinceName: '广东省', cityName: '东莞', confirmedCount: 81, curedCount: 7, deadCount: 1, updateTime: '2020-02-15' },
-  { provinceName: '广东省', cityName: '佛山', confirmedCount: 84, curedCount: 22, deadCount: 0, updateTime: '2020-02-15' },
-  { provinceName: '广东省', cityName: '珠海', confirmedCount: 95, curedCount: 34, deadCount: 0, updateTime: '2020-02-15' },
+  { __id: "1", provinceName: '湖北省', cityName: '武汉', confirmedCount: 37914, curedCount: 2519, deadCount: 1123, updateTime: '2020-02-15' },
+  { __id: "2", provinceName: '湖北省', cityName: '孝感', confirmedCount: 3114, curedCount: 313, deadCount: 62, updateTime: '2020-02-15' },
+  { __id: "3", provinceName: '湖北省', cityName: '黄冈', confirmedCount: 2817, curedCount: 611, deadCount: 68, updateTime: '2020-02-15' },
+  { __id: "4", provinceName: '湖北省', cityName: '荆州', confirmedCount: 1478, curedCount: 193, deadCount: 32, updateTime: '2020-02-15' },
+  { __id: "5", provinceName: '湖北省', cityName: '随州', confirmedCount: 1232, curedCount: 96, deadCount: 19, updateTime: '2020-02-15' },
+  { __id: "6", provinceName: '湖北省', cityName: '襄阳', confirmedCount: 1128, curedCount: 85, deadCount: 18, updateTime: '2020-02-15' },
+  { __id: "7", provinceName: '湖北省', cityName: '鄂州', confirmedCount: 1192, curedCount: 199, deadCount: 33, updateTime: '2020-02-15' },
+  { __id: "8", provinceName: '湖北省', cityName: '宜昌', confirmedCount: 906, curedCount: 92, deadCount: 15, updateTime: '2020-02-15' },
+  { __id: "9", provinceName: '湖北省', cityName: '黄石', confirmedCount: 980, curedCount: 170, deadCount: 13, updateTime: '2020-02-15' },
+  { __id: "10", provinceName: '湖北省', cityName: '荆门', confirmedCount: 902, curedCount: 112, deadCount: 28, updateTime: '2020-02-15' },
+  { __id: "11", provinceName: '湖北省', cityName: '咸宁', confirmedCount: 840, curedCount: 127, deadCount: 8, updateTime: '2020-02-15' },
+  { __id: "12", provinceName: '湖北省', cityName: '十堰', confirmedCount: 597, curedCount: 101, deadCount: 2, updateTime: '2020-02-15' },
+  { __id: "13", provinceName: '湖北省', cityName: '仙桃', confirmedCount: 514, curedCount: 63, deadCount: 17, updateTime: '2020-02-15' },
+  { __id: "14", provinceName: '湖北省', cityName: '天门', confirmedCount: 422, curedCount: 21, deadCount: 10, updateTime: '2020-02-15' },
+  { __id: "15", provinceName: '湖北省', cityName: '恩施州', confirmedCount: 244, curedCount: 71, deadCount: 4, updateTime: '2020-02-15' },
+  { __id: "16", provinceName: '湖北省', cityName: '潜江', confirmedCount: 116, curedCount: 12, deadCount: 5, updateTime: '2020-02-15' },
+  { __id: "17", provinceName: '湖北省', cityName: '神农架林区', confirmedCount: 10, curedCount: 8, deadCount: 0, updateTime: '2020-02-15' },
+  { __id: "18", provinceName: '湖北省', cityName: '待明确地区', confirmedCount: 0, curedCount: 18, deadCount: 0, updateTime: '2020-02-06' },
+  { __id: "19", provinceName: '湖北省', cityName: '未知地区', confirmedCount: 0, curedCount: 35, deadCount: 0, updateTime: '2020-02-02' },
+  { __id: "111", provinceName: '湖北省', cityName: '恩施', confirmedCount: 87, curedCount: 0, deadCount: 0, updateTime: '2020-02-01' },
+  { __id: "122", provinceName: '广东省', cityName: '深圳', confirmedCount: 406, curedCount: 115, deadCount: 0, updateTime: '2020-02-15' },
+  { __id: "133", provinceName: '广东省', cityName: '广州', confirmedCount: 335, curedCount: 106, deadCount: 0, updateTime: '2020-02-15' },
+  { __id: "1544", provinceName: '广东省', cityName: '东莞', confirmedCount: 81, curedCount: 7, deadCount: 1, updateTime: '2020-02-15' },
+  { __id: "155", provinceName: '广东省', cityName: '佛山', confirmedCount: 84, curedCount: 22, deadCount: 0, updateTime: '2020-02-15' },
+  { __id: "166", provinceName: '广东省', cityName: '珠海', confirmedCount: 95, curedCount: 34, deadCount: 0, updateTime: '2020-02-15' },
 ]
 
 const beautifulScrollbarStyleMixin = css`
@@ -191,6 +191,25 @@ export function DemoApp() {
     return null
   }
 
+
+  const p = useTablePipeline()
+    .primaryKey('__id')
+    .input({
+      dataSource: hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : [],
+      columns: [
+        { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
+        {
+          code: 'cityName', name: '城市', width: 150, features: { filter: true },
+        },
+        { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
+        { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
+        { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+        { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
+      ]
+    })
+    .use(features.filter())
+    .use(features.columnResize())
+
   return (
     <AppDivAppDiv ref={appDivRef} className={cx({ 'has-custom-scrollbar': hasCustomScrollbar })}>
       <div style={{ background: '#f2f2f2', padding: 16 }}>
@@ -311,20 +330,21 @@ export function DemoApp() {
         hasStickyScroll={hasStickyScroll}
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
         hasHeader={hasHeader}
-        columns={[
-          { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
-          { code: 'cityName', name: '城市', width: 150 },
-          ...repeat<ArtColumn>(
-            [
-              { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
-              { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
-              { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
-            ],
-            useBigData ? 40 : 10,
-          ),
-          { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
-        ]}
-        dataSource={hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : []}
+        {...p.getProps()}
+        // columns={[
+        //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
+        //   { code: 'cityName', name: '城市', width: 150 },
+        //   ...repeat<ArtColumn>(
+        //     [
+        //       { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
+        //       { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
+        //       { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+        //     ],
+        //     useBigData ? 40 : 10,
+        //   ),
+        //   { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
+        // ]}
+        // dataSource={hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : []}
         footerDataSource={hasFooter ? footerDataSource : []}
       />
     </AppDivAppDiv>
