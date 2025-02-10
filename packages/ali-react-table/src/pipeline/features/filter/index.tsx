@@ -49,6 +49,10 @@ const Svg = styled.svg`
   margin-left: 5px;
   margin-right: 5px;
 `
+const FilterHeaderCell = styled.div`
+  display: flex;
+  align-items: center;
+`
 
 function FilterIcon(props: HTMLAttributes<HTMLOrSVGElement>) {
   return <Svg
@@ -83,7 +87,10 @@ export interface FilterHeaderCellProps {
 }
 
 function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
-  const { children, value, items = [], onSave, formate } = props
+  const { children, value, items = [], onSave, formate, column } = props
+  // 通过 justify-content 来与 col.align 保持对齐方向一致
+  const justifyContent = column.align === 'right' ? 'flex-end' : column.align === 'center' ? 'center' : 'flex-start'
+
   const [tempValue, setTempValue] = useState(value)
   const activeStyle = useMemo(() => {
     if (Array.isArray(value) && value.length) {
@@ -134,7 +141,13 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     }
   }
 
-  return <Fragment  >
+  return <FilterHeaderCell
+    style={{ justifyContent }}
+    onClick={(event) => {
+      event.stopPropagation();
+      event.preventDefault()
+    }}
+  >
     {children}
     <Tooltip
       overlayClassName='ali-simple-table-tooltip-overlay'
@@ -163,7 +176,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     >
       <FilterIcon style={activeStyle} />
     </Tooltip>
-  </Fragment>
+  </FilterHeaderCell>
 }
 
 export interface FilterFeatureOptions {
@@ -259,6 +272,7 @@ export function filter(options: FilterFeatureOptions = {}) {
             formate={formate}
             onSave={(values) => onChangeValues(col.code, values)}
             items={items}
+            column={col}
           >
             {internals.safeRenderHeader(col)}
           </DefaultFilterHeaderCell>)
