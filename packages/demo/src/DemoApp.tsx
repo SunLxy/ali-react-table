@@ -199,7 +199,7 @@ export function DemoApp() {
       columns: [
         { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
         {
-          code: 'cityName', name: '城市', width: 150, features: { filter: true },
+          code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, },
         },
         { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
         { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
@@ -208,6 +208,7 @@ export function DemoApp() {
       ]
     })
     .use(features.filter())
+    .use(features.sort())
     .use(features.columnResize())
 
   return (

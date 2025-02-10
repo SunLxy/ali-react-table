@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { Fragment, useRef } from "react"
 import { TablePipeline, ArtColumn, isLeafNode, collectNodes, internals } from "../../../ali-react-table"
 import { layeredFilter } from "../../../utils"
 import { FilterItem, ValueType } from "../../../interfaces"
@@ -45,12 +45,6 @@ const ListGroupFooterBase = styled.div`
   box-sizing: border-box;
 `
 
-const TableHeaderCell = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-
 const Svg = styled.svg`
   margin-left: 5px;
   margin-right: 5px;
@@ -90,17 +84,13 @@ export interface FilterHeaderCellProps {
 
 function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   const { children, value, items = [], onSave, formate } = props
-
   const [tempValue, setTempValue] = useState(value)
-  const refdom = useRef<HTMLDivElement>(undefined)
-
   const activeStyle = useMemo(() => {
     if (Array.isArray(value) && value.length) {
       return { color: "#1677ff" }
     }
     return { color: "#bfbfbf" }
   }, [props.value])
-
   const onVisibleChange = (visible: boolean) => {
     if (!visible) {
       if (tempValue !== value) {
@@ -108,7 +98,6 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
       }
     }
   }
-
   const searchValue = useMemo(() => {
     if (Array.isArray(tempValue)) {
       // @ts-ignore
@@ -145,8 +134,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     }
   }
 
-
-  return <TableHeaderCell ref={refdom} >
+  return <Fragment  >
     {children}
     <Tooltip
       overlayClassName='ali-simple-table-tooltip-overlay'
@@ -175,7 +163,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     >
       <FilterIcon style={activeStyle} />
     </Tooltip>
-  </TableHeaderCell>
+  </Fragment>
 }
 
 export interface FilterFeatureOptions {
