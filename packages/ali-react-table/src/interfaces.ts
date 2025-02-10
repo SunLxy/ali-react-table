@@ -83,7 +83,7 @@ export interface HoverRange {
 }
 
 
-export type ValueType = string | number | boolean | null | undefined
+export type ValueType = string | number | boolean | null | undefined | { isSearch: boolean, text: string }
 
 export interface FilterItem {
   code: string,

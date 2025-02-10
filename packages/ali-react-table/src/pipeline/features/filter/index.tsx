@@ -8,27 +8,56 @@ import Tooltip from "rc-tooltip"
 import "rc-tooltip/assets/bootstrap.css"
 import { CheckBoxGroup } from "../../../components/CheckBox"
 
+
 const ListGroupBase = styled.div`
   max-height: 300px;
-  overflow: auto;
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
 `
+const InputBase = styled.input`
+  outline: none;
+  border: 1px solid #d9d9d9;
+  width: 100%;
+  border-radius: 4px;
+  padding: 5px;
+  &::placeholder {
+    color: #ccc;
+  }
+`
+
+const ListGroupHeaderBase = styled.div`
+  padding: 14px;
+  box-sizing: border-box;
+  padding-bottom: 0px;
+`
+
 const ListGroupBodyBase = styled.div`
   padding: 8px 10px;
   box-sizing: border-box;
+  overflow: auto;
+  flex: 1;
 `
 const ListGroupFooterBase = styled.div`
   border-top: 1px solid #d9d9d9;
   padding: 8px 10px;
   box-sizing: border-box;
 `
+
 const TableHeaderCell = styled.div`
   display: flex;
   align-items: center;
 `
 
+
+const Svg = styled.svg`
+  margin-left: 5px;
+  margin-right: 5px;
+`
+
 function FilterIcon(props: HTMLAttributes<HTMLOrSVGElement>) {
-  return <svg
+  return <Svg
     viewBox="64 64 896 896"
     focusable="false"
     data-icon="filter"
@@ -40,7 +69,7 @@ function FilterIcon(props: HTMLAttributes<HTMLOrSVGElement>) {
   >
     <path
       d="M349 838c0 17.7 14.2 32 31.8 32h262.4c17.6 0 31.8-14.3 31.8-32V642H349v196zm531.1-684H143.9c-24.5 0-39.8 26.7-27.5 48l221.3 376h348.8l221.3-376c12.1-21.3-3.2-48-27.7-48z" />
-  </svg>
+  </Svg>
 }
 
 
@@ -80,6 +109,43 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     }
   }
 
+  const searchValue = useMemo(() => {
+    if (Array.isArray(tempValue)) {
+      // @ts-ignore
+      const fix = tempValue.find((it) => it.isSearch)
+      if (fix) {
+        // @ts-ignore
+        return fix?.text || ""
+      }
+    }
+    return ''
+  }, [tempValue])
+
+  const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const value = `${event.target.value || ""}`.trim()
+    if (value) {
+      // @ts-ignore
+      const fix = tempValue.find((it) => it.isSearch)
+      if (fix) {
+        const newtempValue = (tempValue || []).map((it) => {
+          // @ts-ignore
+          if (it?.isSearch) {
+            return { isSearch: true, text: value }
+          }
+          return it
+        })
+        setTempValue(() => [...newtempValue])
+      } else {
+        setTempValue((v) => [...v, { isSearch: true, text: value }])
+      }
+    } else {
+      // @ts-ignore
+      const newtempValue = (tempValue || []).filter((it) => !(it?.isSearch))
+      setTempValue(() => [...newtempValue])
+    }
+  }
+
+
   return <TableHeaderCell ref={refdom} >
     {children}
     <Tooltip
@@ -94,8 +160,12 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
         padding: 0,
       }}
       overlay={(<ListGroupBase>
+        <ListGroupHeaderBase>
+          <InputBase placeholder="请输入模糊搜索值" value={searchValue} onChange={onChange} />
+        </ListGroupHeaderBase>
         <ListGroupBodyBase>
           <CheckBoxGroup
+            formate={formate}
             items={items}
             value={tempValue}
             onChange={(list) => setTempValue(list)}
@@ -164,9 +234,15 @@ export function filter(options: FilterFeatureOptions = {}) {
           } else {
             const value = newItem[element.code]
             const newValue = (element.value || [])
-            const finx = (element.value || []).includes(value)
+            const finxd = (element.value || []).find((ite: any) => {
+              if (ite?.isSearch && ite?.text) {
+                return `${value}`.includes(ite.text)
+              }
+              return ite === value
+            })
+            // const finx = (element.value || []).includes(value)
             // 找不到相等数据的时候
-            if (!finx && newValue.length) {
+            if (!finxd && newValue.length) {
               newItem = false
               break;
             }
