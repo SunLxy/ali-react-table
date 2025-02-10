@@ -161,10 +161,12 @@ export interface CheckBoxGroupProps {
   valueField?: string
   labelField?: string
   onChange?: (list: CheckBoxGroupProps['value'], item: any, checked: boolean) => void
+  /**格式化*/
+  formate?: (value: string) => React.ReactNode
 }
 
 export const CheckBoxGroup = (props: CheckBoxGroupProps) => {
-  const { items = [], value = [], valueField = 'value', labelField = 'label', onChange } = props
+  const { items = [], value = [], valueField = 'value', labelField = 'label', onChange, formate } = props
   const onClick = (checked: boolean, item: any, isStringOrNumber: boolean) => {
     let list: CheckBoxGroupProps['value'] = []
     const valueText = isStringOrNumber ? item : item?.[valueField]
@@ -181,10 +183,10 @@ export const CheckBoxGroup = (props: CheckBoxGroupProps) => {
       const isStringOrNumber = typeof item === "string" || typeof item === "number" || typeof item === "boolean"
       const checked = value.includes(isStringOrNumber ? item : item?.[valueField])
       const text = isStringOrNumber ? item : item?.[labelField]
-
+      const newText = typeof formate === 'function' ? formate(text) : text
       return <CheckBoxGroupItemBase $checked={checked} className="ali-simple-table-check-box-group-list-item" key={key} >
         <CheckBox onClick={() => onClick(checked, item, isStringOrNumber)} checked={checked} />
-        <CheckBoxGroupItemTextBase className="ali-simple-table-check-box-group-list-item-text">{text}</CheckBoxGroupItemTextBase>
+        <CheckBoxGroupItemTextBase className="ali-simple-table-check-box-group-list-item-text">{newText}</CheckBoxGroupItemTextBase>
       </CheckBoxGroupItemBase>
     })}
   </CheckBoxGroupBase>)

@@ -55,10 +55,12 @@ export interface FilterHeaderCellProps {
   items?: string[]
   /**选中数据*/
   value?: ValueType[]
+  /**格式化*/
+  formate?: (value: string) => React.ReactNode
 }
 
 function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
-  const { children, value, items = [], onSave, } = props
+  const { children, value, items = [], onSave, formate } = props
 
   const [tempValue, setTempValue] = useState(value)
   const refdom = useRef<HTMLDivElement>(undefined)
@@ -67,7 +69,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     if (Array.isArray(value) && value.length) {
       return { color: "#1677ff" }
     }
-    return {}
+    return { color: "#bfbfbf" }
   }, [props.value])
 
   const onVisibleChange = (visible: boolean) => {
@@ -181,6 +183,8 @@ export function filter(options: FilterFeatureOptions = {}) {
         const result = { ...col }
         const filterTable = col.code && col.features?.filter;
         if (filterTable) {
+          /**格式化*/
+          const formate = col?.features?.filter?.formate
           let items = filterTable?.items || []
           if (!filterTable?.items) {
             items = Array.from(new Set(dataSource.map((ite) => ite[col.code]))).filter((it => (it !== undefined && it !== null)))
@@ -188,6 +192,7 @@ export function filter(options: FilterFeatureOptions = {}) {
           const valueItem = inputFilter.find(ite => ite.code === col.code)
           result.title = (<DefaultFilterHeaderCell
             value={valueItem?.value || []}
+            formate={formate}
             onSave={(values) => onChangeValues(col.code, values)}
             items={items}
           >
