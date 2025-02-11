@@ -206,6 +206,7 @@ export function filter(options: FilterFeatureOptions = {}) {
     pipeline.columns(processColumns(columns)) // 处理表头渲染过滤渲染
     pipeline.dataSource(processDataSource(dataSource)) // 处理渲染数据
 
+
     const onChangeValues = (code: string, values: ValueType[]) => {
       const list = (pipeline.getStateAtKey("filter") || []).filter((ite: FilterItem) => ite.code !== code);
       const newList = [...list].concat({ code, value: values })
@@ -232,7 +233,7 @@ export function filter(options: FilterFeatureOptions = {}) {
           const filter = column?.features?.filter?.onFilter || column?.features?.filter
           if (typeof filter === "function") {
             newItem = filter(newItem, element.value, column)
-          } else {
+          } else if (column) {
             const value = newItem[element.code]
             const newValue = (element.value || [])
             const finxd = (element.value || []).find((ite: any) => {
