@@ -1,7 +1,7 @@
 {
   "name": "ali-react-table-monorepo",
   "private": true,
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "ali-react-table monorepo",
   "license": "MIT",
   "workspaces": [
