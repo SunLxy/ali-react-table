@@ -246,7 +246,7 @@ export function filter(options: FilterFeatureOptions = {}) {
               if (ite === undefined || ite === null) {
                 return value === undefined || value === null
               }
-              return ite === value
+              return `${ite}` === `${value}`
             })
             // 找不到相等数据的时候
             if (finxd < 0 && newValue.length) {
