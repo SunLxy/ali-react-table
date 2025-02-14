@@ -181,10 +181,20 @@ export const CheckBoxGroup = (props: CheckBoxGroupProps) => {
 
   return (<CheckBoxGroupBase className="ali-simple-table-check-box-group">
     {items?.map((item, key) => {
-      const isStringOrNumber = typeof item === "string" || typeof item === "number" || typeof item === "boolean"
-      const checked = value.includes(isStringOrNumber ? item : item?.[valueField])
-      const text = isStringOrNumber ? item : item?.[labelField]
-      const newText = typeof formate === 'function' ? formate(text) : text
+      const isStringOrNumber = typeof item === "string" || typeof item === "number" || typeof item === "boolean" || item === undefined || item === null
+      let newText = ''
+      let checked = false
+      if (item === undefined || item === null) {
+        newText = "空"
+        const finx = value.findIndex((it) => {
+          return (it === undefined || it === null)
+        })
+        checked = finx >= 0;
+      } else {
+        checked = value.includes(isStringOrNumber ? item : item?.[valueField])
+        const text = isStringOrNumber ? item : item?.[labelField]
+        newText = typeof formate === 'function' ? formate(text) : text
+      }
       return <CheckBoxGroupItemBase onClick={() => onClick(checked, item, isStringOrNumber)} $checked={checked} className="ali-simple-table-check-box-group-list-item" key={key} >
         <CheckBox onClick={() => onClick(checked, item, isStringOrNumber)} checked={checked} />
         <CheckBoxGroupItemTextBase className="ali-simple-table-check-box-group-list-item-text">{newText}</CheckBoxGroupItemTextBase>

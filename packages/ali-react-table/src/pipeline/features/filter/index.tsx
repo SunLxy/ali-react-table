@@ -4,7 +4,7 @@ import { layeredFilter } from "../../../utils"
 import { FilterItem, ValueType } from "../../../interfaces"
 import styled from "styled-components"
 import { HTMLAttributes, useMemo, useState } from "react"
-import Tooltip from "rc-tooltip"
+import RcTooltip from "rc-tooltip"
 import "rc-tooltip/assets/bootstrap.css"
 import { CheckBoxGroup } from "../../../components/CheckBox"
 
@@ -44,7 +44,6 @@ const ListGroupFooterBase = styled.div`
   padding: 8px 10px;
   box-sizing: border-box;
 `
-
 const Svg = styled.svg`
   margin-left: 5px;
   margin-right: 5px;
@@ -84,10 +83,14 @@ export interface FilterHeaderCellProps {
   value?: ValueType[]
   /**格式化*/
   formate?: (value: string) => React.ReactNode
+  /**是否模糊搜索*/
+  isFuzzySearch?: boolean
+  /**渲染*/
+  Tooltip: typeof RcTooltip
 }
 
 function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
-  const { children, value, items = [], onSave, formate, column } = props
+  const { children, value, items = [], onSave, formate, column, isFuzzySearch = true, Tooltip = RcTooltip } = props
   // 通过 justify-content 来与 col.align 保持对齐方向一致
   const justifyContent = column.align === 'right' ? 'flex-end' : column.align === 'center' ? 'center' : 'flex-start'
 
@@ -108,7 +111,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   const searchValue = useMemo(() => {
     if (Array.isArray(tempValue)) {
       // @ts-ignore
-      const fix = tempValue.find((it) => it.isSearch)
+      const fix = tempValue.find((it) => it?.isSearch)
       if (fix) {
         // @ts-ignore
         return fix?.text || ""
@@ -121,7 +124,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     const value = `${event.target.value || ""}`.trim()
     if (value) {
       // @ts-ignore
-      const fix = tempValue.find((it) => it.isSearch)
+      const fix = tempValue.find((it) => it?.isSearch)
       if (fix) {
         const newtempValue = (tempValue || []).map((it) => {
           // @ts-ignore
@@ -150,7 +153,6 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   >
     {children}
     <Tooltip
-      overlayClassName='ali-simple-table-tooltip-overlay'
       onVisibleChange={onVisibleChange}
       placement="bottom"
       trigger={['click']}
@@ -161,9 +163,9 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
         padding: 0,
       }}
       overlay={(<ListGroupBase>
-        <ListGroupHeaderBase>
+        {isFuzzySearch ? <ListGroupHeaderBase>
           <InputBase placeholder="请输入模糊搜索值" value={searchValue} onChange={onChange} />
-        </ListGroupHeaderBase>
+        </ListGroupHeaderBase> : <Fragment />}
         <ListGroupBodyBase>
           <CheckBoxGroup
             formate={formate}
@@ -198,9 +200,9 @@ export type ArtColumnFeaturesFilter =
 export function filter(options: FilterFeatureOptions = {}) {
 
   return (pipeline: TablePipeline) => {
+    const Tooltip = pipeline.ctx.components.Tooltip
     /**获取过滤参数  */
     const inputFilter: FilterItem[] = pipeline.getStateAtKey("filter") || options?.filterItems || []
-
     const dataSource = pipeline.getDataSource() // 获取数据
     const columns = pipeline.getColumns() //获取列
     pipeline.columns(processColumns(columns)) // 处理表头渲染过滤渲染
@@ -236,15 +238,18 @@ export function filter(options: FilterFeatureOptions = {}) {
           } else if (column) {
             const value = newItem[element.code]
             const newValue = (element.value || [])
-            const finxd = (element.value || []).find((ite: any) => {
+            const finxd = (element.value || []).findIndex((ite: any) => {
+              /**直接输入的值*/
               if (ite?.isSearch && ite?.text) {
                 return `${value}`.includes(ite.text)
               }
+              if (ite === undefined || ite === null) {
+                return value === undefined || value === null
+              }
               return ite === value
             })
-            // const finx = (element.value || []).includes(value)
             // 找不到相等数据的时候
-            if (!finxd && newValue.length) {
+            if (finxd < 0 && newValue.length) {
               newItem = false
               break;
             }
@@ -263,12 +268,22 @@ export function filter(options: FilterFeatureOptions = {}) {
         if (filterTable) {
           /**格式化*/
           const formate = col?.features?.filter?.formate
+          const isFuzzySearch = col?.features?.filter?.isFuzzySearch
           let items = filterTable?.items || []
           if (!filterTable?.items) {
-            items = Array.from(new Set(dataSource.map((ite) => ite[col.code]))).filter((it => (it !== undefined && it !== null)))
+            items = Array.from(new Set(dataSource.map((ite) => {
+              const value = ite[col.code]
+              if (value === undefined || value === null) {
+                return undefined
+              }
+              return value
+            })))
           }
           const valueItem = inputFilter.find(ite => ite.code === col.code)
+          // isFuzzySearch
           result.title = (<DefaultFilterHeaderCell
+            Tooltip={Tooltip}
+            isFuzzySearch={isFuzzySearch}
             value={valueItem?.value || []}
             formate={formate}
             onSave={(values) => onChangeValues(col.code, values)}

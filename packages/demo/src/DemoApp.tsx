@@ -36,8 +36,8 @@ function repeat<T>(arr: T[], n: number) {
 
 // prettier-ignore
 const dataSource = [
-  { __id: "1", provinceName: '湖北省', cityName: '武汉', confirmedCount: 37914, curedCount: 2519, deadCount: 1123, updateTime: '2020-02-15' },
-  { __id: "2", provinceName: '湖北省', cityName: '孝感', confirmedCount: 3114, curedCount: 313, deadCount: 62, updateTime: '2020-02-15' },
+  { __id: "1", provinceName: '湖北省', cityName: undefined, confirmedCount: 37914, curedCount: 2519, deadCount: 1123, updateTime: '2020-02-15' },
+  { __id: "2", provinceName: '湖北省', cityName: null, confirmedCount: 3114, curedCount: 313, deadCount: 62, updateTime: '2020-02-15' },
   { __id: "3", provinceName: '湖北省', cityName: '黄冈', confirmedCount: 2817, curedCount: 611, deadCount: 68, updateTime: '2020-02-15' },
   { __id: "4", provinceName: '湖北省', cityName: '荆州', confirmedCount: 1478, curedCount: 193, deadCount: 32, updateTime: '2020-02-15' },
   { __id: "5", provinceName: '湖北省', cityName: '随州', confirmedCount: 1232, curedCount: 96, deadCount: 19, updateTime: '2020-02-15' },
