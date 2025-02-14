@@ -15,6 +15,7 @@ const ListGroupBase = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 200px;
+  border-radius: 4px;
 `
 const InputBase = styled.input`
   outline: none;
