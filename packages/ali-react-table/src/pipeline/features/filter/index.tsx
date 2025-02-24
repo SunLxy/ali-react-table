@@ -209,9 +209,12 @@ export function filter(options: FilterFeatureOptions = {}) {
     const inputFilter: FilterItem[] = pipeline.getStateAtKey("filter") || options?.filterItems || []
     const dataSource = pipeline.getDataSource() // 获取数据
     const columns = pipeline.getColumns() //获取列
+    /**如果数据不存在直接删除*/
+    let newFilter = [...inputFilter]
+
     pipeline.columns(processColumns(columns)) // 处理表头渲染过滤渲染
     pipeline.dataSource(processDataSource(dataSource)) // 处理渲染数据
-
+    pipeline.setStateAtKey2('filter', newFilter)
 
     const onChangeValues = (code: string, values: ValueType[]) => {
       const list = (pipeline.getStateAtKey("filter") || []).filter((ite: FilterItem) => ite.code !== code);
@@ -233,8 +236,8 @@ export function filter(options: FilterFeatureOptions = {}) {
 
       return layeredFilter(dataSource, (item) => {
         let newItem = { ...item }
-        for (let index = 0; index < inputFilter.length; index++) {
-          const element = inputFilter[index];
+        for (let index = 0; index < newFilter.length; index++) {
+          const element = newFilter[index];
           const column = filterColumnsMap.get(element.code)
           const filter = column?.features?.filter?.onFilter || column?.features?.filter
           if (typeof filter === "function") {
@@ -273,6 +276,7 @@ export function filter(options: FilterFeatureOptions = {}) {
           /**格式化*/
           const formate = col?.features?.filter?.formate
           const isFuzzySearch = col?.features?.filter?.isFuzzySearch
+          let valueItem = inputFilter.find(ite => ite.code === col.code)
           let items = filterTable?.items || []
           if (!filterTable?.items) {
             items = Array.from(new Set(dataSource.map((ite) => {
@@ -282,9 +286,21 @@ export function filter(options: FilterFeatureOptions = {}) {
               }
               return value
             })))
+            if (valueItem) {
+              // 判断一下数据是否还存在，不存在直接删除
+              // 把数据中不存在的删除
+              if (Array.isArray(valueItem.value)) {
+                const newLi = valueItem.value.filter((it: any) => {
+                  /**直接输入的值*/
+                  if (it?.isSearch) {
+                    return true
+                  }
+                  return [...items].includes(it)
+                })
+                valueItem.value = [...newLi]
+              }
+            }
           }
-          const valueItem = inputFilter.find(ite => ite.code === col.code)
-          // isFuzzySearch
           result.title = (<DefaultFilterHeaderCell
             Tooltip={Tooltip}
             isFuzzySearch={isFuzzySearch}

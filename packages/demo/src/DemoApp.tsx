@@ -152,6 +152,7 @@ export function DemoApp() {
   const [cellCount, setCellCount] = useState(20)
   const [theme, setTheme] = useState('default')
   const [showControlGrid, toggle] = useReducer((s: boolean) => !s, true)
+  const [dataList, setDataList] = useState([...dataSource])
 
   const appDivRef = useRef<HTMLDivElement>()
 
@@ -195,12 +196,11 @@ export function DemoApp() {
   const p = useTablePipeline()
     .primaryKey('__id')
     .input({
-      dataSource: hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : [],
+      dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
       columns: [
         { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
-        {
-          code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, },
-        },
+        { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, } },
+        { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
         { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
         { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
         { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
@@ -320,6 +320,15 @@ export function DemoApp() {
           <div>当前表格中单元格的数量：{cellCount} （包括 th 与 td，每隔 500ms 更新）</div>
         </div>
       </div>
+
+      <button onClick={() => {
+        setDataList((da) => {
+          return da.map((ite, index) => ({
+            ...ite,
+            _temp: index > 1 ? new Date().valueOf().toString() + "_" + index : index.toString()
+          }))
+        })
+      }} >刷新数据</button>
 
       <BaseTableComponent
         className={cx('bordered', 'compact', { dark: theme.includes('dark') })}

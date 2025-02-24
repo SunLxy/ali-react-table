@@ -104,6 +104,11 @@ export class TablePipeline {
     this.setState((prev: any) => ({ ...prev, [stateKey]: partialState }), stateKey, partialState, extraInfo)
   }
 
+  /**直接更新数据值*/
+  setStateAtKey2(stateKey: string, partialState: any, extraInfo?: any) {
+    this.state[stateKey] = partialState
+  }
+
   /** 确保 primaryKey 已被设置，并返回 primaryKey  */
   ensurePrimaryKey(hint?: string): PrimaryKey {
     if (this.ctx.primaryKey == null) {

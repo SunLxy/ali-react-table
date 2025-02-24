@@ -144,7 +144,7 @@ const CheckBoxGroupItemBase = styled.div<{ $checked: boolean }>`
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  padding: 2px 5px;
+  padding: 3px 5px;
   cursor: pointer;
   ${props => props.$checked && css`
     background-color: #e6f4ff;
