@@ -117,6 +117,8 @@ export interface BaseTableProps {
   virtualDebugLabel?: string
 
   getRowProps?(row: any, rowIndex: number): React.HTMLAttributes<HTMLTableRowElement>
+  setTableDomHelper?(domHelper: TableDOMHelper): void
+
 }
 
 interface BaseTableState {
@@ -472,6 +474,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     this.props$ = new BehaviorSubject(this.props)
     this.initSubscriptions()
     this.didMountOrUpdate()
+    this.props.setTableDomHelper?.(this.domHelper)
   }
 
   componentDidUpdate(prevProps: Readonly<BaseTableProps>, prevState: Readonly<BaseTableState>) {

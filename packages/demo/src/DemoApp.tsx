@@ -154,6 +154,17 @@ export function DemoApp() {
   const [showControlGrid, toggle] = useReducer((s: boolean) => !s, true)
   const [dataList, setDataList] = useState([...dataSource])
 
+  const [newColumns, setnewColumns] = useState<any[]>([
+    { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
+    { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, } },
+    { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
+    { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
+    { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
+  ])
+  const [mspa] = useState(new Map(newColumns.map((it) => [it.code, it.name])))
+
   const appDivRef = useRef<HTMLDivElement>()
 
   useEffect(() => {
@@ -197,19 +208,29 @@ export function DemoApp() {
     .primaryKey('__id')
     .input({
       dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
-      columns: [
-        { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
-        { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, } },
-        { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
-        { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
-        { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
-        { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
-        { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
-      ]
+      columns: newColumns
     })
+
+    .use(features.columnResize())
+    .use(features.columnDrag({
+      onColumnDragStopped: (columnMoved, newColumns) => {
+        const columns = newColumns.map((item) => {
+          const { code, name, width, lock, features, render, align } = item
+          return {
+            width,
+            lock,
+            features,
+            render,
+            align,
+            code,
+            name: mspa.get(code) || name,
+          }
+        })
+        setnewColumns(columns)
+      }
+    }))
     .use(features.filter())
     .use(features.sort())
-    .use(features.columnResize())
 
   return (
     <AppDivAppDiv ref={appDivRef} className={cx({ 'has-custom-scrollbar': hasCustomScrollbar })}>

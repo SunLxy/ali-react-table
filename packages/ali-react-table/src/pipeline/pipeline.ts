@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { BaseTableProps, PrimaryKey } from '../base-table'
 import { ArtColumn, TableTransform, Transform } from '../interfaces'
 import { mergeCellProps } from '../utils'
@@ -40,6 +40,7 @@ export interface TablePipelineCtx {
  * 4. snapshots，调用 pipeline.snapshot(name) 可以记录当前的状态，后续可以通过 name 来读取保存的状态
  * */
 export class TablePipeline {
+  ref?: React.MutableRefObject<any>
   private readonly _snapshots: { [key: string]: PipelineSnapshot } = {}
   private readonly _rowPropsGetters: Array<RowPropsGetter> = []
   private _dataSource: any[]
@@ -64,13 +65,16 @@ export class TablePipeline {
     state,
     setState,
     ctx,
+    ref
   }: {
     state: any
     setState: TablePipeline['setState']
-    ctx: Partial<TablePipelineCtx>
+    ctx: Partial<TablePipelineCtx>,
+    ref?: React.MutableRefObject<any>
   }) {
     this.state = state
     this.setState = setState
+    this.ref = ref
     Object.assign(this.ctx, ctx)
   }
 
@@ -202,6 +206,9 @@ export class TablePipeline {
         }, {})
       }
     }
+    result.setTableDomHelper = (domHelper) => {
+      this.ref.current.domHelper = domHelper
+    }
 
     return result
   }
@@ -209,5 +216,6 @@ export class TablePipeline {
 
 export function useTablePipeline(ctx?: Partial<TablePipelineCtx>) {
   const [state, setState] = useState<any>({})
-  return new TablePipeline({ state, setState, ctx })
+  const ref = useRef<any>({})
+  return new TablePipeline({ state, setState, ctx, ref })
 }
