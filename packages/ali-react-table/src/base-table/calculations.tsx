@@ -158,6 +158,7 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     columns: columnsProp,
     dataSource: dataSourceProp,
     defaultColumnWidth,
+    overflowVerticalNumber = 0
   } = table.props
 
   const columns = processColumns(columnsProp, defaultColumnWidth)
@@ -246,6 +247,16 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
 
   const leftLockTotalWidth = sum(flat.left.map((col) => col.width))
   const rightLockTotalWidth = sum(flat.right.map((col) => col.width))
+
+  if (overflowVerticalNumber) {
+    const { topIndex, bottomIndex } = verticalRenderRange
+    const length = dataSourceProp.length;
+    const startTopIndex = topIndex - overflowVerticalNumber <= 0 ? 0 : topIndex - overflowVerticalNumber;
+    const endBottomIndex = bottomIndex + overflowVerticalNumber >= length ? length : bottomIndex + overflowVerticalNumber;
+    verticalRenderRange.startTopIndex = startTopIndex
+    verticalRenderRange.endBottomIndex = endBottomIndex
+  }
+
 
   return {
     horizontalRenderRange,

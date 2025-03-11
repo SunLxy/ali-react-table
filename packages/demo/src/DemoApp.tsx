@@ -63,6 +63,16 @@ const dataSource = [
   { __id: "166", provinceName: '广东省', cityName: '珠海', confirmedCount: 95, curedCount: 34, deadCount: 0, updateTime: '2020-02-15' },
 ]
 
+const length = dataSource.length;
+const data222 = Array.from({ length: 3000 }).map((_, index) => {
+  if (index < length) {
+    return ({ ...dataSource[index], __id: new Date().valueOf().toString() + "_" + index, })
+  }
+  const current = index % length;
+  return ({ ...dataSource[current], __id: new Date().valueOf().toString() + "_" + index, })
+})
+
+
 const beautifulScrollbarStyleMixin = css`
   ::-webkit-scrollbar {
     width: 10px;
@@ -203,11 +213,11 @@ export function DemoApp() {
     return null
   }
 
-
   const p = useTablePipeline()
     .primaryKey('__id')
     .input({
-      dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
+      dataSource: data222,
+      // dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
       columns: newColumns
     })
 
@@ -362,6 +372,8 @@ export function DemoApp() {
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
         hasHeader={hasHeader}
         {...p.getProps()}
+        useVirtual={true}
+        overflowVerticalNumber={30}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
         //   { code: 'cityName', name: '城市', width: 150 },

@@ -8,6 +8,8 @@ export interface VerticalRenderRange {
   topBlank: number
   bottomIndex: number
   bottomBlank: number
+  startTopIndex?: number
+  endBottomIndex?: number
 }
 
 export interface HorizontalRenderRange {

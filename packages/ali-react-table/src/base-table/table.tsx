@@ -119,6 +119,9 @@ export interface BaseTableProps {
   getRowProps?(row: any, rowIndex: number): React.HTMLAttributes<HTMLTableRowElement>
   setTableDomHelper?(domHelper: TableDOMHelper): void
 
+  /**上下多展示多少个数据*/
+  overflowVerticalNumber?: number
+
 }
 
 interface BaseTableState {
@@ -318,7 +321,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       )
     }
 
-    const { topIndex, bottomBlank, topBlank, bottomIndex } = info.verticalRenderRange
+    const { topIndex, bottomBlank, topBlank, bottomIndex, startTopIndex = topIndex, endBottomIndex = bottomIndex } = info.verticalRenderRange
 
     return (
       <div className={tableBodyClassName}>
@@ -330,7 +333,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           tbodyHtmlTag="tbody"
           getRowProps={getRowProps}
           primaryKey={primaryKey}
-          data={dataSource.slice(topIndex, bottomIndex)}
+          data={dataSource.slice(startTopIndex, endBottomIndex)}
           horizontalRenderInfo={info}
           verticalRenderInfo={{
             first: 0,
