@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { CSSProperties, ReactNode } from 'react'
+import React, { CSSProperties, ReactNode, forwardRef } from 'react'
 import { BehaviorSubject, combineLatest, noop, Subscription } from 'rxjs'
 import * as op from 'rxjs/operators'
 import { ArtColumn } from '../interfaces'
@@ -22,6 +22,7 @@ import {
   syncScrollLeft,
   throttledWindowResize$,
 } from './utils'
+import { BaseTableContext, useBaseTableInstance, BaseTableInstance } from "../pipeline/instance"
 
 let emptyContentDeprecatedWarned = false
 function warnEmptyContentIsDeprecated() {
@@ -118,10 +119,8 @@ export interface BaseTableProps {
 
   getRowProps?(row: any, rowIndex: number): React.HTMLAttributes<HTMLTableRowElement>
   setTableDomHelper?(domHelper: TableDOMHelper): void
-
   /**上下多展示多少个数据*/
   overflowVerticalNumber?: number
-
 }
 
 interface BaseTableState {
@@ -654,3 +653,16 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     }
   }
 }
+
+export interface BaseTableImplProps extends BaseTableProps {
+  /**表格实例*/
+  instance?: BaseTableInstance
+}
+
+export const BaseTableImpl = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => {
+  const { instance, ...rest } = props
+  const [baseInstance] = useBaseTableInstance(instance)
+  return <BaseTableContext.Provider value={baseInstance}>
+    <BaseTable {...rest} ref={ref} />
+  </BaseTableContext.Provider>
+})

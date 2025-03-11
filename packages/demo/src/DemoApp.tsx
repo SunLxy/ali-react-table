@@ -2,7 +2,7 @@ import { ArtColumn, BaseTable, useTablePipeline, features } from 'ali-react-tabl
 import { Button, Radio, Switch, Typography } from 'antd'
 import cx from 'classnames'
 import numeral from 'numeral'
-import React, { useEffect, useReducer, useRef, useState } from 'react'
+import React, { createRef, useEffect, useReducer, useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { AntdBaseTable, HippoBaseTable } from 'website/src/assets'
 
