@@ -1,12 +1,12 @@
 import cx from 'classnames'
-import React, { CSSProperties, ReactNode, forwardRef } from 'react'
+import React, { CSSProperties, Fragment, ReactNode, forwardRef } from 'react'
 import { BehaviorSubject, combineLatest, noop, Subscription } from 'rxjs'
 import * as op from 'rxjs/operators'
 import { ArtColumn } from '../interfaces'
 import { calculateRenderInfo } from './calculations'
 import { EmptyHtmlTable } from './empty'
 import TableHeader from './header'
-import { getRichVisibleRectsStream } from './helpers/getRichVisibleRectsStream'
+import { getRichVisibleRectsStream, fromResizeEvent } from './helpers/getRichVisibleRectsStream'
 import { getFullRenderRange, makeRowHeightManager } from './helpers/rowHeightManager'
 import { TableDOMHelper } from './helpers/TableDOMUtils'
 import { HtmlTable } from './html-table'
@@ -121,6 +121,8 @@ export interface BaseTableProps {
   setTableDomHelper?(domHelper: TableDOMHelper): void
   /**上下多展示多少个数据*/
   overflowVerticalNumber?: number
+  /**头部渲染内容*/
+  topContent?: React.ReactNode
 }
 
 interface BaseTableState {
@@ -140,6 +142,9 @@ interface BaseTableState {
   offsetX: number
   /** 横向虚拟滚动 最大渲染尺寸 */
   maxRenderWidth: number
+
+  /**头部内容高度*/
+  topContentHeight?: number
 }
 
 export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
@@ -193,6 +198,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       // https://stackoverflow.com/questions/60026223/does-resizeobserver-invokes-initially-on-page-load
       maxRenderHeight: 600,
       maxRenderWidth: 800,
+      topContentHeight: 0,
     }
   }
 
@@ -226,14 +232,31 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     stickyScrollItem.style.width = `${innerTableWidth}px`
   }
 
+  private renderTableHeaderTop(info: RenderInfo) {
+    const { stickyTop, hasHeader, topContent } = this.props
+    if (topContent)
+      return (
+        <div
+          className={cx(Classes.tableHeaderTop, 'no-scrollbar')}
+          style={{
+            top: stickyTop === 0 ? undefined : stickyTop,
+            display: hasHeader ? undefined : 'none',
+          }}
+        >
+          {topContent}
+        </div>
+      )
+    return <Fragment />
+  }
+
   private renderTableHeader(info: RenderInfo) {
     const { stickyTop, hasHeader } = this.props
-
+    const { topContentHeight = 0 } = this.state
     return (
       <div
         className={cx(Classes.tableHeader, 'no-scrollbar')}
         style={{
-          top: stickyTop === 0 ? undefined : stickyTop,
+          top: stickyTop === 0 ? topContentHeight : stickyTop + topContentHeight,
           display: hasHeader ? undefined : 'none',
         }}
       >
@@ -379,13 +402,19 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       <>
         <div
           className={Classes.lockShadowMask}
-          style={{ left: 0, width: info.leftLockTotalWidth + LOCK_SHADOW_PADDING }}
+          style={{
+            left: 0,
+            width: info.leftLockTotalWidth + LOCK_SHADOW_PADDING,
+          }}
         >
           <div className={cx(Classes.lockShadow, Classes.leftLockShadow)} />
         </div>
         <div
           className={Classes.lockShadowMask}
-          style={{ right: 0, width: info.rightLockTotalWidth + LOCK_SHADOW_PADDING }}
+          style={{
+            right: 0,
+            width: info.rightLockTotalWidth + LOCK_SHADOW_PADDING,
+          }}
         >
           <div className={cx(Classes.lockShadow, Classes.rightLockShadow)} />
         </div>
@@ -460,6 +489,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           LoadingContentWrapper={components.LoadingContentWrapper}
         >
           <div className={Classes.artTable}>
+            {this.renderTableHeaderTop(info)}
             {this.renderTableHeader(info)}
             {this.renderTableBody(info)}
             {this.renderTableFooter(info)}
@@ -521,6 +551,16 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
         this.adjustNeedRenderLock()
       }),
     )
+
+    if (this.domHelper.tableHeaderTop && this.props.topContent) {
+      this.rootSubscription.add(
+        fromResizeEvent(this.domHelper.tableHeaderTop).subscribe((entry: ResizeObserverEntry[]) => {
+          if (entry && entry[0])
+            this.setState({ topContentHeight: entry[0].contentRect.height })
+        }),
+      )
+    }
+
 
     // 滚动同步
     this.rootSubscription.add(

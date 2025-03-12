@@ -222,23 +222,23 @@ export function DemoApp() {
     })
 
     .use(features.columnResize())
-    .use(features.columnDrag({
-      onColumnDragStopped: (columnMoved, newColumns) => {
-        const columns = newColumns.map((item) => {
-          const { code, name, width, lock, features, render, align } = item
-          return {
-            width,
-            lock,
-            features,
-            render,
-            align,
-            code,
-            name: mspa.get(code) || name,
-          }
-        })
-        setnewColumns(columns)
-      }
-    }))
+    // .use(features.columnDrag({
+    //   onColumnDragStopped: (columnMoved, newColumns) => {
+    //     const columns = newColumns.map((item) => {
+    //       const { code, name, width, lock, features, render, align } = item
+    //       return {
+    //         width,
+    //         lock,
+    //         features,
+    //         render,
+    //         align,
+    //         code,
+    //         name: mspa.get(code) || name,
+    //       }
+    //     })
+    //     setnewColumns(columns)
+    //   }
+    // }))
     .use(features.filter())
     .use(features.sort())
 
@@ -362,12 +362,13 @@ export function DemoApp() {
       }} >刷新数据</button>
 
       <BaseTableComponent
+        topContent={<div>21</div>}
         className={cx('bordered', 'compact', { dark: theme.includes('dark') })}
         isStickyHeader={isStickyHeader}
         isStickyFooter={isStickyFooter}
         isLoading={isLoading}
         style={{ ...style1, ...style2 }}
-        useOuterBorder={useOuterBorder}
+        useOuterBorder
         hasStickyScroll={hasStickyScroll}
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
         hasHeader={hasHeader}

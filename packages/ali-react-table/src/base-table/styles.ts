@@ -10,6 +10,7 @@ export const Classes = {
 
   artTable: `${prefix}table`,
   tableHeader: `${prefix}table-header`,
+  tableHeaderTop: `${prefix}table-header-top`,
   tableBody: `${prefix}table-body`,
   tableFooter: `${prefix}table-footer`,
 
@@ -192,6 +193,17 @@ export const StyledArtTableWrapper = styled.div`
     position: sticky;
     top: 0;
     z-index: ${Z.header};
+  }
+  &.sticky-header .${Classes.tableHeaderTop} {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: ${Z.scrollItem};
+    background: var(--header-bgcolor);
+    width: 100%;
+  }
+  &.use-outer-border  .${Classes.tableHeaderTop} {
+    border-bottom: var(--cell-border-horizontal);
   }
 
   &.sticky-footer .${Classes.tableFooter} {

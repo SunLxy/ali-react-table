@@ -44,6 +44,7 @@ export class TableDOMHelper {
   readonly tableHeader: HTMLDivElement
   readonly tableBody: HTMLDivElement
   readonly tableFooter: HTMLDivElement
+  readonly tableHeaderTop: HTMLDivElement
 
   readonly stickyScroll: HTMLDivElement
   readonly stickyScrollItem: HTMLDivElement
@@ -54,7 +55,8 @@ export class TableDOMHelper {
     this.tableHeader = this.artTable.querySelector(`:scope > .${Classes.tableHeader}`)
     this.tableBody = this.artTable.querySelector(`:scope > .${Classes.tableBody}`)
     this.tableFooter = this.artTable.querySelector(`:scope > .${Classes.tableFooter}`)
-    // this.virtual = this.artTable.querySelector(`.${Classes.virtual}`)
+    this.tableHeaderTop = this.artTable.querySelector(`:scope > .${Classes.tableHeaderTop}`)
+
     const stickyScrollSelector = `.${Classes.artTable} + .${Classes.stickyScroll}`
     this.stickyScroll = artTableWrapper.querySelector<HTMLDivElement>(stickyScrollSelector)
     this.stickyScrollItem = this.stickyScroll.querySelector(`.${Classes.stickyScrollItem}`)

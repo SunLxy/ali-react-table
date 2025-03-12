@@ -127,7 +127,7 @@ function fromScrollEvent(element: HTMLElement | Window) {
   return fromEvent(element, 'scroll', { passive: true })
 }
 
-function fromResizeEvent(element: HTMLElement | Window): Observable<Event | ResizeObserverEntry[]> {
+export function fromResizeEvent(element: HTMLElement | Window): Observable<Event | ResizeObserverEntry[]> {
   if (isWindow(element)) {
     return fromEvent<Event>(element, 'resize', { passive: true })
   }

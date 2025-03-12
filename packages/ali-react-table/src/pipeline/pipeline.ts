@@ -128,8 +128,10 @@ export class TablePipeline {
     }
 
     this._dataSource = input.dataSource
-    this._columns = input.columns
-
+    // 添加原始数据存储
+    this._columns = input.columns.map((ite) => {
+      return Object.assign({ ...ite }, { __o__: { ...ite } })
+    })
     this.snapshot('input')
 
     return this

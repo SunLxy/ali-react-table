@@ -15,13 +15,13 @@ function range(n: number) {
 
 type ColWithRenderInfo =
   | {
-      type: 'normal'
-      colIndex: number
-      col: ArtColumn
-      colSpan: number
-      isLeaf: boolean
-      width: number
-    }
+    type: 'normal'
+    colIndex: number
+    col: ArtColumn
+    colSpan: number
+    isLeaf: boolean
+    width: number
+  }
   | { type: 'blank'; blankSide: 'left' | 'right'; width: number }
 
 type IndexedCol = {
@@ -166,15 +166,43 @@ function calculateHeaderRenderInfo(
       ]),
     }
   }
-
   return calculateLeveledAndFlat(attachColIndex(nested.full, 0), rowCount)
 }
+
+// const TH = (props: any) => {
+//   let timer: NodeJS.Timeout;
+//   const ref = React.useRef<HTMLTableHeaderCellElement>(undefined)
+
+//   return <th
+//     {...props}
+//     ref={ref}
+//     onDragEnd={() => {
+//       ref.current?.setAttribute('draggable', "false")
+//       console.log('onDragEnd');
+//     }}
+//     onMouseDown={(event) => {
+//       // 设置一个定时器，当超过指定时间后触发长按事件
+//       timer = setTimeout(() => {
+//         console.log('Long press detected!', event);
+//         ref.current?.setAttribute('draggable', "true")
+//         // 在这里可以添加你想在长按后执行的代码
+//         // alert('Long press detected!');
+//       }, 500);
+//     }}
+//     onMouseUp={(event) => {
+//       // 如果在指定时间内释放鼠标，则清除定时器
+//       clearTimeout(timer);
+//       console.log('onMouseUp', event);
+//       ref.current?.setAttribute('draggable', "false")
+//     }}
+//   />
+// }
+
 
 export default function TableHeader({ info }: { info: RenderInfo }) {
   const { nested, flat, stickyLeftMap, stickyRightMap } = info
   const rowCount = getTreeDepth(nested.full) + 1
   const headerRenderInfo = calculateHeaderRenderInfo(info, rowCount)
-
   const fullFlatCount = flat.full.length
   const leftFlatCount = flat.left.length
   const rightFlatCount = flat.right.length
@@ -183,7 +211,7 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
     const headerCells = wrappedCols.map((wrapped) => {
       if (wrapped.type === 'normal') {
         const { colIndex, colSpan, isLeaf, col } = wrapped
-
+        // console.log("col", col.__o__)
         const headerCellProps = col.headerCellProps ?? {}
 
         const positionStyle: CSSProperties = {}
@@ -194,7 +222,6 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
           positionStyle.position = 'sticky'
           positionStyle.right = stickyRightMap.get(colIndex + colSpan - 1)
         }
-
         return (
           <th
             key={colIndex}
