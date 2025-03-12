@@ -371,3 +371,59 @@ export const StyledArtTableWrapper = styled.div`
   }
   //#endregion
 `
+
+export const StyleArtTableTh = styled.th`
+  &[draggable=true]{
+    cursor: move;
+  }
+  &.dragging {
+    opacity: 0.5;
+  }
+  &.draggover-left{
+    &::before{
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      left: 0;
+      background-color: red;
+    }
+  }
+
+  &.draggover-right{
+    &::after{
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      right: 0;
+      background-color: red;
+    }
+  }
+
+  &.draggover-top{
+    &::before{
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: red;
+    }
+  }
+  &.draggover-bottom{
+    &::after{
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: red;
+    }
+  }
+
+`

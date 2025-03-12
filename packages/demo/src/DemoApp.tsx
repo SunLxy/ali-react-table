@@ -171,6 +171,12 @@ export function DemoApp() {
     { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
     { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount1', name: '死亡1', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount2', name: '死亡2', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount3', name: '死亡3', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount4', name: '死亡4', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount5', name: '死亡5', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount6', name: '死亡6', width: 100, render: amount, align: 'right' },
     { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
   ])
   const [mspa] = useState(new Map(newColumns.map((it) => [it.code, it.name])))
@@ -373,7 +379,7 @@ export function DemoApp() {
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
         hasHeader={hasHeader}
         {...p.getProps()}
-        useVirtual={true}
+        useVirtual={{ header: false, vertical: true }}
         overflowVerticalNumber={30}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },

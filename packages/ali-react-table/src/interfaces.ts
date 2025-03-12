@@ -50,8 +50,13 @@ export interface ArtColumnDynamicPart {
 export interface ArtColumn extends ArtColumnStaticPart, ArtColumnDynamicPart {
   /** 该列的子节点 */
   children?: ArtColumn[]
+}
+
+export interface ArtColumnMergePath extends ArtColumn {
   /**原始表头配置*/
-  __o__?: ArtColumn
+  __o?: ArtColumn
+  /**处理后的表头位置*/
+  __path?: string
 }
 
 /** SpanRect 用于描述合并单元格的边界

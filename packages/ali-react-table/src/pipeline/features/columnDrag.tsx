@@ -89,6 +89,7 @@ export function columnDrag(opts: ColumnDragOptions = {}) {
                 const { left, width } = tableBodyClientRect
                 if (clientX + SCROLL_SIZE >= left + width) {
                   pipeline.ref.current.domHelper.tableBody.scrollLeft += SCROLL_SIZE
+                  console.log(pipeline.ref.current.domHelper.tableBody.scrollLeft)
                 }
                 if (clientX - SCROLL_SIZE <= left) {
                   pipeline.ref.current.domHelper.tableBody.scrollLeft -= SCROLL_SIZE

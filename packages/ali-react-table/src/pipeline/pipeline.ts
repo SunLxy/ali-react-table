@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { BaseTableProps, PrimaryKey } from '../base-table'
 import { ArtColumn, TableTransform, Transform } from '../interfaces'
-import { mergeCellProps } from '../utils'
+import { mergeCellProps, makeRecursiveMapperWithPathIndex } from '../utils'
 
 type RowPropsGetter = BaseTableProps['getRowProps']
 
@@ -126,12 +126,10 @@ export class TablePipeline {
     if (this._dataSource != null || this._columns != null) {
       throw new Error('input 不能调用两次')
     }
-
     this._dataSource = input.dataSource
     // 添加原始数据存储
-    this._columns = input.columns.map((ite) => {
-      return Object.assign({ ...ite }, { __o__: { ...ite } })
-    })
+    this._columns = makeRecursiveMapperWithPathIndex(input.columns);
+
     this.snapshot('input')
 
     return this

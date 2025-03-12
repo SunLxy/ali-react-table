@@ -23,6 +23,9 @@ import {
   throttledWindowResize$,
 } from './utils'
 import { BaseTableContext, useBaseTableInstance, BaseTableInstance } from "../pipeline/instance"
+import { fromEvent } from 'rxjs'
+
+import { ProviderInstance } from "../pipeline/dragInstance"
 
 let emptyContentDeprecatedWarned = false
 function warnEmptyContentIsDeprecated() {
@@ -123,6 +126,8 @@ export interface BaseTableProps {
   overflowVerticalNumber?: number
   /**头部渲染内容*/
   topContent?: React.ReactNode
+  /**拖拽类型*/
+  dragType?: "column" | "columnGroup"
 }
 
 interface BaseTableState {
@@ -260,7 +265,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           display: hasHeader ? undefined : 'none',
         }}
       >
-        <TableHeader info={info} />
+        <TableHeader domHelper={this.domHelper} info={info} />
       </div>
     )
   }
@@ -544,7 +549,6 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   private initSubscriptions() {
     const { tableHeader, tableBody, tableFooter, stickyScroll } = this.domHelper
-
     this.rootSubscription.add(
       throttledWindowResize$.subscribe(() => {
         this.updateStickyScroll()
@@ -552,7 +556,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       }),
     )
 
-    if (this.domHelper.tableHeaderTop && this.props.topContent) {
+    if (this.domHelper.tableHeaderTop) {
       this.rootSubscription.add(
         fromResizeEvent(this.domHelper.tableHeaderTop).subscribe((entry: ResizeObserverEntry[]) => {
           if (entry && entry[0])
@@ -561,6 +565,30 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       )
     }
 
+    if (this.props.dragType) {
+      /**用于拖拽列表头和滚动条变动*/
+      this.rootSubscription.add(
+        fromEvent<React.DragEvent<HTMLDivElement>>(document, "dragover").subscribe((event) => {
+          // 处理横向滚动
+          // event.clientX
+          const rect = this.domHelper.artTableWrapper.getBoundingClientRect();
+          if (rect.right <= event.clientX) {
+            // 这个的时候慢慢滚动
+            if (this.domHelper.tableBody.scrollLeft < this.domHelper.tableBody.scrollWidth) {
+              this.domHelper.tableBody.scrollLeft = this.domHelper.tableBody.scrollLeft + 10;
+            } else {
+              this.domHelper.tableBody.scrollLeft = this.domHelper.tableBody.scrollWidth;
+            }
+          } else if (rect.left >= event.clientX) {
+            if (this.domHelper.tableBody.scrollLeft > 0) {
+              this.domHelper.tableBody.scrollLeft = this.domHelper.tableBody.scrollLeft - 10;
+            } else {
+              this.domHelper.tableBody.scrollLeft = 0;
+            }
+          }
+        })
+      )
+    }
 
     // 滚动同步
     this.rootSubscription.add(
@@ -703,6 +731,8 @@ export const BaseTableImpl = forwardRef<BaseTable, BaseTableImplProps>((props, r
   const { instance, ...rest } = props
   const [baseInstance] = useBaseTableInstance(instance)
   return <BaseTableContext.Provider value={baseInstance}>
-    <BaseTable {...rest} ref={ref} />
+    <ProviderInstance>
+      <BaseTable {...rest} ref={ref} />
+    </ProviderInstance>
   </BaseTableContext.Provider>
 })

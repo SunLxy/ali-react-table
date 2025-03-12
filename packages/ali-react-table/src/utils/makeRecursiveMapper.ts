@@ -1,5 +1,6 @@
-import { AbstractTreeNode } from '../interfaces'
+import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from '../interfaces'
 import isLeafNode from './isLeafNode'
+
 
 type RecursiveFlatMapInfo<T> = {
   startIndex: number
@@ -53,4 +54,19 @@ export default function makeRecursiveMapper<T extends AbstractTreeNode>(
       return { result, flatCount }
     }
   }
+}
+
+/**添加表头下标位置*/
+export const makeRecursiveMapperWithPathIndex = (columns: ArtColumn[]): ArtColumnMergePath[] => {
+  function dfs(columns: ArtColumn[], path: string = '') {
+    return columns.map((column, index) => {
+      const newPath = path ? `${path}.${index}` : `${index}`
+      if (column.children) {
+        return { ...column, children: dfs(column.children, newPath) }
+      } else {
+        return { ...column, __path: newPath, __o: column }
+      }
+    })
+  }
+  return dfs(columns)
 }

@@ -270,5 +270,6 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     leftLockTotalWidth,
     rightLockTotalWidth,
     hasLockColumn: nested.left.length > 0 || nested.right.length > 0,
+    columns: columnsProp
   }
 }

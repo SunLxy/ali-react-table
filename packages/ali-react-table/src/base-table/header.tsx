@@ -1,9 +1,14 @@
 import cx from 'classnames'
-import React, { CSSProperties } from 'react'
-import { ArtColumn } from '../interfaces'
+import React, { CSSProperties, useEffect, useRef } from 'react'
+import { ArtColumn, ArtColumnMergePath } from '../interfaces'
 import { getTreeDepth, isLeafNode } from '../utils'
 import { HorizontalRenderRange, RenderInfo } from './interfaces'
-import { Classes } from './styles'
+import { Classes, StyleArtTableTh } from './styles'
+import {
+  useDragInstance, ProviderDragInstance,
+  useDragItemInstance, useProviderDragInstance
+} from "../pipeline/dragInstance"
+import { TableDOMHelper } from "./helpers/TableDOMUtils"
 
 function range(n: number) {
   const array: number[] = []
@@ -169,51 +174,78 @@ function calculateHeaderRenderInfo(
   return calculateLeveledAndFlat(attachColIndex(nested.full, 0), rowCount)
 }
 
-// const TH = (props: any) => {
-//   let timer: NodeJS.Timeout;
-//   const ref = React.useRef<HTMLTableHeaderCellElement>(undefined)
+interface TableHeaderTHProps extends React.DetailedHTMLProps<React.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement> {
+  itemData?: ArtColumnMergePath
+}
 
-//   return <th
-//     {...props}
-//     ref={ref}
-//     onDragEnd={() => {
-//       ref.current?.setAttribute('draggable', "false")
-//       console.log('onDragEnd');
-//     }}
-//     onMouseDown={(event) => {
-//       // 设置一个定时器，当超过指定时间后触发长按事件
-//       timer = setTimeout(() => {
-//         console.log('Long press detected!', event);
-//         ref.current?.setAttribute('draggable', "true")
-//         // 在这里可以添加你想在长按后执行的代码
-//         // alert('Long press detected!');
-//       }, 500);
-//     }}
-//     onMouseUp={(event) => {
-//       // 如果在指定时间内释放鼠标，则清除定时器
-//       clearTimeout(timer);
-//       console.log('onMouseUp', event);
-//       ref.current?.setAttribute('draggable', "false")
-//     }}
-//   />
-// }
+const TableHeaderTH = (props: TableHeaderTHProps) => {
+  const { itemData, ...rest } = props
+
+  const dragInstance = useProviderDragInstance()
+  const [itemInstance] = useDragItemInstance()
+  itemInstance.itemData = props.itemData;
+  const timer = useRef<NodeJS.Timeout>(undefined)
+  useEffect(() => {
+    const om = dragInstance.register(itemInstance)
+    return () => om()
+  }, [props.itemData])
+
+  const onDragStart: React.DragEventHandler<HTMLSpanElement> = (event) => {
+    itemInstance.parentDOM.current?.classList.add('dragging')
+    dragInstance.onDragStart(itemInstance, event)
+  }
+  const onDragEnd: React.DragEventHandler<HTMLSpanElement> = (event) => {
+    itemInstance.parentDOM.current?.classList.remove('dragging')
+    itemInstance.parentDOM.current?.removeAttribute('draggable');
+    dragInstance.onDragEnd(itemInstance, event)
+  }
+
+  const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    if (event.target === itemInstance.handleDOM.current) {
+      itemInstance.parentDOM.current?.setAttribute('draggable', "true")
+    } else {
+      itemInstance.parentDOM.current?.removeAttribute('draggable');
+    }
+  }
+
+  return <StyleArtTableTh
+    {...rest}
+    onDragEnd={onDragEnd}
+    onDragStart={onDragStart}
+    ref={itemInstance.parentDOM}
+    onMouseDown={(event) => {
+      props.onMouseDown?.(event)
+      timer.current = setTimeout(() => {
+        itemInstance.parentDOM.current?.setAttribute('draggable', "true")
+        clearTimeout(timer.current);
+      }, 300);
+    }}
+    onMouseLeave={(event) => {
+      // 如果在指定时间内释放鼠标，则清除定时器
+      clearTimeout(timer.current);
+      itemInstance.parentDOM.current?.removeAttribute('draggable');
+      props.onMouseLeave?.(event)
+    }}
+  />
+}
 
 
-export default function TableHeader({ info }: { info: RenderInfo }) {
+export default function TableHeader({ info, domHelper }: { info: RenderInfo, domHelper: TableDOMHelper }) {
   const { nested, flat, stickyLeftMap, stickyRightMap } = info
   const rowCount = getTreeDepth(nested.full) + 1
   const headerRenderInfo = calculateHeaderRenderInfo(info, rowCount)
   const fullFlatCount = flat.full.length
   const leftFlatCount = flat.left.length
   const rightFlatCount = flat.right.length
+  const [dragInstance] = useDragInstance(undefined, { direction: 'horizontal' })
+  dragInstance.itemListData = info.columns;
+  dragInstance.domHelper = domHelper;
 
   const thead = headerRenderInfo.leveled.map((wrappedCols, level) => {
     const headerCells = wrappedCols.map((wrapped) => {
       if (wrapped.type === 'normal') {
         const { colIndex, colSpan, isLeaf, col } = wrapped
-        // console.log("col", col.__o__)
         const headerCellProps = col.headerCellProps ?? {}
-
         const positionStyle: CSSProperties = {}
         if (colIndex < leftFlatCount) {
           positionStyle.position = 'sticky'
@@ -223,7 +255,7 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
           positionStyle.right = stickyRightMap.get(colIndex + colSpan - 1)
         }
         return (
-          <th
+          <TableHeaderTH
             key={colIndex}
             {...headerCellProps}
             className={cx(Classes.tableHeaderCell, headerCellProps.className, {
@@ -239,9 +271,10 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
               ...headerCellProps.style,
               ...positionStyle,
             }}
+            itemData={col}
           >
             {col.title ?? col.name}
-          </th>
+          </TableHeaderTH>
         )
       } else {
         if (wrapped.width > 0) {
@@ -251,7 +284,6 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
         }
       }
     })
-
     return (
       <tr
         key={level}
@@ -259,6 +291,10 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
           first: level === 0,
           last: level === rowCount - 1,
         })}
+        onDragEnter={dragInstance.onDragEnter}
+        onDragLeave={dragInstance.onDragLeave}
+        onDrop={dragInstance.onDrop}
+        onDragOver={dragInstance.onDragOver}
       >
         {headerCells}
       </tr>
@@ -266,21 +302,23 @@ export default function TableHeader({ info }: { info: RenderInfo }) {
   })
 
   return (
-    <table>
-      <colgroup>
-        {headerRenderInfo.flat.map((wrapped) => {
-          if (wrapped.type === 'blank') {
-            if (wrapped.width > 0) {
-              return <col key={wrapped.blankSide} style={{ width: wrapped.width }} />
+    <ProviderDragInstance value={dragInstance}>
+      <table>
+        <colgroup>
+          {headerRenderInfo.flat.map((wrapped) => {
+            if (wrapped.type === 'blank') {
+              if (wrapped.width > 0) {
+                return <col key={wrapped.blankSide} style={{ width: wrapped.width }} />
+              } else {
+                return null
+              }
             } else {
-              return null
+              return <col key={wrapped.colIndex} style={{ width: wrapped.width }} />
             }
-          } else {
-            return <col key={wrapped.colIndex} style={{ width: wrapped.width }} />
-          }
-        })}
-      </colgroup>
-      <thead>{thead}</thead>
-    </table>
+          })}
+        </colgroup>
+        <thead>{thead}</thead>
+      </table>
+    </ProviderDragInstance>
   )
 }

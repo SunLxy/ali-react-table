@@ -47,4 +47,6 @@ export interface RenderInfo {
   leftLockTotalWidth: number
   /** 右侧锁定列的总宽度 */
   rightLockTotalWidth: number
+
+  columns: ArtColumn[]
 }
