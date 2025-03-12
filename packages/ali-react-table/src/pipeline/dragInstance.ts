@@ -109,7 +109,6 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
           }
         }
       }
-      console.log("newDataList===>", newDataList)
       if (Array.isArray(newDataList) && this.dragItem && hoverItem) {
         if (this.onUpdated) {
           this.onUpdated?.({

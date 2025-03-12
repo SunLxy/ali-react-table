@@ -1,4 +1,4 @@
-import { ArtColumn, BaseTable, useTablePipeline, features } from 'ali-react-table'
+import { ArtColumn, BaseTableImpl as BaseTable, useTablePipeline, features } from 'ali-react-table'
 import { Button, Radio, Switch, Typography } from 'antd'
 import cx from 'classnames'
 import numeral from 'numeral'
@@ -382,6 +382,13 @@ export function DemoApp() {
         useVirtual={{ header: false, vertical: true }}
         overflowVerticalNumber={30}
         dragType='column'
+        onColumnDragEnd={(param) => {
+          console.log()
+          const list = param.formListData.map((ite) => {
+            return ({ ...ite.__o })
+          })
+          setnewColumns(list)
+        }}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
         //   { code: 'cityName', name: '城市', width: 150 },

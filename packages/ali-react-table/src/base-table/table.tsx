@@ -732,7 +732,7 @@ export interface BaseTableImplProps extends BaseTableProps {
   dragInstance?: DragInstance
 }
 
-export const BaseTableImpl = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => {
+const TableImplBase = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => {
   const { instance, onColumnDragEnd, dragInstance: darg, ...rest } = props
   const [baseInstance] = useBaseTableInstance(instance)
   const [dragInstance] = useDragInstance(darg)
@@ -744,3 +744,11 @@ export const BaseTableImpl = forwardRef<BaseTable, BaseTableImplProps>((props, r
     </DragInstanceProvider>
   </BaseTableContext.Provider>
 })
+
+export const BaseTableImpl = TableImplBase as typeof TableImplBase & {
+  useBaseTableInstance: typeof useBaseTableInstance,
+  useDragInstance: typeof useDragInstance;
+}
+
+BaseTableImpl.useBaseTableInstance = useBaseTableInstance
+BaseTableImpl.useDragInstance = useDragInstance

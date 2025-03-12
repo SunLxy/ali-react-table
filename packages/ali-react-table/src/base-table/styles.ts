@@ -131,6 +131,7 @@ export const StyledArtTableWrapper = styled.div`
   --bgcolor: white;
   --hover-bgcolor: var(--hover-color, #f5f5f5);
   --highlight-bgcolor: #eee;
+  --primary-color:#1677ff;
 
   --header-row-height: 32px;
   --header-color: #5a6c84;
@@ -373,12 +374,17 @@ export const StyledArtTableWrapper = styled.div`
 `
 
 export const StyleArtTableTh = styled.th`
+  position: relative;
   &[draggable=true]{
-    cursor: move;
+    cursor: move !important;
+    div,span,svg{
+      cursor: move !important;
+    }
   }
   &.dragging {
     opacity: 0.5;
   }
+
   &.draggover-left{
     &::before{
       content: "";
@@ -387,7 +393,7 @@ export const StyleArtTableTh = styled.th`
       bottom: 0;
       width: 2px;
       left: 0;
-      background-color: red;
+      background-color: var(--primary-color,#1677ff);
     }
   }
 
@@ -399,7 +405,7 @@ export const StyleArtTableTh = styled.th`
       bottom: 0;
       width: 2px;
       right: 0;
-      background-color: red;
+      background-color: var(--primary-color,#1677ff);
     }
   }
 
@@ -411,7 +417,7 @@ export const StyleArtTableTh = styled.th`
       left: 0;
       right: 0;
       height: 2px;
-      background-color: red;
+      background-color: var(--primary-color,#1677ff);
     }
   }
   &.draggover-bottom{
@@ -422,7 +428,7 @@ export const StyleArtTableTh = styled.th`
       left: 0;
       right: 0;
       height: 2px;
-      background-color: red;
+      background-color:var(--primary-color,#1677ff);
     }
   }
 
