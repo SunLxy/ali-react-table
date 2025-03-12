@@ -5,10 +5,12 @@ import { getTreeDepth, isLeafNode } from '../utils'
 import { HorizontalRenderRange, RenderInfo } from './interfaces'
 import { Classes, StyleArtTableTh } from './styles'
 import {
-  useDragInstance, ProviderDragInstance,
-  useDragItemInstance, useProviderDragInstance
+  useDragBodyInstance, DragBodyInstanceProvider,
+  useDragItemInstance, useDragBodyInstanceProvider
 } from "../pipeline/dragInstance"
 import { TableDOMHelper } from "./helpers/TableDOMUtils"
+import { BaseTableProps } from "./table"
+
 
 function range(n: number) {
   const array: number[] = []
@@ -176,15 +178,17 @@ function calculateHeaderRenderInfo(
 
 interface TableHeaderTHProps extends React.DetailedHTMLProps<React.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement> {
   itemData?: ArtColumnMergePath
+  dragType: BaseTableProps['dragType']
 }
 
 const TableHeaderTH = (props: TableHeaderTHProps) => {
-  const { itemData, ...rest } = props
-
-  const dragInstance = useProviderDragInstance()
+  const { itemData, dragType, ...rest } = props
+  const dragInstance = useDragBodyInstanceProvider()
   const [itemInstance] = useDragItemInstance()
   itemInstance.itemData = props.itemData;
+
   const timer = useRef<NodeJS.Timeout>(undefined)
+
   useEffect(() => {
     const om = dragInstance.register(itemInstance)
     return () => om()
@@ -194,50 +198,55 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
     itemInstance.parentDOM.current?.classList.add('dragging')
     dragInstance.onDragStart(itemInstance, event)
   }
+
   const onDragEnd: React.DragEventHandler<HTMLSpanElement> = (event) => {
     itemInstance.parentDOM.current?.classList.remove('dragging')
     itemInstance.parentDOM.current?.removeAttribute('draggable');
     dragInstance.onDragEnd(itemInstance, event)
   }
 
-  const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
-    if (event.target === itemInstance.handleDOM.current) {
-      itemInstance.parentDOM.current?.setAttribute('draggable', "true")
-    } else {
-      itemInstance.parentDOM.current?.removeAttribute('draggable');
-    }
-  }
+  // const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
+  //   if (event.target === itemInstance.handleDOM.current) {
+  //     itemInstance.parentDOM.current?.setAttribute('draggable', "true")
+  //   } else {
+  //     itemInstance.parentDOM.current?.removeAttribute('draggable');
+  //   }
+  // }
 
   return <StyleArtTableTh
     {...rest}
-    onDragEnd={onDragEnd}
-    onDragStart={onDragStart}
+    onDragEnd={dragType && onDragEnd}
+    onDragStart={dragType && onDragStart}
     ref={itemInstance.parentDOM}
     onMouseDown={(event) => {
       props.onMouseDown?.(event)
-      timer.current = setTimeout(() => {
-        itemInstance.parentDOM.current?.setAttribute('draggable', "true")
-        clearTimeout(timer.current);
-      }, 300);
+      if (dragType) {
+        timer.current = setTimeout(() => {
+          itemInstance.parentDOM.current?.setAttribute('draggable', "true")
+          clearTimeout(timer.current);
+        }, 300);
+      }
+
     }}
     onMouseLeave={(event) => {
       // 如果在指定时间内释放鼠标，则清除定时器
-      clearTimeout(timer.current);
-      itemInstance.parentDOM.current?.removeAttribute('draggable');
+      if (dragType) {
+        clearTimeout(timer.current);
+        itemInstance.parentDOM.current?.removeAttribute('draggable');
+      }
       props.onMouseLeave?.(event)
     }}
   />
 }
 
-
-export default function TableHeader({ info, domHelper }: { info: RenderInfo, domHelper: TableDOMHelper }) {
+export default function TableHeader({ info, domHelper, dragType }: { info: RenderInfo, domHelper: TableDOMHelper, dragType: BaseTableProps['dragType'] }) {
   const { nested, flat, stickyLeftMap, stickyRightMap } = info
   const rowCount = getTreeDepth(nested.full) + 1
   const headerRenderInfo = calculateHeaderRenderInfo(info, rowCount)
   const fullFlatCount = flat.full.length
   const leftFlatCount = flat.left.length
   const rightFlatCount = flat.right.length
-  const [dragInstance] = useDragInstance(undefined, { direction: 'horizontal' })
+  const [dragInstance] = useDragBodyInstance(undefined, { direction: 'horizontal' })
   dragInstance.itemListData = info.columns;
   dragInstance.domHelper = domHelper;
 
@@ -272,6 +281,7 @@ export default function TableHeader({ info, domHelper }: { info: RenderInfo, dom
               ...positionStyle,
             }}
             itemData={col}
+            dragType={dragType}
           >
             {col.title ?? col.name}
           </TableHeaderTH>
@@ -291,10 +301,10 @@ export default function TableHeader({ info, domHelper }: { info: RenderInfo, dom
           first: level === 0,
           last: level === rowCount - 1,
         })}
-        onDragEnter={dragInstance.onDragEnter}
-        onDragLeave={dragInstance.onDragLeave}
-        onDrop={dragInstance.onDrop}
-        onDragOver={dragInstance.onDragOver}
+        onDragEnter={dragType && dragInstance.onDragEnter}
+        onDragLeave={dragType && dragInstance.onDragLeave}
+        onDrop={dragType && dragInstance.onDrop}
+        onDragOver={dragType && dragInstance.onDragOver}
       >
         {headerCells}
       </tr>
@@ -302,7 +312,7 @@ export default function TableHeader({ info, domHelper }: { info: RenderInfo, dom
   })
 
   return (
-    <ProviderDragInstance value={dragInstance}>
+    <DragBodyInstanceProvider value={dragInstance}>
       <table>
         <colgroup>
           {headerRenderInfo.flat.map((wrapped) => {
@@ -319,6 +329,6 @@ export default function TableHeader({ info, domHelper }: { info: RenderInfo, dom
         </colgroup>
         <thead>{thead}</thead>
       </table>
-    </ProviderDragInstance>
+    </DragBodyInstanceProvider>
   )
 }

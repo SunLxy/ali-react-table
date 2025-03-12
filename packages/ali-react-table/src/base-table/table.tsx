@@ -25,7 +25,7 @@ import {
 import { BaseTableContext, useBaseTableInstance, BaseTableInstance } from "../pipeline/instance"
 import { fromEvent } from 'rxjs'
 
-import { ProviderInstance } from "../pipeline/dragInstance"
+import { DragInstanceProvider, useDragInstance, OnUpdatedOptions, DragInstance } from "../pipeline/dragInstance"
 
 let emptyContentDeprecatedWarned = false
 function warnEmptyContentIsDeprecated() {
@@ -128,6 +128,7 @@ export interface BaseTableProps {
   topContent?: React.ReactNode
   /**拖拽类型*/
   dragType?: "column" | "columnGroup"
+
 }
 
 interface BaseTableState {
@@ -265,7 +266,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           display: hasHeader ? undefined : 'none',
         }}
       >
-        <TableHeader domHelper={this.domHelper} info={info} />
+        <TableHeader dragType={this.props.dragType} domHelper={this.domHelper} info={info} />
       </div>
     )
   }
@@ -725,14 +726,21 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 export interface BaseTableImplProps extends BaseTableProps {
   /**表格实例*/
   instance?: BaseTableInstance
+  /**列拖拽结束*/
+  onColumnDragEnd?: (param: OnUpdatedOptions) => void
+  /**拖拽实例*/
+  dragInstance?: DragInstance
 }
 
 export const BaseTableImpl = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => {
-  const { instance, ...rest } = props
+  const { instance, onColumnDragEnd, dragInstance: darg, ...rest } = props
   const [baseInstance] = useBaseTableInstance(instance)
+  const [dragInstance] = useDragInstance(darg)
+  dragInstance.onUpdated = onColumnDragEnd
+
   return <BaseTableContext.Provider value={baseInstance}>
-    <ProviderInstance>
+    <DragInstanceProvider value={dragInstance}>
       <BaseTable {...rest} ref={ref} />
-    </ProviderInstance>
+    </DragInstanceProvider>
   </BaseTableContext.Provider>
 })

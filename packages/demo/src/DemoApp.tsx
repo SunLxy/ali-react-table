@@ -381,6 +381,7 @@ export function DemoApp() {
         {...p.getProps()}
         useVirtual={{ header: false, vertical: true }}
         overflowVerticalNumber={30}
+        dragType='column'
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
         //   { code: 'cityName', name: '城市', width: 150 },

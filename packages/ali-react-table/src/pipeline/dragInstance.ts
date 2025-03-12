@@ -9,11 +9,11 @@ import { TableDOMHelper } from "../base-table/helpers/TableDOMUtils"
 */
 // =================================最外层数据共享====================================================
 
-interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergePath> {
+export interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergePath> {
   /**拖拽开始区域实例*/
-  form: DragInstance;
+  form: DragBodyInstance;
   /**放置区域实例*/
-  to?: DragInstance;
+  to?: DragBodyInstance;
   /**拖拽开始区域数据*/
   formListData: T[];
   /**放置区域数据*/
@@ -33,19 +33,19 @@ interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergePath> {
 }
 
 /**最外层包裹实例*/
-export class Instance<T extends ArtColumnMergePath = ArtColumnMergePath> {
+export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   /**实例*/
-  listItemInstance: DragInstance[] = []
+  listItemInstance: DragBodyInstance[] = []
   /**拖拽对象*/
   dragItem?: DragItemInstance
   /**放置区域所在实例*/
-  toDragInstance?: DragInstance
+  toDragInstance?: DragBodyInstance
   /**拖拽所在实例*/
-  formDragInstance?: DragInstance
+  formDragInstance?: DragBodyInstance
   /**更新操作*/
   onUpdated?: (parms: OnUpdatedOptions<T>) => void
   /**注册实例*/
-  register = (item: DragInstance) => {
+  register = (item: DragBodyInstance) => {
     this.listItemInstance.push(item)
     return () => {
       this.listItemInstance = this.listItemInstance.filter(it => it !== item)
@@ -185,28 +185,28 @@ export class Instance<T extends ArtColumnMergePath = ArtColumnMergePath> {
 
 }
 
-interface ProviderProps<T = Instance> {
+interface ProviderProps<T = DragInstance> {
   children?: React.ReactNode
   value?: T
 }
 
-export const useInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>(instance?: Instance<T>): [Instance<T>] => {
-  const ref = useRef<Instance>(undefined)
+export const useDragInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>(instance?: DragInstance<T>): [DragInstance<T>] => {
+  const ref = useRef<DragInstance>(undefined)
   if (!ref.current) {
     if (instance) {
       ref.current = instance
     } else {
-      ref.current = new Instance()
+      ref.current = new DragInstance()
     }
   }
   return [ref.current]
 }
-const ContextInstance = createContext(new Instance())
-export const ProviderInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>(props: ProviderProps<Instance<T>>) => {
-  const [instance] = useInstance(props.value)
-  return createElement(ContextInstance.Provider, { value: instance, children: props.children })
+const ContextDragInstance = createContext(new DragInstance())
+export const DragInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>(props: ProviderProps<DragInstance<T>>) => {
+  const [instance] = useDragInstance(props.value)
+  return createElement(ContextDragInstance.Provider, { value: instance, children: props.children })
 }
-export const useProviderInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<Instance<T>>(ContextInstance)
+export const useDragInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<DragInstance<T>>(ContextDragInstance)
 
 // ====================================拖拽项=================================================
 
@@ -235,11 +235,11 @@ export const useDragItemInstance = (instance?: DragItemInstance): [DragItemInsta
 }
 
 const ContextDragItemInstance = createContext(new DragItemInstance())
-export const ProviderDragItemInstance = (props: ProviderProps<DragItemInstance>) => {
+export const DragItemInstanceProvider = (props: ProviderProps<DragItemInstance>) => {
   const [instance] = useDragItemInstance(props.value)
   return createElement(ContextDragItemInstance.Provider, { value: instance, children: props.children })
 }
-export const useProviderDragItemInstance = () => useContext(ContextDragItemInstance)
+export const useDragItemInstanceProvider = () => useContext(ContextDragItemInstance)
 
 // ========================================拖拽=============================================
 
@@ -247,8 +247,8 @@ interface DragInstanceOptions {
   direction: "horizontal" | "vertical",
 }
 
-export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
-  instance?: Instance;
+export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
+  instance?: DragInstance;
   list: DragItemInstance[] = []
   /**拖拽对象*/
   dragItem?: DragItemInstance
@@ -436,23 +436,23 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   }
 }
 
-export const useDragInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>(instance?: DragInstance<T>, options?: DragInstanceOptions): [DragInstance<T>] => {
-  const ref = useRef<DragInstance<T>>(undefined)
+export const useDragBodyInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>(instance?: DragBodyInstance<T>, options?: DragInstanceOptions): [DragBodyInstance<T>] => {
+  const ref = useRef<DragBodyInstance<T>>(undefined)
   if (!ref.current) {
     if (instance) {
       ref.current = instance
     } else {
-      ref.current = new DragInstance<T>({ direction: 'vertical', ...options })
+      ref.current = new DragBodyInstance<T>({ direction: 'vertical', ...options })
     }
   }
   return [ref.current]
 }
 
-const ContextDragInstance = createContext(new DragInstance({ direction: 'vertical' }))
+const ContextDragBodyInstance = createContext(new DragBodyInstance({ direction: 'vertical' }))
 
-export const ProviderDragInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>(props: ProviderProps<DragInstance<T>> & { options?: DragInstanceOptions }) => {
-  const [instance] = useDragInstance(props.value, props.options)
-  const dataInstance = useProviderInstance()
+export const DragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>(props: ProviderProps<DragBodyInstance<T>> & { options?: DragInstanceOptions }) => {
+  const [instance] = useDragBodyInstance(props.value, props.options)
+  const dataInstance = useDragInstanceProvider()
   instance.instance = dataInstance
   useEffect(() => {
     const register = instance?.instance?.register || dataInstance.register
@@ -461,7 +461,7 @@ export const ProviderDragInstance = <T extends ArtColumnMergePath = ArtColumnMer
       onMount?.()
     }
   }, [])
-  return createElement(ContextDragInstance.Provider, { value: instance, children: props.children })
+  return createElement(ContextDragBodyInstance.Provider, { value: instance, children: props.children })
 }
 
-export const useProviderDragInstance = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<DragInstance<T>>(ContextDragInstance)
+export const useDragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<DragBodyInstance<T>>(ContextDragBodyInstance)
