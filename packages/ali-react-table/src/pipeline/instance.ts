@@ -1,5 +1,7 @@
-import { createContext, useContext, useRef } from "react";
-import { TablePipeline } from "./pipeline"
+import { createContext, createRef, useContext, useRef } from "react";
+import { BaseTable } from "../base-table/table"
+import { DragInstance } from "./dragInstance"
+
 
 /**整体数据实例
  * 1. 列数据(原始列+处理后的渲染列)
@@ -8,9 +10,10 @@ import { TablePipeline } from "./pipeline"
  * 4. 右键清除过滤数据
 */
 export class BaseTableInstance {
-  /**管道*/
-  pipeline?: TablePipeline;
-
+  /**表格实例*/
+  baseTable = createRef<BaseTable>()
+  /**拖拽实例*/
+  dragInstance: DragInstance
 }
 
 export const useBaseTableInstance = (baseTable?: BaseTableInstance) => {

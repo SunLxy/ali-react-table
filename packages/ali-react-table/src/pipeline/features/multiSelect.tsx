@@ -114,11 +114,11 @@ export function multiSelect(opts: MultiSelectFeatureOptions = {}) {
             onClick: disabled
               ? undefined
               : (e) => {
-                  if (opts.stopClickEventPropagation) {
-                    e.stopPropagation()
-                  }
-                  onCheckboxChange(prevChecked, rowKey, e.shiftKey)
-                },
+                if (opts.stopClickEventPropagation) {
+                  e.stopPropagation()
+                }
+                onCheckboxChange(prevChecked, rowKey, e.shiftKey)
+              },
           }
         }
       },
@@ -132,22 +132,23 @@ export function multiSelect(opts: MultiSelectFeatureOptions = {}) {
             onChange={
               clickArea === 'checkbox'
                 ? (arg1: any, arg2: any) => {
-                    // 这里要同时兼容 antd 和 fusion 的用法
-                    // fusion: arg2?.nativeEvent
-                    // antd: arg1.nativeEvent
-                    const nativeEvent: MouseEvent = arg2?.nativeEvent ?? arg1.nativeEvent
-                    if (nativeEvent) {
-                      if (opts.stopClickEventPropagation) {
-                        nativeEvent.stopPropagation()
-                      }
-                      onCheckboxChange(checked, key, nativeEvent.shiftKey)
+                  // 这里要同时兼容 antd 和 fusion 的用法
+                  // fusion: arg2?.nativeEvent
+                  // antd: arg1.nativeEvent
+                  const nativeEvent: MouseEvent = arg2?.nativeEvent ?? arg1.nativeEvent
+                  if (nativeEvent) {
+                    if (opts.stopClickEventPropagation) {
+                      nativeEvent.stopPropagation()
                     }
+                    onCheckboxChange(checked, key, nativeEvent.shiftKey)
                   }
+                }
                 : undefined
             }
           />
         )
       },
+      isCheckBox: true,
     }
 
     const nextColumns = pipeline.getColumns().slice()

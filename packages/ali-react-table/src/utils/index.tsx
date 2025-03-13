@@ -14,3 +14,4 @@ export { default as smartCompare } from './smartCompare'
 export { default as traverseColumn } from './traverseColumn'
 export { MULTI_SELECT_MARK_PROPNAME, SINGLE_SELECT_MARK_PROPNAME, isSelectColumn } from './selectColumn'
 export * from './filter'
+export * from "./group"

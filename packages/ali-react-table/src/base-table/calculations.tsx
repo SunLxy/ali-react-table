@@ -161,8 +161,11 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     overflowVerticalNumber = 0
   } = table.props
 
+  /**处理列*/
   const columns = processColumns(columnsProp, defaultColumnWidth)
+  // 获取锁定列
   const leftNestedLockCount = getLeftNestedLockCount(columns)
+  /***/
   const fullFlat = collectNodes(columns, 'leaf-only')
 
   let flat: RenderInfo['flat']

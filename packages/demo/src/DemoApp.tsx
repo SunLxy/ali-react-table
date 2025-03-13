@@ -1,5 +1,5 @@
 import { ArtColumn, BaseTableImpl as BaseTable, useTablePipeline, features } from 'ali-react-table'
-import { Button, Radio, Switch, Typography } from 'antd'
+import { Button, Radio, Switch, Typography, Checkbox } from 'antd'
 import cx from 'classnames'
 import numeral from 'numeral'
 import React, { createRef, useEffect, useReducer, useRef, useState } from 'react'
@@ -64,13 +64,14 @@ const dataSource = [
 ]
 
 const length = dataSource.length;
-const data222 = Array.from({ length: 3000 }).map((_, index) => {
-  if (index < length) {
-    return ({ ...dataSource[index], __id: new Date().valueOf().toString() + "_" + index, })
-  }
-  const current = index % length;
-  return ({ ...dataSource[current], __id: new Date().valueOf().toString() + "_" + index, })
-})
+const data222 = dataSource;
+// const data222 = Array.from({ length: 100 }).map((_, index) => {
+//   if (index < length) {
+//     return ({ ...dataSource[index], __id: new Date().valueOf().toString() + "_" + index, })
+//   }
+//   const current = index % length;
+//   return ({ ...dataSource[current], __id: new Date().valueOf().toString() + "_" + index, })
+// })
 
 
 const beautifulScrollbarStyleMixin = css`
@@ -165,8 +166,8 @@ export function DemoApp() {
   const [dataList, setDataList] = useState([...dataSource])
 
   const [newColumns, setnewColumns] = useState<any[]>([
-    { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
-    { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, } },
+    { code: 'provinceName', name: '省份', width: 150, lock: leftLock, groupIndex: 0 },
+    { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, }, groupIndex: 1 },
     { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
     { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
@@ -219,14 +220,15 @@ export function DemoApp() {
     return null
   }
 
-  const p = useTablePipeline()
+  const p = useTablePipeline({ components: { Checkbox } })
     .primaryKey('__id')
     .input({
       dataSource: data222,
       // dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
       columns: newColumns
     })
-
+    .use(features.multiSelect())
+    .use(features.dragRowGrouping())
     .use(features.columnResize())
     // .use(features.columnDrag({
     //   onColumnDragStopped: (columnMoved, newColumns) => {
@@ -248,6 +250,8 @@ export function DemoApp() {
     .use(features.filter())
     .use(features.sort())
 
+  const dpp = { ...p.getProps() }
+  console.log("dpp", dpp)
   return (
     <AppDivAppDiv ref={appDivRef} className={cx({ 'has-custom-scrollbar': hasCustomScrollbar })}>
       <div style={{ background: '#f2f2f2', padding: 16 }}>
@@ -378,12 +382,11 @@ export function DemoApp() {
         hasStickyScroll={hasStickyScroll}
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
         hasHeader={hasHeader}
-        {...p.getProps()}
+        {...dpp}
         useVirtual={{ header: false, vertical: true }}
-        overflowVerticalNumber={30}
+        // overflowVerticalNumber={30}
         dragType='column'
         onColumnDragEnd={(param) => {
-          console.log()
           const list = param.formListData.map((ite) => {
             return ({ ...ite.__o })
           })

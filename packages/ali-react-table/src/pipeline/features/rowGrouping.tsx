@@ -103,6 +103,7 @@ export function rowGrouping(opts: RowGroupingFeatureOptions = {}) {
             </InlineFlexCell>
           )
         }
+        const renderText = row.__art_custom_group_text
 
         const expanded = openKeySet.has(row[primaryKey])
         const expandCls = expanded ? 'expanded' : 'collapsed'

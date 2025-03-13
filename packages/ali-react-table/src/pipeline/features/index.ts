@@ -13,3 +13,4 @@ export { treeMode, TreeModeFeatureOptions, treeMetaSymbol } from './treeMode'
 export { treeSelect, TreeSelectFeatureOptions } from './treeSelect'
 export { filter, FilterFeatureOptions } from './filter'
 export { columnDrag, ColumnDragOptions } from "./columnDrag"
+export { dragRowGrouping, DragRowGroupingFeatureOptions, } from "./dragRowGroup"

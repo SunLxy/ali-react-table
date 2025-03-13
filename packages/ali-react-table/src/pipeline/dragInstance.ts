@@ -1,6 +1,7 @@
 import { createRef, createContext, createElement, useRef, useContext, useEffect } from 'react';
 import { ArtColumnMergePath } from "../interfaces"
 import { TableDOMHelper } from "../base-table/helpers/TableDOMUtils"
+import { BaseTableInstance } from "./instance"
 
 /**
  * 1. 可进行拖拽排序
@@ -34,6 +35,8 @@ export interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergeP
 
 /**最外层包裹实例*/
 export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
+  /**表格实例*/
+  tableInstance: BaseTableInstance
   /**实例*/
   listItemInstance: DragBodyInstance[] = []
   /**拖拽对象*/
@@ -211,8 +214,6 @@ export const useDragInstanceProvider = <T extends ArtColumnMergePath = ArtColumn
 
 /**每个拖拽项的实例*/
 export class DragItemInstance {
-  /**拖拽节点*/
-  handleDOM = createRef<HTMLSpanElement>()
   /**外部整个包裹节点*/
   parentDOM = createRef<HTMLTableHeaderCellElement>()
   /**存储数据*/
@@ -247,7 +248,7 @@ interface DragInstanceOptions {
 }
 
 export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
-  instance?: DragInstance;
+  dragInstance?: DragInstance;
   list: DragItemInstance[] = []
   /**拖拽对象*/
   dragItem?: DragItemInstance
@@ -265,10 +266,6 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
   hoverIndex?: number;
   /**数据*/
   itemListData: T[] = []
-
-  domHelper?: TableDOMHelper
-
-
   /**更新数据*/
   updatedItemListData?: (dataList: T[]) => void
 
@@ -287,9 +284,9 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
   /**开始拖拽*/
   onDragStart = (item: DragItemInstance, event: React.DragEvent<HTMLSpanElement>) => {
     this.dragItem = item;
-    if (this.instance) {
-      this.instance.dragItem = item;
-      this.instance.formDragInstance = this;
+    if (this.dragInstance) {
+      this.dragInstance.dragItem = item;
+      this.dragInstance.formDragInstance = this;
     }
   }
 
@@ -298,8 +295,8 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
     if (this.hoverItem) {
       this.removeClassList(this.hoverItem.parentDOM.current)
     }
-    if (this.instance?.onDragEnd) {
-      this.instance.onDragEnd()
+    if (this.dragInstance?.onDragEnd) {
+      this.dragInstance.onDragEnd()
     }
   }
 
@@ -324,8 +321,8 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
     if (this.hoverItem) {
       this.removeClassList(this.hoverItem.parentDOM.current)
     }
-    if (this.instance) {
-      this.instance.toDragInstance = this;
+    if (this.dragInstance) {
+      this.dragInstance.toDragInstance = this;
     }
   }
 
@@ -452,9 +449,9 @@ const ContextDragBodyInstance = createContext(new DragBodyInstance({ direction: 
 export const DragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>(props: ProviderProps<DragBodyInstance<T>> & { options?: DragInstanceOptions }) => {
   const [instance] = useDragBodyInstance(props.value, props.options)
   const dataInstance = useDragInstanceProvider()
-  instance.instance = dataInstance
+  instance.dragInstance = dataInstance
   useEffect(() => {
-    const register = instance?.instance?.register || dataInstance.register
+    const register = instance?.dragInstance?.register || dataInstance.register
     const onMount = register(instance)
     return () => {
       onMount?.()

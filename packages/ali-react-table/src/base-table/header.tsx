@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { CSSProperties, useEffect, useRef } from 'react'
+import React, { CSSProperties, Fragment, useEffect, useRef } from 'react'
 import { ArtColumn, ArtColumnMergePath } from '../interfaces'
 import { getTreeDepth, isLeafNode } from '../utils'
 import { HorizontalRenderRange, RenderInfo } from './interfaces'
@@ -8,7 +8,6 @@ import {
   useDragBodyInstance, DragBodyInstanceProvider,
   useDragItemInstance, useDragBodyInstanceProvider
 } from "../pipeline/dragInstance"
-import { TableDOMHelper } from "./helpers/TableDOMUtils"
 import { BaseTableProps } from "./table"
 
 
@@ -182,10 +181,12 @@ interface TableHeaderTHProps extends React.DetailedHTMLProps<React.ThHTMLAttribu
 }
 
 const TableHeaderTH = (props: TableHeaderTHProps) => {
-  const { itemData, dragType, ...rest } = props
+  const { itemData, dragType, children, ...rest } = props
   const dragInstance = useDragBodyInstanceProvider()
   const [itemInstance] = useDragItemInstance()
   itemInstance.itemData = props.itemData;
+  const isGroupIndex = typeof itemData.groupIndex === 'number'
+  const isLock = typeof itemData.lock === 'boolean'
 
   const timer = useRef<NodeJS.Timeout>(undefined)
 
@@ -195,14 +196,18 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
   }, [props.itemData])
 
   const onDragStart: React.DragEventHandler<HTMLSpanElement> = (event) => {
-    itemInstance.parentDOM.current?.classList.add('dragging')
-    dragInstance.onDragStart(itemInstance, event)
+    if (dragType && !isLock && !isGroupIndex) {
+      itemInstance.parentDOM.current?.classList.add('dragging')
+      dragInstance.onDragStart(itemInstance, event)
+    }
   }
 
   const onDragEnd: React.DragEventHandler<HTMLSpanElement> = (event) => {
-    itemInstance.parentDOM.current?.classList.remove('dragging')
-    itemInstance.parentDOM.current?.removeAttribute('draggable');
-    dragInstance.onDragEnd(itemInstance, event)
+    if (dragType && !isLock && !isGroupIndex) {
+      itemInstance.parentDOM.current?.classList.remove('dragging')
+      itemInstance.parentDOM.current?.removeAttribute('draggable');
+      dragInstance.onDragEnd(itemInstance, event)
+    }
   }
 
   // const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
@@ -215,31 +220,32 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
 
   return <StyleArtTableTh
     {...rest}
-    onDragEnd={dragType && onDragEnd}
-    onDragStart={dragType && onDragStart}
+    onDragEnd={onDragEnd}
+    onDragStart={onDragStart}
     ref={itemInstance.parentDOM}
     onMouseDown={(event) => {
       props.onMouseDown?.(event)
-      if (dragType) {
+      if (dragType && !isLock && !isGroupIndex) {
         timer.current = setTimeout(() => {
           itemInstance.parentDOM.current?.setAttribute('draggable', "true")
           clearTimeout(timer.current);
         }, 300);
       }
-
     }}
     onMouseLeave={(event) => {
       // 如果在指定时间内释放鼠标，则清除定时器
-      if (dragType) {
+      if (dragType && !isLock && !isGroupIndex) {
         clearTimeout(timer.current);
         itemInstance.parentDOM.current?.removeAttribute('draggable');
       }
       props.onMouseLeave?.(event)
     }}
-  />
+  >
+    {isGroupIndex ? <Fragment /> : children}
+  </StyleArtTableTh>
 }
 
-export default function TableHeader({ info, domHelper, dragType }: { info: RenderInfo, domHelper: TableDOMHelper, dragType: BaseTableProps['dragType'] }) {
+export default function TableHeader({ info, dragType }: { info: RenderInfo, dragType: BaseTableProps['dragType'] }) {
   const { nested, flat, stickyLeftMap, stickyRightMap } = info
   const rowCount = getTreeDepth(nested.full) + 1
   const headerRenderInfo = calculateHeaderRenderInfo(info, rowCount)
@@ -248,7 +254,6 @@ export default function TableHeader({ info, domHelper, dragType }: { info: Rende
   const rightFlatCount = flat.right.length
   const [dragInstance] = useDragBodyInstance(undefined, { direction: 'horizontal' })
   dragInstance.itemListData = info.columns;
-  dragInstance.domHelper = domHelper;
 
   const thead = headerRenderInfo.leveled.map((wrappedCols, level) => {
     const headerCells = wrappedCols.map((wrapped) => {
@@ -256,6 +261,7 @@ export default function TableHeader({ info, domHelper, dragType }: { info: Rende
         const { colIndex, colSpan, isLeaf, col } = wrapped
         const headerCellProps = col.headerCellProps ?? {}
         const positionStyle: CSSProperties = {}
+
         if (colIndex < leftFlatCount) {
           positionStyle.position = 'sticky'
           positionStyle.left = stickyLeftMap.get(colIndex)
@@ -263,6 +269,7 @@ export default function TableHeader({ info, domHelper, dragType }: { info: Rende
           positionStyle.position = 'sticky'
           positionStyle.right = stickyRightMap.get(colIndex + colSpan - 1)
         }
+
         return (
           <TableHeaderTH
             key={colIndex}

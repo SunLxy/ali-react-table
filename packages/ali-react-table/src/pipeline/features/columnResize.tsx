@@ -26,8 +26,8 @@ const ResizeHandle = styled.span`
 
   &:hover {
     background: ${(props: any) => {
-      return props['var-handleHoverBackground']
-    }};
+    return props['var-handleHoverBackground']
+  }};
   }
 `
 
@@ -138,7 +138,9 @@ export function columnResize(opts: ColumnResizeFeatureOptions = {}) {
     return pipeline.mapColumns(
       makeRecursiveMapper((col, { startIndex, endIndex }) => {
         const prevTitle = internals.safeRenderHeader(col)
-
+        if (typeof col.groupIndex === 'number') {
+          return col
+        }
         return {
           ...col,
           width: sizes[startIndex],

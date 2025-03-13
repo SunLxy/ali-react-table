@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { CSSProperties, Fragment, ReactNode, forwardRef } from 'react'
+import React, { CSSProperties, Fragment, ReactNode, forwardRef, useImperativeHandle } from 'react'
 import { BehaviorSubject, combineLatest, noop, Subscription } from 'rxjs'
 import * as op from 'rxjs/operators'
 import { ArtColumn } from '../interfaces'
@@ -12,7 +12,7 @@ import { TableDOMHelper } from './helpers/TableDOMUtils'
 import { HtmlTable } from './html-table'
 import { RenderInfo, ResolvedUseVirtual, VerticalRenderRange, VirtualEnum } from './interfaces'
 import Loading, { LoadingContentWrapperProps } from './loading'
-import { BaseTableCSSVariables, Classes, LOCK_SHADOW_PADDING, StyledArtTableWrapper } from './styles'
+import { BaseTableCSSVariables, Classes, LOCK_SHADOW_PADDING, StyleArtTableHeaderTopLayout, StyleArtTableHeaderTopLayoutLeft, StyleArtTableHeaderTopLayoutRight, StyledArtTableWrapper } from './styles'
 import {
   getScrollbarSize,
   OVERSCAN_SIZE,
@@ -240,19 +240,22 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   private renderTableHeaderTop(info: RenderInfo) {
     const { stickyTop, hasHeader, topContent } = this.props
-    if (topContent)
-      return (
-        <div
-          className={cx(Classes.tableHeaderTop, 'no-scrollbar')}
-          style={{
-            top: stickyTop === 0 ? undefined : stickyTop,
-            display: hasHeader ? undefined : 'none',
-          }}
-        >
+    return (
+      <StyleArtTableHeaderTopLayout
+        className={cx(Classes.tableHeaderTop, 'no-scrollbar')}
+        style={{
+          top: stickyTop === 0 ? undefined : stickyTop,
+          display: hasHeader ? undefined : 'none',
+        }}
+      >
+        <StyleArtTableHeaderTopLayoutLeft>
+          拖拽内容 22222
+        </StyleArtTableHeaderTopLayoutLeft>
+        <StyleArtTableHeaderTopLayoutRight>
           {topContent}
-        </div>
-      )
-    return <Fragment />
+        </StyleArtTableHeaderTopLayoutRight>
+      </StyleArtTableHeaderTopLayout>
+    )
   }
 
   private renderTableHeader(info: RenderInfo) {
@@ -266,7 +269,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           display: hasHeader ? undefined : 'none',
         }}
       >
-        <TableHeader dragType={this.props.dragType} domHelper={this.domHelper} info={info} />
+        <TableHeader dragType={this.props.dragType} info={info} />
       </div>
     )
   }
@@ -495,11 +498,11 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           LoadingContentWrapper={components.LoadingContentWrapper}
         >
           <div className={Classes.artTable}>
+            {this.renderLockShadows(info)}
             {this.renderTableHeaderTop(info)}
             {this.renderTableHeader(info)}
             {this.renderTableBody(info)}
             {this.renderTableFooter(info)}
-            {this.renderLockShadows(info)}
           </div>
           {this.renderStickyScroll(info)}
         </Loading>
@@ -560,8 +563,11 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     if (this.domHelper.tableHeaderTop) {
       this.rootSubscription.add(
         fromResizeEvent(this.domHelper.tableHeaderTop).subscribe((entry: ResizeObserverEntry[]) => {
-          if (entry && entry[0])
-            this.setState({ topContentHeight: entry[0].contentRect.height })
+          if (entry && entry[0]) {
+            const [borderBoxSize] = entry[0].borderBoxSize
+            // console.log(entry, entry[0].borderBoxSize)
+            this.setState({ topContentHeight: borderBoxSize.blockSize })
+          }
         }),
       )
     }
@@ -736,11 +742,16 @@ const TableImplBase = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => 
   const { instance, onColumnDragEnd, dragInstance: darg, ...rest } = props
   const [baseInstance] = useBaseTableInstance(instance)
   const [dragInstance] = useDragInstance(darg)
+  dragInstance.tableInstance = baseInstance;
+  baseInstance.dragInstance = dragInstance;
   dragInstance.onUpdated = onColumnDragEnd
+  // groupIndex
 
+
+  useImperativeHandle(ref, () => baseInstance.baseTable.current);
   return <BaseTableContext.Provider value={baseInstance}>
     <DragInstanceProvider value={dragInstance}>
-      <BaseTable {...rest} ref={ref} />
+      <BaseTable {...rest} ref={baseInstance.baseTable} />
     </DragInstanceProvider>
   </BaseTableContext.Provider>
 })

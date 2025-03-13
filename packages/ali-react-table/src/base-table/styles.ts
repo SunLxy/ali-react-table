@@ -277,6 +277,11 @@ export const StyledArtTableWrapper = styled.div`
     z-index: ${Z.lock};
   }
 
+  .art_custom_group_lock_td{
+    justify-content: flex-start!important;
+    text-align: left !important;
+  }
+
   //#region 锁列阴影
   .${Classes.lockShadowMask} {
     position: absolute;
@@ -431,5 +436,31 @@ export const StyleArtTableTh = styled.th`
       background-color:var(--primary-color,#1677ff);
     }
   }
+`
+
+export const StyleArtTableHeaderTopLayoutLeft = styled.div`
+  flex: 1;
+`
+
+export const StyleArtTableHeaderTopLayoutRight = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`
+
+export const StyleArtTableHeaderTopLayout = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content:space-between;
+`
+
+export const StyleArtPlaceArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+
+export const StyleArtPlaceAreaItem = styled.div`
 
 `

@@ -31,6 +31,11 @@ export interface ArtColumnStaticPart {
 
   /** 功能开关 */
   features?: { [key: string]: any }
+
+  /**分组下标*/
+  groupIndex?: number;
+  /**是否是多选列*/
+  isCheckBox?: boolean;
 }
 
 export interface ArtColumnDynamicPart {
