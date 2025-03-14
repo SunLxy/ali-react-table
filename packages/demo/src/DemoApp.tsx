@@ -227,7 +227,7 @@ export function DemoApp() {
       // dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
       columns: newColumns
     })
-    .use(features.multiSelect())
+    // .use(features.multiSelect())
     .use(features.dragRowGrouping())
     .use(features.columnResize())
     // .use(features.columnDrag({
@@ -377,7 +377,7 @@ export function DemoApp() {
         isStickyHeader={isStickyHeader}
         isStickyFooter={isStickyFooter}
         isLoading={isLoading}
-        style={{ ...style1, ...style2 }}
+        // style={{ ...style1, ...style2 }}
         useOuterBorder
         hasStickyScroll={hasStickyScroll}
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
@@ -387,9 +387,10 @@ export function DemoApp() {
         // overflowVerticalNumber={30}
         dragType='column'
         onColumnDragEnd={(param) => {
-          const list = param.formListData.map((ite) => {
+          const list = param.columns.map((ite) => {
             return ({ ...ite.__o })
           })
+          console.log("list", list)
           setnewColumns(list)
         }}
         // columns={[

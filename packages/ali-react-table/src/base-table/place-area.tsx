@@ -4,15 +4,26 @@ import {
   useDragItemInstance, useDragBodyInstanceProvider
 } from "../pipeline/dragInstance"
 import { StyleArtPlaceArea, StyleArtPlaceAreaItem } from "./styles"
+import { ArtColumnMergePath } from "../interfaces"
 
-const PlaceAreaItem = (props: any) => {
+
+interface PlaceAreaItemProps {
+  column: ArtColumnMergePath
+  sort: number
+}
+
+const PlaceAreaItem = (props: PlaceAreaItemProps) => {
+  const { column, sort } = props
   const dragInstance = useDragBodyInstanceProvider()
   const [itemInstance] = useDragItemInstance()
+  itemInstance.itemData = column
+  itemInstance.isGroup = true;
+  itemInstance.sort = sort;
 
   useEffect(() => {
     const om = dragInstance.register(itemInstance)
     return () => om()
-  }, [props.itemData])
+  }, [props.column])
 
   const onDragStart: React.DragEventHandler<HTMLSpanElement> = (event) => {
     itemInstance.parentDOM.current?.classList.add('dragging')
@@ -40,12 +51,18 @@ const PlaceAreaItem = (props: any) => {
     onMouseMove={onMouseMove}
     onMouseLeave={onMouseLeave}
   >
-
+    {column.title ?? column.name ?? column.code}
   </StyleArtPlaceAreaItem>
 }
+export interface PlaceAreaProps {
+  columns: ArtColumnMergePath[]
+}
 
-export const PlaceArea = () => {
+export const PlaceArea = (props: PlaceAreaProps) => {
+  const { columns } = props
   const [dragInstance] = useDragBodyInstance(undefined, { direction: 'horizontal' })
+  dragInstance.itemListData = columns;
+  dragInstance.isGroup = true;
 
   return <DragBodyInstanceProvider value={dragInstance}>
     <StyleArtPlaceArea
@@ -53,8 +70,11 @@ export const PlaceArea = () => {
       onDragLeave={dragInstance.onDragLeave}
       onDrop={dragInstance.onDrop}
       onDragOver={dragInstance.onDragOver}
+      ref={dragInstance.dom}
     >
-
+      {columns.map((item, index) => {
+        return <PlaceAreaItem sort={index} column={item} key={`${item.code}_${index}`} />
+      })}
     </StyleArtPlaceArea>
   </DragBodyInstanceProvider>
 }

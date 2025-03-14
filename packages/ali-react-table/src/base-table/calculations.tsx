@@ -167,6 +167,9 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
   const leftNestedLockCount = getLeftNestedLockCount(columns)
   /***/
   const fullFlat = collectNodes(columns, 'leaf-only')
+  /**分组数据*/
+  const groupColumns = columns.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
+  const otherColumns = columns.filter((col) => typeof col.groupIndex !== 'number')
 
   let flat: RenderInfo['flat']
   let nested: RenderInfo['nested']
@@ -260,8 +263,10 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     verticalRenderRange.endBottomIndex = endBottomIndex
   }
 
-
   return {
+    groupColumns,
+    otherColumns,
+    columns: columnsProp,
     horizontalRenderRange,
     verticalRenderRange,
     visible: visibleColumnDescriptors,
@@ -273,6 +278,5 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     leftLockTotalWidth,
     rightLockTotalWidth,
     hasLockColumn: nested.left.length > 0 || nested.right.length > 0,
-    columns: columnsProp
   }
 }

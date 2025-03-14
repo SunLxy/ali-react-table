@@ -26,6 +26,7 @@ import { BaseTableContext, useBaseTableInstance, BaseTableInstance } from "../pi
 import { fromEvent } from 'rxjs'
 
 import { DragInstanceProvider, useDragInstance, OnUpdatedOptions, DragInstance } from "../pipeline/dragInstance"
+import { PlaceArea } from './place-area'
 
 let emptyContentDeprecatedWarned = false
 function warnEmptyContentIsDeprecated() {
@@ -249,7 +250,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
         }}
       >
         <StyleArtTableHeaderTopLayoutLeft>
-          拖拽内容 22222
+          <PlaceArea columns={info.groupColumns} />
         </StyleArtTableHeaderTopLayoutLeft>
         <StyleArtTableHeaderTopLayoutRight>
           {topContent}
@@ -746,7 +747,6 @@ const TableImplBase = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => 
   baseInstance.dragInstance = dragInstance;
   dragInstance.onUpdated = onColumnDragEnd
   // groupIndex
-
 
   useImperativeHandle(ref, () => baseInstance.baseTable.current);
   return <BaseTableContext.Provider value={baseInstance}>

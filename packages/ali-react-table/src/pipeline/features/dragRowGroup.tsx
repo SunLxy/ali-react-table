@@ -51,7 +51,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
     }
     const columns = pipeline.getColumns() //获取列
     /**对列中的分组数据进行获取*/
-    const groupColumns = columns.filter((column) => typeof column.groupIndex === 'number')
+    const groupColumns = columns.filter((column) => typeof column.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
 
     return pipeline
       .mapDataSource(processPreData)
@@ -161,12 +161,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       return [
         {
           ...firstCol,
-          width: firstCol.isCheckBox ? firstCol.width : 16,
-          // title: (
-          //   <div style={{ display: 'inline-block', marginLeft: textOffset }}>
-          //     {internals.safeRenderHeader(firstCol)}
-          //   </div>
-          // ),
+          width: firstCol.isCheckBox ? firstCol.width : 12,
           render,
           getCellProps(value, row, rowIndex) {
             return mergeCellProps(getCellProps(value, row, rowIndex), {
@@ -189,7 +184,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         ...others.map((it) => {
           const newIte = { ...it }
           if (typeof it.groupIndex === 'number') {
-            newIte.width = 0;
+            newIte.width = firstCol.isCheckBox ? 0 : 12;
             newIte.lock = true;
             newIte.getCellProps = function (value, row, rowIndex) {
               return mergeCellProps(it.getCellProps?.(value, row, rowIndex) || {}, {

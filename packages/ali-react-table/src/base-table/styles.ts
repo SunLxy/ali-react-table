@@ -378,7 +378,8 @@ export const StyledArtTableWrapper = styled.div`
   //#endregion
 `
 
-export const StyleArtTableTh = styled.th`
+
+const draggableStyleMixin = css`
   position: relative;
   &[draggable=true]{
     cursor: move !important;
@@ -438,6 +439,10 @@ export const StyleArtTableTh = styled.th`
   }
 `
 
+export const StyleArtTableTh = styled.th`
+  ${draggableStyleMixin}
+`
+
 export const StyleArtTableHeaderTopLayoutLeft = styled.div`
   flex: 1;
 `
@@ -452,15 +457,33 @@ export const StyleArtTableHeaderTopLayout = styled.div`
   display: flex;
   align-items: center;
   justify-content:space-between;
+  padding: 4px 0px;
+`
+
+export const StyleArtPlaceAreaItem = styled.div`
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 12px;
+  border:var(--cell-border-horizontal);
+  ${draggableStyleMixin}
 `
 
 export const StyleArtPlaceArea = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-`
-
-
-export const StyleArtPlaceAreaItem = styled.div`
-
+  gap: 12px;
+  &.draggover-last-item {
+    &>${StyleArtPlaceAreaItem}:last-child{
+      &::after{
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        right: 0;
+        background-color: var(--primary-color,#1677ff);
+      }
+    }
+  }
 `

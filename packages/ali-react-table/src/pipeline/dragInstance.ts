@@ -1,6 +1,5 @@
 import { createRef, createContext, createElement, useRef, useContext, useEffect } from 'react';
 import { ArtColumnMergePath } from "../interfaces"
-import { TableDOMHelper } from "../base-table/helpers/TableDOMUtils"
 import { BaseTableInstance } from "./instance"
 
 /**
@@ -19,6 +18,8 @@ export interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergeP
   formListData: T[];
   /**放置区域数据*/
   toListData?: T[];
+  /**列表数据*/
+  columns?: T[]
   /**拖拽项*/
   formItem: DragItemInstance;
   /**放置项*/
@@ -113,11 +114,27 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         }
       }
       if (Array.isArray(newDataList) && this.dragItem && hoverItem) {
+        let newList = [...newDataList]
+        let columns = [...newDataList]
+        const groupInstance = this.listItemInstance.find((it) => it.isGroup)
+        const otherInstance = this.listItemInstance.find((it) => !it.isGroup)
+        if (this.toDragInstance.isGroup) {
+          newList = newList.map((ite, groupIndex) => {
+            if (ite?.__o) {
+              ite.__o.groupIndex = groupIndex
+            }
+            return ({ ...ite, groupIndex })
+          })
+          columns = [...newList, ...otherInstance?.itemListData]
+        } else {
+          columns = [...groupInstance?.itemListData, ...newList]
+        }
         if (this.onUpdated) {
           this.onUpdated?.({
             form: this.formDragInstance,
-            formListData: [...newDataList],
+            formListData: [...newList],
             formItem: this.dragItem,
+            columns: [...columns],
             toItem: hoverItem,
             verticalPosition,
             horizontalPosition,
@@ -125,7 +142,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             toIndex: hoverIndex
           })
         } else {
-          this.formDragInstance.updatedItemListData?.([...newDataList])
+          this.formDragInstance.updatedItemListData?.([...newList])
         }
       }
     } else if (this.toDragInstance && this.formDragInstance) {
@@ -136,11 +153,18 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       const itemListData = [...(this.toDragInstance.itemListData || [])]
       const newList = [...itemListData]
       const dragItem = this?.dragItem;
-      const hoverIndex = this.toDragInstance.hoverIndex
+      let hoverIndex = this.toDragInstance.hoverIndex
       const hoverItem = this.toDragInstance.hoverItem
       const direction = this.toDragInstance.direction
       const horizontalPosition = this.toDragInstance.horizontalPosition
       const verticalPosition = this.toDragInstance.verticalPosition
+
+      // 如果放置区域不是分组区域的话，需要把分组区域的个数减去
+      if (this.formDragInstance.isGroup && !this.toDragInstance.isGroup) {
+        // hoverIndex
+        hoverIndex = hoverIndex - this.formDragInstance.itemListData.length;
+      }
+
       /**放置区的数据*/
       let newDataList;
       if (typeof hoverIndex === 'number' && dragItem && hoverItem) {
@@ -160,15 +184,60 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       } else if (Array.isArray(itemListData) && itemListData.length === 0) {
         newDataList = [this.dragItem?.itemData]
       }
+      /**判断是移入分组区还是移除分组区域*/
       if (Array.isArray(newDataList) && dragItem) {
         /**原拖拽区域的数据处理*/
         const oListData = [...(this.formDragInstance.itemListData || [])].filter((it) => it?.__path !== this.dragItem?.itemData?.__path) as T[]
+        let formDataList = [...oListData]
+        let toDataList = [...newDataList] as T[]
+        let columns = []
+        if (this.formDragInstance.isGroup) {
+          formDataList = formDataList.map((ite, groupIndex) => {
+            if (ite?.__o) {
+              ite.__o.groupIndex = groupIndex
+            }
+            return ({ ...ite, groupIndex })
+          })
+        }
+        if (!this.formDragInstance.isGroup) {
+          formDataList = formDataList.map((ite) => {
+            const { groupIndex, ...rest } = ite;
+            if (ite?.__o) {
+              delete ite.__o.groupIndex
+            }
+            return { ...rest }
+          }) as T[]
+        }
+        if (this.toDragInstance.isGroup) {
+          // toDataList = toDataList.map((ite, groupIndex) => ({ ...ite, groupIndex }))
+          toDataList = toDataList.map((ite, groupIndex) => {
+            if (ite?.__o) {
+              ite.__o.groupIndex = groupIndex
+            }
+            return ({ ...ite, groupIndex })
+          })
+        }
+        if (!this.toDragInstance.isGroup) {
+          toDataList = toDataList.map((ite) => {
+            const { groupIndex, ...rest } = ite;
+            if (ite?.__o) {
+              delete ite.__o.groupIndex
+            }
+            return { ...rest }
+          }) as T[]
+        }
+        if (this.formDragInstance.isGroup) {
+          columns = [...formDataList, ...toDataList]
+        } else {
+          columns = [...toDataList, ...formDataList]
+        }
         if (this.onUpdated) {
           this.onUpdated?.({
             form: this.formDragInstance,
             to: this.toDragInstance,
-            formListData: [...newDataList],
-            toListData: [...oListData],
+            formListData: [...formDataList],
+            toListData: [...toDataList],
+            columns: [...columns],
             formItem: dragItem,
             toItem: hoverItem,
             verticalPosition,
@@ -177,8 +246,8 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             toIndex: hoverIndex
           })
         } else {
-          this.formDragInstance.updatedItemListData?.([...oListData])
-          this.toDragInstance.updatedItemListData?.([...newDataList])
+          this.formDragInstance.updatedItemListData?.([...formDataList])
+          this.toDragInstance.updatedItemListData?.([...toDataList])
         }
       }
     }
@@ -210,37 +279,6 @@ export const DragInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMer
 }
 export const useDragInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<DragInstance<T>>(ContextDragInstance)
 
-// ====================================拖拽项=================================================
-
-/**每个拖拽项的实例*/
-export class DragItemInstance {
-  /**外部整个包裹节点*/
-  parentDOM = createRef<HTMLTableHeaderCellElement>()
-  /**存储数据*/
-  itemData?: ArtColumnMergePath;
-  /**排序*/
-  sort: number = 0;
-}
-
-export const useDragItemInstance = (instance?: DragItemInstance): [DragItemInstance] => {
-  const ref = useRef<DragItemInstance>(undefined)
-  if (!ref.current) {
-    if (instance) {
-      ref.current = instance
-    } else {
-      ref.current = new DragItemInstance()
-    }
-  }
-  return [ref.current]
-}
-
-const ContextDragItemInstance = createContext(new DragItemInstance())
-export const DragItemInstanceProvider = (props: ProviderProps<DragItemInstance>) => {
-  const [instance] = useDragItemInstance(props.value)
-  return createElement(ContextDragItemInstance.Provider, { value: instance, children: props.children })
-}
-export const useDragItemInstanceProvider = () => useContext(ContextDragItemInstance)
-
 // ========================================拖拽=============================================
 
 interface DragInstanceOptions {
@@ -248,7 +286,12 @@ interface DragInstanceOptions {
 }
 
 export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
+  /**整个包裹节点(只有放置区域才有值)*/
+  dom = createRef<HTMLDivElement>()
+
   dragInstance?: DragInstance;
+  /**是否分组区域数据*/
+  isGroup?: boolean
   list: DragItemInstance[] = []
   /**拖拽对象*/
   dragItem?: DragItemInstance
@@ -266,6 +309,7 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
   hoverIndex?: number;
   /**数据*/
   itemListData: T[] = []
+
   /**更新数据*/
   updatedItemListData?: (dataList: T[]) => void
 
@@ -365,7 +409,6 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
         this.removeClassList(element.parentDOM.current)
       }
     }
-
     if (this.hoverItem && this.dragItem) {
       if (this.hoverItem !== this.dragItem) {
         const hoverBox = this.hoverItem.parentDOM.current?.getBoundingClientRect()
@@ -392,7 +435,6 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
     } else if (this.hoverItem) {
       // 不在的 移动节点的所在放置区，在另一个放置区
       const hoverBox = this.hoverItem.parentDOM.current?.getBoundingClientRect()
-
       if (this.direction === 'horizontal') {
         const startW = (hoverBox?.left || 0);
         const endW = (hoverBox?.left || 0) + (hoverBox?.width || 0);
@@ -417,6 +459,18 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
           }
           this.hoverItem?.parentDOM.current?.classList.add(`draggover-${this.verticalPosition}`)
         }
+      }
+    }
+    // 在这个区域，但是没有移入的项，取最后一个
+    if (!this.hoverItem && this.isGroup && list.length) {
+      // 放置区
+      const item = list[list.length - 1]
+      this.hoverIndex = list.length - 1;
+      this.hoverItem = item;
+      if (this.direction === 'horizontal') {
+        this.horizontalPosition = "right"
+      } else {
+        this.verticalPosition = "bottom"
       }
     }
   }
@@ -461,3 +515,36 @@ export const DragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColum
 }
 
 export const useDragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<DragBodyInstance<T>>(ContextDragBodyInstance)
+
+// ====================================拖拽项=================================================
+
+/**每个拖拽项的实例*/
+export class DragItemInstance {
+  /**外部整个包裹节点*/
+  parentDOM = createRef<HTMLTableHeaderCellElement>()
+  /**存储数据*/
+  itemData?: ArtColumnMergePath;
+  /**排序*/
+  sort: number = 0;
+  /**是否分组区域数据*/
+  isGroup?: boolean
+}
+
+export const useDragItemInstance = (instance?: DragItemInstance): [DragItemInstance] => {
+  const ref = useRef<DragItemInstance>(undefined)
+  if (!ref.current) {
+    if (instance) {
+      ref.current = instance
+    } else {
+      ref.current = new DragItemInstance()
+    }
+  }
+  return [ref.current]
+}
+
+const ContextDragItemInstance = createContext(new DragItemInstance())
+export const DragItemInstanceProvider = (props: ProviderProps<DragItemInstance>) => {
+  const [instance] = useDragItemInstance(props.value)
+  return createElement(ContextDragItemInstance.Provider, { value: instance, children: props.children })
+}
+export const useDragItemInstanceProvider = () => useContext(ContextDragItemInstance)

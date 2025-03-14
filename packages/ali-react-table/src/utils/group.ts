@@ -70,10 +70,11 @@ export function layeredGroup<T extends AbstractTreeNode>(
       const value = groupItemList[0][firstGroupItem.code]
       const textValue = getValue(value)
       const rowKey = typeof primaryKey === "function" ? primaryKey(groupItemList[0]) : primaryKey
+      const valueKey = groupItemList[0][rowKey]
 
       if (group.length) {
         const list = layeredGroup<T>(groupItemList, group, primaryKey, openKeys, newParentKey, level + 1, { ...parentObj, [firstGroupItem.code]: value, })
-        const newKeys = textValue + "_" + newParentKey + "_" + level;
+        const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
         openKeys.push(newKeys)
         newArray.push({
           ...parentObj,
@@ -85,7 +86,7 @@ export function layeredGroup<T extends AbstractTreeNode>(
           [groupMetaSymbol]: true,
         } as undefined as T)
       } else {
-        const newKeys = textValue + "_" + newParentKey + "_" + level;
+        const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
         openKeys.push(newKeys)
         newArray.push({
           ...parentObj,

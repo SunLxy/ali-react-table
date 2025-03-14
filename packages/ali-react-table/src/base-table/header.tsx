@@ -178,13 +178,17 @@ function calculateHeaderRenderInfo(
 interface TableHeaderTHProps extends React.DetailedHTMLProps<React.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement> {
   itemData?: ArtColumnMergePath
   dragType: BaseTableProps['dragType']
+  sort: number
 }
 
 const TableHeaderTH = (props: TableHeaderTHProps) => {
-  const { itemData, dragType, children, ...rest } = props
+  const { itemData, dragType, children, sort, ...rest } = props
   const dragInstance = useDragBodyInstanceProvider()
   const [itemInstance] = useDragItemInstance()
   itemInstance.itemData = props.itemData;
+  itemInstance.isGroup = false;
+  itemInstance.sort = sort;
+
   const isGroupIndex = typeof itemData.groupIndex === 'number'
   const isLock = typeof itemData.lock === 'boolean'
 
@@ -253,7 +257,8 @@ export default function TableHeader({ info, dragType }: { info: RenderInfo, drag
   const leftFlatCount = flat.left.length
   const rightFlatCount = flat.right.length
   const [dragInstance] = useDragBodyInstance(undefined, { direction: 'horizontal' })
-  dragInstance.itemListData = info.columns;
+  dragInstance.itemListData = info.otherColumns;
+  dragInstance.isGroup = false;
 
   const thead = headerRenderInfo.leveled.map((wrappedCols, level) => {
     const headerCells = wrappedCols.map((wrapped) => {
@@ -273,6 +278,7 @@ export default function TableHeader({ info, dragType }: { info: RenderInfo, drag
         return (
           <TableHeaderTH
             key={colIndex}
+            sort={colIndex}
             {...headerCellProps}
             className={cx(Classes.tableHeaderCell, headerCellProps.className, {
               first: colIndex === 0,

@@ -47,6 +47,9 @@ export interface RenderInfo {
   leftLockTotalWidth: number
   /** 右侧锁定列的总宽度 */
   rightLockTotalWidth: number
-
   columns: ArtColumn[]
+  /**除了分组表头数据*/
+  otherColumns: ArtColumn[]
+  /**分组表头*/
+  groupColumns: ArtColumn[]
 }
