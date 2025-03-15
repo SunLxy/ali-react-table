@@ -227,13 +227,13 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
     onDragEnd={onDragEnd}
     onDragStart={onDragStart}
     ref={itemInstance.parentDOM}
-    onMouseDown={(event) => {
-      props.onMouseDown?.(event)
+    onMouseEnter={(event) => {
+      props.onMouseEnter?.(event)
       if (dragType && !isLock && !isGroupIndex) {
         timer.current = setTimeout(() => {
           itemInstance.parentDOM.current?.setAttribute('draggable', "true")
           clearTimeout(timer.current);
-        }, 300);
+        }, 1000);
       }
     }}
     onMouseLeave={(event) => {

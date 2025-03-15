@@ -12,7 +12,7 @@ import { TableDOMHelper } from './helpers/TableDOMUtils'
 import { HtmlTable } from './html-table'
 import { RenderInfo, ResolvedUseVirtual, VerticalRenderRange, VirtualEnum } from './interfaces'
 import Loading, { LoadingContentWrapperProps } from './loading'
-import { BaseTableCSSVariables, Classes, LOCK_SHADOW_PADDING, StyleArtTableHeaderTopLayout, StyleArtTableHeaderTopLayoutLeft, StyleArtTableHeaderTopLayoutRight, StyledArtTableWrapper } from './styles'
+import { BaseTableCSSVariables, Classes, LOCK_SHADOW_PADDING, StyleArtTableHeaderTopLayout, StyleArtTableHeaderTopLayoutLeft, StyleArtTableHeaderTopLayoutMiddle, StyleArtTableHeaderTopLayoutRight, StyledArtTableWrapper } from './styles'
 import {
   getScrollbarSize,
   OVERSCAN_SIZE,
@@ -125,8 +125,10 @@ export interface BaseTableProps {
   setTableDomHelper?(domHelper: TableDOMHelper): void
   /**上下多展示多少个数据*/
   overflowVerticalNumber?: number
-  /**头部渲染内容*/
-  topContent?: React.ReactNode
+  /**头部渲染右侧内容*/
+  topRightContent?: React.ReactNode
+  /**头部渲染左侧内容*/
+  topLeftContent?: React.ReactNode
   /**拖拽类型*/
   dragType?: "column" | "columnGroup"
 
@@ -240,7 +242,11 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   }
 
   private renderTableHeaderTop(info: RenderInfo) {
-    const { stickyTop, hasHeader, topContent } = this.props
+    const { stickyTop, hasHeader, topRightContent, topLeftContent, dragType } = this.props
+    if (!dragType && !topLeftContent && !topRightContent) {
+      return <Fragment />
+    }
+
     return (
       <StyleArtTableHeaderTopLayout
         className={cx(Classes.tableHeaderTop, 'no-scrollbar')}
@@ -250,10 +256,13 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
         }}
       >
         <StyleArtTableHeaderTopLayoutLeft>
-          <PlaceArea columns={info.groupColumns} />
+          {topLeftContent}
         </StyleArtTableHeaderTopLayoutLeft>
+        <StyleArtTableHeaderTopLayoutMiddle>
+          {dragType === 'columnGroup' ? <PlaceArea columns={info.groupColumns} /> : <Fragment />}
+        </StyleArtTableHeaderTopLayoutMiddle>
         <StyleArtTableHeaderTopLayoutRight>
-          {topContent}
+          {topRightContent}
         </StyleArtTableHeaderTopLayoutRight>
       </StyleArtTableHeaderTopLayout>
     )
@@ -408,9 +417,10 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   }
 
   private renderLockShadows(info: RenderInfo) {
+    const { dragType } = this.props
     return (
       <>
-        <div
+        {dragType !== "columnGroup" ? <div
           className={Classes.lockShadowMask}
           style={{
             left: 0,
@@ -418,7 +428,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           }}
         >
           <div className={cx(Classes.lockShadow, Classes.leftLockShadow)} />
-        </div>
+        </div> : <Fragment />}
         <div
           className={Classes.lockShadowMask}
           style={{
@@ -499,11 +509,11 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           LoadingContentWrapper={components.LoadingContentWrapper}
         >
           <div className={Classes.artTable}>
-            {this.renderLockShadows(info)}
             {this.renderTableHeaderTop(info)}
             {this.renderTableHeader(info)}
             {this.renderTableBody(info)}
             {this.renderTableFooter(info)}
+            {this.renderLockShadows(info)}
           </div>
           {this.renderStickyScroll(info)}
         </Loading>

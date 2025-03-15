@@ -132,6 +132,7 @@ export const StyledArtTableWrapper = styled.div`
   --hover-bgcolor: var(--hover-color, #f5f5f5);
   --highlight-bgcolor: #eee;
   --primary-color:#1677ff;
+  --placeholder-color:#ccc;
 
   --header-row-height: 32px;
   --header-color: #5a6c84;
@@ -140,6 +141,9 @@ export const StyledArtTableWrapper = styled.div`
   --header-highlight-bgcolor: #e4e8ed;
 
   --cell-padding: 8px 12px;
+  --cell-padding-v: 8px;
+  --cell-padding-h: 12px;
+
   --font-size: 12px;
   --line-height: 1.28571;
   --lock-shadow: rgba(152, 152, 152, 0.5) 0 0 6px 2px;
@@ -276,10 +280,20 @@ export const StyledArtTableWrapper = styled.div`
   .lock-right {
     z-index: ${Z.lock};
   }
-
+  
   .art_custom_group_lock_td{
     justify-content: flex-start!important;
     text-align: left !important;
+    & > .art_custom_group_lock_td_body{
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      bottom: 0px;
+      right: 0px;
+      .art_custom_group_lock_td_body-content{
+        position: sticky;
+      }
+    }
   }
 
   //#region 锁列阴影
@@ -444,19 +458,31 @@ export const StyleArtTableTh = styled.th`
 `
 
 export const StyleArtTableHeaderTopLayoutLeft = styled.div`
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  &:not(:empty){
+    padding-right: 12px;
+  }
+`
+
+export const StyleArtTableHeaderTopLayoutMiddle = styled.div`
   flex: 1;
+  box-sizing: border-box;
 `
 
 export const StyleArtTableHeaderTopLayoutRight = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  box-sizing: border-box;
 `
 
 export const StyleArtTableHeaderTopLayout = styled.div`
   display: flex;
   align-items: center;
   justify-content:space-between;
+  box-sizing: border-box;
   padding: 4px 0px;
 `
 
@@ -464,6 +490,7 @@ export const StyleArtPlaceAreaItem = styled.div`
   display: inline-flex;
   padding: 7px 12px;
   border-radius: 12px;
+  box-sizing: border-box;
   border:var(--cell-border-horizontal);
   ${draggableStyleMixin}
 `
@@ -473,17 +500,8 @@ export const StyleArtPlaceArea = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 12px;
-  &.draggover-last-item {
-    &>${StyleArtPlaceAreaItem}:last-child{
-      &::after{
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        right: 0;
-        background-color: var(--primary-color,#1677ff);
-      }
-    }
+  box-sizing: border-box;
+  .place-area-placeholder{
+    color: var(--placeholder-color,#ccc);
   }
 `

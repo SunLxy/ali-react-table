@@ -1,4 +1,4 @@
-import { ArtColumn, BaseTableImpl as BaseTable, useTablePipeline, features } from 'ali-react-table'
+import { ArtColumn, BaseTableImpl, BaseTable, useTablePipeline, features } from 'ali-react-table'
 import { Button, Radio, Switch, Typography, Checkbox } from 'antd'
 import cx from 'classnames'
 import numeral from 'numeral'
@@ -227,8 +227,8 @@ export function DemoApp() {
       // dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
       columns: newColumns
     })
-    // .use(features.multiSelect())
-    .use(features.dragRowGrouping())
+    .use(features.multiSelect())
+    // .use(features.dragRowGrouping())
     .use(features.columnResize())
     // .use(features.columnDrag({
     //   onColumnDragStopped: (columnMoved, newColumns) => {
@@ -372,12 +372,13 @@ export function DemoApp() {
       }} >刷新数据</button>
 
       <BaseTableComponent
-        topContent={<div>21</div>}
+        // topLeftContent={<div>21</div>}
+        // topRightContent={<div>21</div>}
         className={cx('bordered', 'compact', { dark: theme.includes('dark') })}
         isStickyHeader={isStickyHeader}
         isStickyFooter={isStickyFooter}
         isLoading={isLoading}
-        // style={{ ...style1, ...style2 }}
+        style={{ ...style1, ...style2 }}
         useOuterBorder
         hasStickyScroll={hasStickyScroll}
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
@@ -385,14 +386,14 @@ export function DemoApp() {
         {...dpp}
         useVirtual={{ header: false, vertical: true }}
         // overflowVerticalNumber={30}
-        dragType='column'
-        onColumnDragEnd={(param) => {
-          const list = param.columns.map((ite) => {
-            return ({ ...ite.__o })
-          })
-          console.log("list", list)
-          setnewColumns(list)
-        }}
+        // dragType="columnGroup"
+        // onColumnDragEnd={(param) => {
+        //   const list = param.columns.map((ite) => {
+        //     return ({ ...ite.__o })
+        //   })
+        //   console.log("list", list)
+        //   setnewColumns(list)
+        // }}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
         //   { code: 'cityName', name: '城市', width: 150 },

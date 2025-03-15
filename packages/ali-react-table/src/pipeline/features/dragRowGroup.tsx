@@ -106,18 +106,13 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         }
         const expanded = openKeySet.has(row[primaryKey])
         const expandCls = expanded ? 'expanded' : 'collapsed'
-        const indent = indents.iconIndent + row[groupLevelMetaSymbol] * indents.iconWidth
+        const indent = indents.iconIndent + row[groupLevelMetaSymbol] * indents.iconWidth + 12
 
         return (
-          <ExpansionCell className={cx('expansion-cell', expandCls)}>
-            <div>
-              <div>
-                <icons.CaretRight
-                  className={cx('expansion-icon', expandCls)}
-                  style={{ marginLeft: indent, marginRight: indents.iconGap }}
-                />
-                {row.groupTitle ?? content}
-              </div>
+          <ExpansionCell style={{ left: indent }} className={cx('expansion-cell', 'art_custom_group_lock_td_body', expandCls)}>
+            <div className='art_custom_group_lock_td_body-content' style={{ left: indent }}>
+              <icons.CaretRight className={cx('expansion-icon', expandCls)} style={{ marginRight: indents.iconGap }} />
+              {row.groupTitle ?? content}
             </div>
           </ExpansionCell>
         )
@@ -161,7 +156,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       return [
         {
           ...firstCol,
-          width: firstCol.isCheckBox ? firstCol.width : 12,
+          width: firstCol.isCheckBox ? firstCol.width : 0,
           render,
           getCellProps(value, row, rowIndex) {
             return mergeCellProps(getCellProps(value, row, rowIndex), {
@@ -184,7 +179,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         ...others.map((it) => {
           const newIte = { ...it }
           if (typeof it.groupIndex === 'number') {
-            newIte.width = firstCol.isCheckBox ? 0 : 12;
+            newIte.width = 0;
             newIte.lock = true;
             newIte.getCellProps = function (value, row, rowIndex) {
               return mergeCellProps(it.getCellProps?.(value, row, rowIndex) || {}, {

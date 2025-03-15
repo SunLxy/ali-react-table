@@ -158,7 +158,8 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     columns: columnsProp,
     dataSource: dataSourceProp,
     defaultColumnWidth,
-    overflowVerticalNumber = 0
+    overflowVerticalNumber = 0,
+    dragType
   } = table.props
 
   /**处理列*/
@@ -168,8 +169,12 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
   /***/
   const fullFlat = collectNodes(columns, 'leaf-only')
   /**分组数据*/
-  const groupColumns = columns.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
-  const otherColumns = columns.filter((col) => typeof col.groupIndex !== 'number')
+  let groupColumns = []
+  let otherColumns = [...columns]
+  if (dragType === 'columnGroup') {
+    groupColumns = columns.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
+    otherColumns = columns.filter((col) => typeof col.groupIndex !== 'number')
+  }
 
   let flat: RenderInfo['flat']
   let nested: RenderInfo['nested']

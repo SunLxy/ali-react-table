@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { Fragment, useEffect } from "react"
 import {
   useDragBodyInstance, DragBodyInstanceProvider,
   useDragItemInstance, useDragBodyInstanceProvider
@@ -59,7 +59,7 @@ export interface PlaceAreaProps {
 }
 
 export const PlaceArea = (props: PlaceAreaProps) => {
-  const { columns } = props
+  const { columns = [] } = props
   const [dragInstance] = useDragBodyInstance(undefined, { direction: 'horizontal' })
   dragInstance.itemListData = columns;
   dragInstance.isGroup = true;
@@ -75,6 +75,7 @@ export const PlaceArea = (props: PlaceAreaProps) => {
       {columns.map((item, index) => {
         return <PlaceAreaItem sort={index} column={item} key={`${item.code}_${index}`} />
       })}
+      <div className="place-area-placeholder">拖动列标题至此以进行列分组</div>
     </StyleArtPlaceArea>
   </DragBodyInstanceProvider>
 }
