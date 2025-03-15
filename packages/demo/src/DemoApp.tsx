@@ -372,7 +372,7 @@ export function DemoApp() {
       }} >刷新数据</button>
 
       <BaseTableComponent
-        // topLeftContent={<div>21</div>}
+        topLeftContent={<div>21</div>}
         // topRightContent={<div>21</div>}
         className={cx('bordered', 'compact', { dark: theme.includes('dark') })}
         isStickyHeader={isStickyHeader}
@@ -387,13 +387,14 @@ export function DemoApp() {
         useVirtual={{ header: false, vertical: true }}
         // overflowVerticalNumber={30}
         // dragType="columnGroup"
-        // onColumnDragEnd={(param) => {
-        //   const list = param.columns.map((ite) => {
-        //     return ({ ...ite.__o })
-        //   })
-        //   console.log("list", list)
-        //   setnewColumns(list)
-        // }}
+        dragType="column"
+        onColumnDragEnd={(param) => {
+          const list = param.columns.filter((it) => it.__o).map((ite) => {
+            return ({ ...ite.__o })
+          })
+          console.log("list", list)
+          setnewColumns(list)
+        }}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
         //   { code: 'cityName', name: '城市', width: 150 },

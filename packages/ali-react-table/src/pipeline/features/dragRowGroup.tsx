@@ -175,6 +175,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
               return { top: rowIndex, bottom: rowIndex + 1, left: 0, right: groupColumns.length + (firstCol.isCheckBox ? 1 : 0) }
             }
           },
+          isDragColumn: true
         },
         ...others.map((it) => {
           const newIte = { ...it }

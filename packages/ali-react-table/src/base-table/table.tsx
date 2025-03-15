@@ -22,7 +22,9 @@ import {
   syncScrollLeft,
   throttledWindowResize$,
 } from './utils'
-import { BaseTableContext, useBaseTableInstance, BaseTableInstance } from "../pipeline/instance"
+import {
+  BaseTableContext, useBaseTableInstance, BaseTableInstance,
+} from "../pipeline/instance"
 import { fromEvent } from 'rxjs'
 
 import { DragInstanceProvider, useDragInstance, OnUpdatedOptions, DragInstance } from "../pipeline/dragInstance"
@@ -131,6 +133,12 @@ export interface BaseTableProps {
   topLeftContent?: React.ReactNode
   /**拖拽类型*/
   dragType?: "column" | "columnGroup"
+  /**表格实例*/
+  instance?: BaseTableInstance
+  /**列拖拽结束*/
+  onColumnDragEnd?: (param: OnUpdatedOptions) => void
+  /**拖拽实例*/
+  dragInstance?: DragInstance
 
 }
 
@@ -176,6 +184,8 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     getRowProps: noop,
     dataSource: [] as any[],
   }
+  static useBaseTableInstance: typeof useBaseTableInstance;
+  static useDragInstance: typeof useDragInstance
 
   private rowHeightManager = makeRowHeightManager(this.props.dataSource.length, this.props.estimatedRowHeight)
 
@@ -187,6 +197,12 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   private lastInfo: RenderInfo
 
   private props$: BehaviorSubject<BaseTableProps>
+
+  /**基础实例*/
+  private baseTableInstance: BaseTableInstance;
+  /**拖拽基础实例*/
+  private dragInstance: DragInstance;
+
 
   /** @deprecated BaseTable.getDoms() 已经过时，请勿调用 */
   getDoms() {
@@ -209,6 +225,20 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       maxRenderWidth: 800,
       topContentHeight: 0,
     }
+    /**初始数据*/
+    if (props.dragInstance) {
+      this.dragInstance = props.dragInstance
+    } else {
+      this.dragInstance = new DragInstance();
+    }
+    if (props.instance) {
+      this.baseTableInstance = props.instance
+    } else {
+      this.baseTableInstance = new BaseTableInstance();
+    }
+    this.dragInstance.tableInstance = this.baseTableInstance;
+    this.baseTableInstance.dragInstance = this.dragInstance;
+    this.dragInstance.onUpdated = props.onColumnDragEnd
   }
 
   /** 自定义滚动条宽度为table宽度，使滚动条滑块宽度相同 */
@@ -243,7 +273,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   private renderTableHeaderTop(info: RenderInfo) {
     const { stickyTop, hasHeader, topRightContent, topLeftContent, dragType } = this.props
-    if (!dragType && !topLeftContent && !topRightContent) {
+    if (dragType !== "columnGroup" && !topLeftContent && !topRightContent) {
       return <Fragment />
     }
 
@@ -502,22 +532,26 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     }
 
     return (
-      <StyledArtTableWrapper {...artTableWrapperProps}>
-        <Loading
-          visible={isLoading}
-          LoadingIcon={components.LoadingIcon}
-          LoadingContentWrapper={components.LoadingContentWrapper}
-        >
-          <div className={Classes.artTable}>
-            {this.renderTableHeaderTop(info)}
-            {this.renderTableHeader(info)}
-            {this.renderTableBody(info)}
-            {this.renderTableFooter(info)}
-            {this.renderLockShadows(info)}
-          </div>
-          {this.renderStickyScroll(info)}
-        </Loading>
-      </StyledArtTableWrapper>
+      <BaseTableContext.Provider value={this.baseTableInstance}>
+        <DragInstanceProvider value={this.dragInstance}>
+          <StyledArtTableWrapper {...artTableWrapperProps}>
+            <Loading
+              visible={isLoading}
+              LoadingIcon={components.LoadingIcon}
+              LoadingContentWrapper={components.LoadingContentWrapper}
+            >
+              <div className={Classes.artTable}>
+                {this.renderTableHeaderTop(info)}
+                {this.renderTableHeader(info)}
+                {this.renderTableBody(info)}
+                {this.renderTableFooter(info)}
+                {this.renderLockShadows(info)}
+              </div>
+              {this.renderStickyScroll(info)}
+            </Loading>
+          </StyledArtTableWrapper>
+        </DragInstanceProvider>
+      </BaseTableContext.Provider>
     )
   }
 
@@ -740,36 +774,5 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   }
 }
 
-export interface BaseTableImplProps extends BaseTableProps {
-  /**表格实例*/
-  instance?: BaseTableInstance
-  /**列拖拽结束*/
-  onColumnDragEnd?: (param: OnUpdatedOptions) => void
-  /**拖拽实例*/
-  dragInstance?: DragInstance
-}
-
-const TableImplBase = forwardRef<BaseTable, BaseTableImplProps>((props, ref) => {
-  const { instance, onColumnDragEnd, dragInstance: darg, ...rest } = props
-  const [baseInstance] = useBaseTableInstance(instance)
-  const [dragInstance] = useDragInstance(darg)
-  dragInstance.tableInstance = baseInstance;
-  baseInstance.dragInstance = dragInstance;
-  dragInstance.onUpdated = onColumnDragEnd
-  // groupIndex
-
-  useImperativeHandle(ref, () => baseInstance.baseTable.current);
-  return <BaseTableContext.Provider value={baseInstance}>
-    <DragInstanceProvider value={dragInstance}>
-      <BaseTable {...rest} ref={baseInstance.baseTable} />
-    </DragInstanceProvider>
-  </BaseTableContext.Provider>
-})
-
-export const BaseTableImpl = TableImplBase as typeof TableImplBase & {
-  useBaseTableInstance: typeof useBaseTableInstance,
-  useDragInstance: typeof useDragInstance;
-}
-
-BaseTableImpl.useBaseTableInstance = useBaseTableInstance
-BaseTableImpl.useDragInstance = useDragInstance
+BaseTable.useBaseTableInstance = useBaseTableInstance
+BaseTable.useDragInstance = useDragInstance

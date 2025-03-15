@@ -51,6 +51,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   /**注册实例*/
   register = (item: DragBodyInstance) => {
     this.listItemInstance.push(item)
+    console.log("注册实例", this.listItemInstance)
     return () => {
       this.listItemInstance = this.listItemInstance.filter(it => it !== item)
     }
@@ -125,9 +126,9 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             }
             return ({ ...ite, groupIndex })
           })
-          columns = [...newList, ...otherInstance?.itemListData]
+          columns = [...newList, ...(otherInstance?.itemListData || [])]
         } else {
-          columns = [...groupInstance?.itemListData, ...newList]
+          columns = [...(groupInstance?.itemListData || [])].concat([...newList])
         }
         if (this.onUpdated) {
           this.onUpdated?.({
