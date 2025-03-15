@@ -61,7 +61,10 @@ export type BaseTableCSSVariables = Partial<{
   '--hover-bgcolor': string
   /** 单元格高亮时的背景色 */
   '--highlight-bgcolor': string
-
+  /**主题样式*/
+  '--primary-color': string;
+  /**拖拽放置区域提示信息字体颜色*/
+  '--placeholder-color': string;
   /** 表头中一行的高度，注意该属性将被作为 CSS variable，不能使用数字作为简写 */
   '--header-row-height': string
   /** 表头中的字体颜色 */
@@ -73,8 +76,13 @@ export type BaseTableCSSVariables = Partial<{
   /** 表头上单元格高亮时的背景色 */
   '--header-highlight-bgcolor': string
 
+
   /** 单元格 padding */
   '--cell-padding': string
+  /** 单元格垂直 padding */
+  '--cell-padding-v': string
+  /** 单元格水平 padding */
+  '--cell-padding-h': string
   /** 字体大小 */
   '--font-size': string
   /** 表格内字体的行高 */
