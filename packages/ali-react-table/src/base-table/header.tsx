@@ -189,7 +189,9 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
   itemInstance.isGroup = false;
   itemInstance.sort = sort;
 
-  const isGroupIndex = typeof itemData.groupIndex === 'number'
+  /**如果是 columnGroup 分组式的，则表头不能进行拖拽和渲染内容*/
+  const isColumnGroup = dragType === 'columnGroup' && typeof itemData.groupIndex === 'number'
+
   const isLock = typeof itemData.lock === 'boolean'
 
   const timer = useRef<NodeJS.Timeout>(undefined)
@@ -200,27 +202,20 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
   }, [props.itemData])
 
   const onDragStart: React.DragEventHandler<HTMLSpanElement> = (event) => {
-    if (dragType && !isLock && !isGroupIndex) {
+    if (dragType && !isLock && !isColumnGroup) {
       itemInstance.parentDOM.current?.classList.add('dragging')
       dragInstance.onDragStart(itemInstance, event)
     }
   }
 
   const onDragEnd: React.DragEventHandler<HTMLSpanElement> = (event) => {
-    if (dragType && !isLock && !isGroupIndex) {
+    if (dragType && !isLock && !isColumnGroup) {
       itemInstance.parentDOM.current?.classList.remove('dragging')
       itemInstance.parentDOM.current?.removeAttribute('draggable');
       dragInstance.onDragEnd(itemInstance, event)
     }
   }
 
-  // const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
-  //   if (event.target === itemInstance.handleDOM.current) {
-  //     itemInstance.parentDOM.current?.setAttribute('draggable', "true")
-  //   } else {
-  //     itemInstance.parentDOM.current?.removeAttribute('draggable');
-  //   }
-  // }
 
   return <StyleArtTableTh
     {...rest}
@@ -229,7 +224,7 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
     ref={itemInstance.parentDOM}
     onMouseEnter={(event) => {
       props.onMouseEnter?.(event)
-      if (dragType && !isLock && !isGroupIndex) {
+      if (dragType && !isLock && !isColumnGroup) {
         timer.current = setTimeout(() => {
           itemInstance.parentDOM.current?.setAttribute('draggable', "true")
           clearTimeout(timer.current);
@@ -238,14 +233,14 @@ const TableHeaderTH = (props: TableHeaderTHProps) => {
     }}
     onMouseLeave={(event) => {
       // 如果在指定时间内释放鼠标，则清除定时器
-      if (dragType && !isLock && !isGroupIndex) {
+      if (dragType && !isLock && !isColumnGroup) {
         clearTimeout(timer.current);
         itemInstance.parentDOM.current?.removeAttribute('draggable');
       }
       props.onMouseLeave?.(event)
     }}
   >
-    {isGroupIndex ? <Fragment /> : children}
+    {isColumnGroup ? <Fragment /> : children}
   </StyleArtTableTh>
 }
 
