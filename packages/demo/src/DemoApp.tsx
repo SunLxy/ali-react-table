@@ -165,7 +165,7 @@ export function DemoApp() {
   const [showControlGrid, toggle] = useReducer((s: boolean) => !s, true)
   const [dataList, setDataList] = useState([...dataSource])
 
-  const [newColumns, setnewColumns] = useState<any[]>(makeRecursiveMapperWithPathIndex([
+  const [newColumns, setnewColumns] = useState<any[]>(([
     { code: 'provinceName', name: '省份', width: 150, lock: leftLock, groupIndex: 0 },
     { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, }, groupIndex: 1 },
     { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
@@ -227,6 +227,7 @@ export function DemoApp() {
       // dataSource: hasData ? (useBigData ? repeat(dataList, 5) : dataList) : [],
       columns: newColumns
     })
+    .useWithColumns()
     .use(features.multiSelect())
     // .use(features.dragRowGrouping())
     .use(features.columnResize())
@@ -389,13 +390,13 @@ export function DemoApp() {
         // dragType="columnGroup"
         dragType="column"
         onColumnDragEnd={(param) => {
-          // const list = param.columns.filter((it) => it[protoMetaSymbol]).map((ite) => {
-          //   return ({ ...ite[protoMetaSymbol] })
-          // })
-          console.log(param.formItem, param.toItem, newColumns)
-          const newList = makeRecursiveMapperWithPathIndex(replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
-          console.log("list", newList)
-          setnewColumns(newList)
+          const list = param.columns.filter((it) => it[protoMetaSymbol]).map((ite) => {
+            return ({ ...ite[protoMetaSymbol] })
+          })
+          // console.log(param.formItem, param.toItem, newColumns)
+          // const newList = makeRecursiveMapperWithPathIndex(replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
+          console.log("list", list)
+          setnewColumns(list)
         }}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
