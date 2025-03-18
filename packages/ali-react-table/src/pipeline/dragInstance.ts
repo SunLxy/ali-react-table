@@ -32,6 +32,8 @@ export interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergeP
   verticalPosition?: "top" | "bottom"
   /**当前是横向还是纵向*/
   direction?: "horizontal" | "vertical"
+  /**位置*/
+  position?: OnUpdatedOptions<T>['horizontalPosition'] | OnUpdatedOptions<T>['verticalPosition']
 }
 
 /**最外层包裹实例*/
@@ -75,6 +77,28 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
     this.formDragInstance = undefined
   }
 
+  /**设置分组下标*/
+  setGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
+    return columns.map((ite, groupIndex) => {
+      if (ite?.__o) {
+        ite.__o.groupIndex = groupIndex
+      }
+      return ({ ...ite, groupIndex })
+    })
+  }
+
+  /**移除分组下标*/
+  removeGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
+    return columns.map((ite) => {
+      const { groupIndex, ...rest } = ite;
+      if (ite?.__o) {
+        delete ite.__o.groupIndex
+      }
+      return { ...rest }
+    }) as T[]
+  }
+
+
   /**
    * 这个位置进行数据操作
    * 1. 如果存在放置区域则进行数据操作及其更新
@@ -90,6 +114,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       const direction = this.formDragInstance.direction
       const horizontalPosition = this.formDragInstance.horizontalPosition
       const verticalPosition = this.formDragInstance.verticalPosition
+      const position = direction === 'horizontal' ? horizontalPosition : verticalPosition
       /**放置区的数据*/
       let newDataList;
       // 处理数据
@@ -97,21 +122,31 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       if (this.dragItem && hoverItem && this.dragItem !== hoverItem && typeof hoverIndex === 'number') {
         const newList = [...itemListData]
         if (direction === 'horizontal' || direction === 'vertical') {
-          if (horizontalPosition === 'left' || verticalPosition === 'top') {
+          if (horizontalPosition || verticalPosition) {
             newDataList = [...(newList.filter((it, index, arr) => this.filter(it, index, arr, this.dragItem?.itemData)))]
             if (hoverIndex === 0) {
               newDataList.unshift(this.dragItem.itemData)
-            } else {
-              newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
-            }
-          } else if (horizontalPosition === 'right' || verticalPosition === 'bottom') {
-            newDataList = [...(newList.filter((it, index, arr,) => this.filter(it, index, arr, this.dragItem?.itemData)))]
-            if (hoverIndex === newList.length - 1) {
+            } else if (hoverIndex === newList.length - 1) {
               newDataList.push(this.dragItem.itemData)
             } else {
               newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
             }
           }
+          // if (horizontalPosition === 'left' || verticalPosition === 'top') {
+          //   newDataList = [...(newList.filter((it, index, arr) => this.filter(it, index, arr, this.dragItem?.itemData)))]
+          //   if (hoverIndex === 0) {
+          //     newDataList.unshift(this.dragItem.itemData)
+          //   } else {
+          //     newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
+          //   }
+          // } else if (horizontalPosition === 'right' || verticalPosition === 'bottom') {
+          //   newDataList = [...(newList.filter((it, index, arr,) => this.filter(it, index, arr, this.dragItem?.itemData)))]
+          //   if (hoverIndex === newList.length - 1) {
+          //     newDataList.push(this.dragItem.itemData)
+          //   } else {
+          //     newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
+          //   }
+          // }
         }
       }
       if (Array.isArray(newDataList) && this.dragItem && hoverItem) {
@@ -120,12 +155,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         const groupInstance = this.listItemInstance.find((it) => it.isGroup)
         const otherInstance = this.listItemInstance.find((it) => !it.isGroup)
         if (this.toDragInstance.isGroup) {
-          newList = newList.map((ite, groupIndex) => {
-            if (ite?.__o) {
-              ite.__o.groupIndex = groupIndex
-            }
-            return ({ ...ite, groupIndex })
-          })
+          newList = this.setGroupIndex(newList);
           columns = [...newList, ...(otherInstance?.itemListData || [])]
         } else {
           columns = [...(groupInstance?.itemListData || [])].concat([...newList])
@@ -140,7 +170,8 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             verticalPosition,
             horizontalPosition,
             direction,
-            toIndex: hoverIndex
+            toIndex: hoverIndex,
+            position
           })
         } else {
           this.formDragInstance.updatedItemListData?.([...newList])
@@ -159,6 +190,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       const direction = this.toDragInstance.direction
       const horizontalPosition = this.toDragInstance.horizontalPosition
       const verticalPosition = this.toDragInstance.verticalPosition
+      const position = direction === 'horizontal' ? horizontalPosition : verticalPosition
 
       // 如果放置区域不是分组区域的话，需要把分组区域的个数减去
       if (this.formDragInstance.isGroup && !this.toDragInstance.isGroup) {
@@ -178,8 +210,8 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
               newDataList.splice(hoverIndex, 0, dragItem.itemData)
             }
           } else if (horizontalPosition === 'right' || verticalPosition === 'bottom') {
-            newList.splice(hoverIndex + 1, 0, dragItem.itemData)
             newDataList = [...newList]
+            newDataList.splice(hoverIndex + 1, 0, this.dragItem.itemData)
           }
         }
       } else if (Array.isArray(itemListData) && itemListData.length === 0) {
@@ -193,39 +225,17 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         let toDataList = [...newDataList] as T[]
         let columns = []
         if (this.formDragInstance.isGroup) {
-          formDataList = formDataList.map((ite, groupIndex) => {
-            if (ite?.__o) {
-              ite.__o.groupIndex = groupIndex
-            }
-            return ({ ...ite, groupIndex })
-          })
+          formDataList = this.setGroupIndex(formDataList)
         }
         if (!this.formDragInstance.isGroup) {
-          formDataList = formDataList.map((ite) => {
-            const { groupIndex, ...rest } = ite;
-            if (ite?.__o) {
-              delete ite.__o.groupIndex
-            }
-            return { ...rest }
-          }) as T[]
+          formDataList = this.removeGroupIndex(formDataList);
         }
         if (this.toDragInstance.isGroup) {
           // toDataList = toDataList.map((ite, groupIndex) => ({ ...ite, groupIndex }))
-          toDataList = toDataList.map((ite, groupIndex) => {
-            if (ite?.__o) {
-              ite.__o.groupIndex = groupIndex
-            }
-            return ({ ...ite, groupIndex })
-          })
+          toDataList = this.setGroupIndex(toDataList)
         }
         if (!this.toDragInstance.isGroup) {
-          toDataList = toDataList.map((ite) => {
-            const { groupIndex, ...rest } = ite;
-            if (ite?.__o) {
-              delete ite.__o.groupIndex
-            }
-            return { ...rest }
-          }) as T[]
+          toDataList = this.removeGroupIndex(toDataList);
         }
         if (this.formDragInstance.isGroup) {
           columns = [...formDataList, ...toDataList]
@@ -244,7 +254,8 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             verticalPosition,
             horizontalPosition,
             direction,
-            toIndex: hoverIndex
+            toIndex: hoverIndex,
+            position
           })
         } else {
           this.formDragInstance.updatedItemListData?.([...formDataList])

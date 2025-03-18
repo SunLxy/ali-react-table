@@ -161,7 +161,7 @@ interface BaseTableState {
   maxRenderWidth: number
 
   /**头部内容高度*/
-  topContentHeight?: number
+  headerContentHeight?: number
 }
 
 export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
@@ -212,7 +212,6 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   constructor(props: Readonly<BaseTableProps>) {
     super(props)
-
     this.state = {
       hasScroll: true,
       needRenderLock: true,
@@ -223,7 +222,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       // https://stackoverflow.com/questions/60026223/does-resizeobserver-invokes-initially-on-page-load
       maxRenderHeight: 600,
       maxRenderWidth: 800,
-      topContentHeight: 0,
+      headerContentHeight: 0,// 头部高度
     }
     /**初始数据*/
     if (props.dragInstance) {
@@ -236,8 +235,9 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     } else {
       this.baseTableInstance = new BaseTableInstance();
     }
-    this.dragInstance.tableInstance = this.baseTableInstance;
+    this.baseTableInstance.baseTable = this;// 把当前实例进行存储
     this.baseTableInstance.dragInstance = this.dragInstance;
+    this.dragInstance.tableInstance = this.baseTableInstance;
     this.dragInstance.onUpdated = props.onColumnDragEnd
   }
 
@@ -300,12 +300,12 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   private renderTableHeader(info: RenderInfo) {
     const { stickyTop, hasHeader } = this.props
-    const { topContentHeight = 0 } = this.state
+    const { headerContentHeight = 0 } = this.state
     return (
       <div
         className={cx(Classes.tableHeader, 'no-scrollbar')}
         style={{
-          top: stickyTop === 0 ? topContentHeight : stickyTop + topContentHeight,
+          top: stickyTop === 0 ? headerContentHeight : stickyTop + headerContentHeight,
           display: hasHeader ? undefined : 'none',
         }}
       >
@@ -611,7 +611,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
           if (entry && entry[0]) {
             const [borderBoxSize] = entry[0].borderBoxSize
             // console.log(entry, entry[0].borderBoxSize)
-            this.setState({ topContentHeight: borderBoxSize.blockSize })
+            this.setState({ headerContentHeight: borderBoxSize.blockSize })
           }
         }),
       )

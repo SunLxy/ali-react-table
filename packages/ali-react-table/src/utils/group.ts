@@ -1,5 +1,5 @@
 
-import { AbstractTreeNode, ArtColumn } from "../interfaces"
+import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from "../interfaces"
 
 export const groupMetaSymbol = Symbol('groupMetaSymbol')
 export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
@@ -102,4 +102,21 @@ export function layeredGroup<T extends AbstractTreeNode>(
     return newArray
   }
   return array
+}
+
+/**对列进行替换处理*/
+export const replaceColumns = (columns: ArtColumnMergePath[], startPath: string, movePath: string) => {
+  /**移动的数据下标*/
+  /**需要移动的数据下标*/
+  const startColumn = columns.find((column) => column.__path === startPath);
+  const moveIndex = columns.findIndex((column) => column.__path === movePath);
+  const newColumns = columns.filter((column) => column.__path !== startPath);
+  if (moveIndex === 0) {
+    newColumns.unshift(startColumn)
+  } else if (moveIndex === columns.length - 1) {
+    newColumns.push(startColumn)
+  } else {
+    newColumns.splice(moveIndex, 0, startColumn)
+  }
+  return [...newColumns]
 }
