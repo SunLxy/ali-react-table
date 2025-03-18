@@ -138,7 +138,8 @@ export function columnResize(opts: ColumnResizeFeatureOptions = {}) {
     return pipeline.mapColumns(
       makeRecursiveMapper((col, { startIndex, endIndex }) => {
         const prevTitle = internals.safeRenderHeader(col)
-        if (typeof col.groupIndex === 'number') {
+        console.log(col)
+        if (typeof col.groupIndex === 'number' || col.isDragColumn) {
           return col
         }
         return {

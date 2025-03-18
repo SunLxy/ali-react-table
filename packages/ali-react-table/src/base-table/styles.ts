@@ -292,6 +292,7 @@ export const StyledArtTableWrapper = styled.div`
   .art_custom_group_lock_td{
     justify-content: flex-start!important;
     text-align: left !important;
+    font-weight: 600;
     & > .art_custom_group_lock_td_body{
       position: absolute;
       left: 0px;

@@ -75,9 +75,9 @@ export function rowDetail(opts: RowDetailFeatureOptions = {}) {
       pipeline.getStateAtKey(stateKey) ??
       (opts.defaultOpenAll
         ? pipeline
-            .getDataSource()
-            .filter(hasDetail)
-            .map((row) => row[primaryKey])
+          .getDataSource()
+          .filter(hasDetail)
+          .map((row) => row[primaryKey])
         : opts.defaultOpenKeys) ??
       []
     const onChangeOpenKeys: RowDetailFeatureOptions['onChangeOpenKeys'] = (nextKeys, key, action) => {

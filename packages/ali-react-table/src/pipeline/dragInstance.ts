@@ -2,6 +2,7 @@ import { createRef, createContext, createElement, useRef, useContext, useEffect 
 import { ArtColumnMergePath } from "../interfaces"
 import { BaseTableInstance } from "./instance"
 import { pathIndexMetaSymbol, protoMetaSymbol } from "../utils/makeRecursiveMapper"
+import { replaceColumns, replaceColumns2 } from "../utils/group"
 
 /**
  * 1. 可进行拖拽排序
@@ -15,18 +16,12 @@ export interface OnUpdatedOptions<T extends ArtColumnMergePath = ArtColumnMergeP
   form: DragBodyInstance;
   /**放置区域实例*/
   to?: DragBodyInstance;
-  /**拖拽开始区域数据*/
-  formListData: T[];
-  /**放置区域数据*/
-  toListData?: T[];
   /**列表数据*/
   columns?: T[]
   /**拖拽项*/
   formItem: DragItemInstance;
   /**放置项*/
   toItem?: DragItemInstance;
-  /**放置下标*/
-  toIndex?: number;
   /**横向位置*/
   horizontalPosition?: "left" | "right"
   /**纵向位置*/
@@ -99,12 +94,22 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   }
 
 
+
+  /**
+   * 开始数据
+   * 结束数据
+   * 位置：列表->分组   分组->列表   分组->分组  列表->列表
+  */
+
   /**
    * 这个位置进行数据操作
    * 1. 如果存在放置区域则进行数据操作及其更新
    * 2. 如果不存在放置区域，则不进行数据执行
   */
   onDragEnd = () => {
+    const groupInstance = this.listItemInstance.find((it) => it.isGroup);
+    const otherInstance = this.listItemInstance.find((it) => !it.isGroup);
+
     /**放置区和拖拽区相同*/
     if (this.toDragInstance && this.formDragInstance && this.toDragInstance === this.formDragInstance) {
       // 这个就是 排序操作
@@ -115,66 +120,34 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       const horizontalPosition = this.formDragInstance.horizontalPosition
       const verticalPosition = this.formDragInstance.verticalPosition
       const position = direction === 'horizontal' ? horizontalPosition : verticalPosition
-      /**放置区的数据*/
-      let newDataList;
-      // 处理数据
-      // 根据这些参数 this.hoverIndex  this.direction   this.verticalPosition  this.horizontalPosition 处理数据
-      if (this.dragItem && hoverItem && this.dragItem !== hoverItem && typeof hoverIndex === 'number') {
-        const newList = [...itemListData]
-        if (direction === 'horizontal' || direction === 'vertical') {
-          if (horizontalPosition || verticalPosition) {
-            newDataList = [...(newList.filter((it, index, arr) => this.filter(it, index, arr, this.dragItem?.itemData)))]
-            if (hoverIndex === 0) {
-              newDataList.unshift(this.dragItem.itemData)
-            } else if (hoverIndex === newList.length - 1) {
-              newDataList.push(this.dragItem.itemData)
-            } else {
-              newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
-            }
-          }
-          // if (horizontalPosition === 'left' || verticalPosition === 'top') {
-          //   newDataList = [...(newList.filter((it, index, arr) => this.filter(it, index, arr, this.dragItem?.itemData)))]
-          //   if (hoverIndex === 0) {
-          //     newDataList.unshift(this.dragItem.itemData)
-          //   } else {
-          //     newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
-          //   }
-          // } else if (horizontalPosition === 'right' || verticalPosition === 'bottom') {
-          //   newDataList = [...(newList.filter((it, index, arr,) => this.filter(it, index, arr, this.dragItem?.itemData)))]
-          //   if (hoverIndex === newList.length - 1) {
-          //     newDataList.push(this.dragItem.itemData)
-          //   } else {
-          //     newDataList.splice(hoverIndex, 0, this.dragItem.itemData)
-          //   }
-          // }
-        }
-      }
-      if (Array.isArray(newDataList) && this.dragItem && hoverItem) {
-        let newList = [...newDataList]
-        let columns = [...newDataList]
-        const groupInstance = this.listItemInstance.find((it) => it.isGroup)
-        const otherInstance = this.listItemInstance.find((it) => !it.isGroup)
-        if (this.toDragInstance.isGroup) {
-          newList = this.setGroupIndex(newList);
-          columns = [...newList, ...(otherInstance?.itemListData || [])]
+      // 判断放置和拖拽是否在一个位置
+      if (this.dragItem !== hoverItem && this.dragItem && hoverItem && typeof hoverIndex === 'number') {
+        let groupListData = []
+        let listData = []
+
+        const newList = replaceColumns(itemListData, this.dragItem?.itemData?.[pathIndexMetaSymbol], hoverItem.itemData?.[pathIndexMetaSymbol]);
+        /**判断是列表还是分组*/
+        if (this.dragItem.isGroup) {
+          //  如果是分组区域
+          groupListData = this.setGroupIndex(newList);
+          listData = this.removeGroupIndex([...(otherInstance?.itemListData || [])])
         } else {
-          columns = [...(groupInstance?.itemListData || [])].concat([...newList])
+          //  如果是列表区域
+          listData = this.removeGroupIndex([...newList])
+          groupListData = [...(groupInstance?.itemListData || [])]
         }
         if (this.onUpdated) {
           this.onUpdated?.({
             form: this.formDragInstance,
-            formListData: [...newList],
+            to: this.toDragInstance,
+            columns: [...groupListData, ...listData],
             formItem: this.dragItem,
-            columns: [...columns],
             toItem: hoverItem,
             verticalPosition,
             horizontalPosition,
             direction,
-            toIndex: hoverIndex,
             position
           })
-        } else {
-          this.formDragInstance.updatedItemListData?.([...newList])
         }
       }
     } else if (this.toDragInstance && this.formDragInstance) {
@@ -182,88 +155,82 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       // 处理数据
       // 根据这些参数 this.hoverIndex  this.direction   this.verticalPosition  this.horizontalPosition 处理数据
       // this.instance?.dragItem
-      const itemListData = [...(this.toDragInstance.itemListData || [])]
-      const newList = [...itemListData]
+      const formItemListData = [...(this.formDragInstance.itemListData || [])]
+      const toItemListData = [...(this.toDragInstance.itemListData || [])]
       const dragItem = this?.dragItem;
       let hoverIndex = this.toDragInstance.hoverIndex
       const hoverItem = this.toDragInstance.hoverItem
       const direction = this.toDragInstance.direction
       const horizontalPosition = this.toDragInstance.horizontalPosition
       const verticalPosition = this.toDragInstance.verticalPosition
-      const position = direction === 'horizontal' ? horizontalPosition : verticalPosition
+      const position = direction === 'horizontal' ? horizontalPosition : verticalPosition;
 
-      // 如果放置区域不是分组区域的话，需要把分组区域的个数减去
-      if (this.formDragInstance.isGroup && !this.toDragInstance.isGroup) {
-        // hoverIndex
-        hoverIndex = hoverIndex - this.formDragInstance.itemListData.length;
-      }
-
-      /**放置区的数据*/
-      let newDataList;
-      if (typeof hoverIndex === 'number' && dragItem && hoverItem) {
-        if (direction === 'horizontal' || direction === 'vertical') {
-          if (horizontalPosition === 'left' || verticalPosition === 'top') {
-            newDataList = [...newList]
-            if (hoverIndex === 0) {
-              newDataList.unshift(dragItem.itemData)
-            } else {
-              newDataList.splice(hoverIndex, 0, dragItem.itemData)
-            }
-          } else if (horizontalPosition === 'right' || verticalPosition === 'bottom') {
-            newDataList = [...newList]
-            newDataList.splice(hoverIndex + 1, 0, this.dragItem.itemData)
-          }
-        }
-      } else if (Array.isArray(itemListData) && itemListData.length === 0) {
-        newDataList = [this.dragItem?.itemData]
-      }
-      /**判断是移入分组区还是移除分组区域*/
-      if (Array.isArray(newDataList) && dragItem) {
-        /**原拖拽区域的数据处理*/
-        const oListData = [...(this.formDragInstance.itemListData || [])].filter((it) => it?.[pathIndexMetaSymbol] !== this.dragItem?.itemData?.[pathIndexMetaSymbol]) as T[]
-        let formDataList = [...oListData]
-        let toDataList = [...newDataList] as T[]
-        let columns = []
-        if (this.formDragInstance.isGroup) {
-          formDataList = this.setGroupIndex(formDataList)
-        }
-        if (!this.formDragInstance.isGroup) {
-          formDataList = this.removeGroupIndex(formDataList);
-        }
-        if (this.toDragInstance.isGroup) {
-          // toDataList = toDataList.map((ite, groupIndex) => ({ ...ite, groupIndex }))
-          toDataList = this.setGroupIndex(toDataList)
-        }
-        if (!this.toDragInstance.isGroup) {
-          toDataList = this.removeGroupIndex(toDataList);
-        }
-        if (this.formDragInstance.isGroup) {
-          columns = [...formDataList, ...toDataList]
+      // 如果放置区域是空情况
+      console.log("this", this, dragItem,)
+      if (typeof hoverIndex === 'number' && dragItem && hoverItem && this.dragItem !== hoverItem) {
+        let groupListData = []
+        let listData = []
+        const result = replaceColumns2(
+          formItemListData,
+          toItemListData,
+          this.dragItem?.itemData?.[pathIndexMetaSymbol],
+          hoverItem.itemData?.[pathIndexMetaSymbol],
+          ['right', 'bottom'].includes(position)
+        );
+        /**判断是列表还是分组*/
+        if (this.dragItem.isGroup) {
+          //  如果是分组区域
+          groupListData = this.setGroupIndex(result.startColumns);
+          listData = this.removeGroupIndex(result.moveColumns);
         } else {
-          columns = [...toDataList, ...formDataList]
+          //  如果是列表区域
+          listData = this.removeGroupIndex(result.startColumns);
+          groupListData = this.setGroupIndex(result.moveColumns);
         }
         if (this.onUpdated) {
           this.onUpdated?.({
             form: this.formDragInstance,
             to: this.toDragInstance,
-            formListData: [...formDataList],
-            toListData: [...toDataList],
-            columns: [...columns],
+            columns: [...groupListData, ...listData],
             formItem: dragItem,
             toItem: hoverItem,
             verticalPosition,
             horizontalPosition,
             direction,
-            toIndex: hoverIndex,
             position
           })
+        }
+      } else if (toItemListData.length === 0) {
+        // 直接扔数据
+        // 如果放置区域数据为空的时候
+        let groupListData = []
+        let listData = []
+        /**判断是列表还是分组*/
+        if (this.toDragInstance.isGroup) {
+          //  如果是分组区域
+          groupListData = this.setGroupIndex([dragItem.itemData]);
+          listData = this.removeGroupIndex(formItemListData.filter((it) => it[pathIndexMetaSymbol] !== dragItem.itemData[pathIndexMetaSymbol]));
         } else {
-          this.formDragInstance.updatedItemListData?.([...formDataList])
-          this.toDragInstance.updatedItemListData?.([...toDataList])
+          //  如果是列表区域
+          listData = this.removeGroupIndex([dragItem.itemData]);
+          groupListData = this.setGroupIndex(formItemListData.filter((it) => it[pathIndexMetaSymbol] !== dragItem.itemData[pathIndexMetaSymbol]));
+        }
+        if (this.onUpdated) {
+          this.onUpdated?.({
+            form: this.formDragInstance,
+            to: this.toDragInstance,
+            columns: [...groupListData, ...listData],
+            formItem: dragItem,
+            toItem: hoverItem,
+            verticalPosition,
+            horizontalPosition,
+            direction,
+            position
+          })
         }
       }
     }
-    this.clear()
+    // this.clear()
   }
 
 }

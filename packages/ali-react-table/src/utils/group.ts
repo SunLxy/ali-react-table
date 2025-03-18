@@ -112,7 +112,6 @@ export const replaceColumns = (columns: ArtColumnMergePath[], startPath: string,
   const startColumn = columns.find((column) => column[pathIndexMetaSymbol] === startPath);
   const moveIndex = columns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
   const newColumns = columns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
-  console.log("replaceColumns===>", startColumn, moveIndex, newColumns)
   if (moveIndex === 0) {
     newColumns.unshift(startColumn)
   } else if (moveIndex === columns.length - 1) {
@@ -121,4 +120,22 @@ export const replaceColumns = (columns: ArtColumnMergePath[], startPath: string,
     newColumns.splice(moveIndex, 0, startColumn)
   }
   return [...newColumns]
+}
+
+
+/**对列进行替换处理2*/
+export const replaceColumns2 = (startColumns: ArtColumnMergePath[], moveColumns: ArtColumnMergePath[], startPath: string, movePath: string, isAdd1: boolean) => {
+  const startColumn = startColumns.find((column) => column[pathIndexMetaSymbol] === startPath);
+  const moveIndex = moveColumns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
+  const newStartColumns = startColumns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
+  const newMoveColumns = [...moveColumns]
+  if (isAdd1) {
+    newMoveColumns.splice(moveIndex + 1, 0, startColumn)
+  } else {
+    newMoveColumns.splice(moveIndex, 0, startColumn)
+  }
+  return {
+    moveColumns: [...newMoveColumns],
+    startColumns: [...newStartColumns],
+  }
 }

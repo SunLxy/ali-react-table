@@ -34,22 +34,37 @@ export interface DragRowGroupingFeatureOptions {
 
 export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
   return (pipeline: TablePipeline) => {
-    const stateKey = 'rowGrouping'
+    const stateKey = 'dragGrouping'
     const indents = pipeline.ctx.indents
-    const textOffset = indents.iconIndent + indents.iconWidth + indents.iconGap
 
-    const primaryKey = pipeline.ensurePrimaryKey('rowGrouping') as string
+    const primaryKey = pipeline.ensurePrimaryKey('dragGrouping') as string
     if (typeof primaryKey !== 'string') {
-      throw new Error('rowGrouping 仅支持字符串作为 primaryKey')
+      throw new Error('dragGrouping 仅支持字符串作为 primaryKey')
     }
 
     const openKeys: string[] = pipeline.getStateAtKey(stateKey) ?? []
+
     let openKeySet = new Set(openKeys)
 
     const onChangeOpenKeys = (nextKeys, key, action) => {
+      console.log(stateKey, nextKeys)
       pipeline.setStateAtKey(stateKey, nextKeys, { key, action })
     }
-    const columns = pipeline.getColumns() //获取列
+
+    const toggle = (rowKey: string) => {
+      const expanded = openKeySet.has(rowKey)
+      if (expanded) {
+        onChangeOpenKeys(
+          openKeys.filter((key) => key !== rowKey),
+          rowKey,
+          'collapse',
+        )
+      } else {
+        onChangeOpenKeys([...openKeys, rowKey], rowKey, 'expand')
+      }
+    }
+
+    const columns = pipeline.getColumns() // 获取列
     /**对列中的分组数据进行获取*/
     const groupColumns = columns.filter((column) => typeof column.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
 
@@ -60,13 +75,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       .appendRowPropsGetter(rowGroupingRowPropsGetter)
 
     function processPreData(dataSource: any[]) {
-      const newOpenKeys = []
-      const list = layeredGroup(dataSource, groupColumns, primaryKey, newOpenKeys);
-      if (openKeys.length === 0) {
-        openKeys.push(...newOpenKeys)
-        openKeySet = new Set(openKeys);
-      }
-      return list
+      return layeredGroup(dataSource, groupColumns, primaryKey, []);
     }
 
     function processDataSource(input: any[]) {
@@ -79,7 +88,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         for (const node of nodes) {
           const rowKey = node[primaryKey]
           if (Array.isArray(node.children)) {
-            const expanded = openKeySet.has(rowKey)
+            const expanded = !openKeySet.has(rowKey)
             result.push({ ...attachGroupingMeta(node) })
             if (expanded)
               dfs(node.children, depth + 1)
@@ -104,7 +113,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         if (!meta.isGroupHeader || !meta.expandable) {
           return firstCol.render?.(value, row, rowIndex);
         }
-        const expanded = openKeySet.has(row[primaryKey])
+        const expanded = !openKeySet.has(row[primaryKey])
         const expandCls = expanded ? 'expanded' : 'collapsed'
         const indent = indents.iconIndent + row[groupLevelMetaSymbol] * indents.iconWidth + 12
 
@@ -123,25 +132,23 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         if (!meta.isGroupHeader) {
           return
         }
-
         const { expandable } = meta
-
         const rowKey = row[primaryKey]
-        const expanded = openKeySet.has(rowKey)
-
+        const expanded = !openKeySet.has(rowKey)
         let onClick: any
         if (expandable) {
           onClick = (e: React.MouseEvent) => {
             e.stopPropagation()
-            if (expanded) {
-              onChangeOpenKeys(
-                openKeys.filter((key) => key !== rowKey),
-                rowKey,
-                'collapse',
-              )
-            } else {
-              onChangeOpenKeys([...openKeys, rowKey], rowKey, 'expand')
-            }
+            toggle(rowKey)
+            // if (expanded) {
+            //   onChangeOpenKeys(
+            //     openKeys.filter((key) => key !== rowKey),
+            //     rowKey,
+            //     'collapse',
+            //   )
+            // } else {
+            //   onChangeOpenKeys([...openKeys, rowKey], rowKey, 'expand')
+            // }
           }
         }
 

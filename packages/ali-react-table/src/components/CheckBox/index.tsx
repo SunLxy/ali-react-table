@@ -15,8 +15,8 @@ const CheckBoxWarp = styled.label<{ $checked: boolean, $indeterminate: boolean, 
   cursor: pointer;
   ${props => props.$checked && !props.$indeterminate && css`
     ${CheckBoxInner}{
-      background-color: #1677ff;
-      border-color: #1677ff;
+      background-color: var(--primary-color,#1677ff);
+      border-color: var(--primary-color,#1677ff);
       &::after{
         opacity: 1;
         transform: rotate(45deg) scale(1) translate(-50%, -50%);
@@ -32,7 +32,7 @@ const CheckBoxWarp = styled.label<{ $checked: boolean, $indeterminate: boolean, 
         inset-inline-start: 50%;
         width: calc(16px / 2);
         height: calc(16px / 2);
-        background-color: #1677ff;
+        background-color: var(--primary-color,#1677ff);
         border: 0;
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
@@ -108,10 +108,13 @@ export interface CheckBoxProps {
   onClick?: (event: React.MouseEvent<HTMLLabelElement, MouseEvent>, checked: boolean, indeterminate: boolean,) => void
   /**是否禁用*/
   disabled?: boolean
+  onChange?: (event: React.MouseEvent<HTMLLabelElement, MouseEvent>, checked: boolean, indeterminate: boolean,) => void
 }
 
 export const CheckBox = (props: CheckBoxProps) => {
-  const { checked = false, onClick, indeterminate = false, disabled = false } = props
+  const { checked = false, onClick, indeterminate = false, disabled = false, onChange } = props
+  console.log(props);
+
   const cls = useMemo(() => {
     return ['ali-simple-table-check-box', checked && 'checked', indeterminate && 'indeterminate'].filter(Boolean).join(' ')
   }, [indeterminate, checked])
@@ -124,8 +127,10 @@ export const CheckBox = (props: CheckBoxProps) => {
     }
     if (indeterminate) {
       onClick?.(event, true, indeterminate)
+      onChange?.(event, true, indeterminate)
     } else {
       onClick?.(event, !checked, indeterminate,)
+      onChange?.(event, true, indeterminate)
     }
   }
 

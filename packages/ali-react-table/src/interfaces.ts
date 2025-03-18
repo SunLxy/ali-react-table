@@ -64,6 +64,7 @@ export interface ArtColumnMergePath extends ArtColumn {
   [protoMetaSymbol]?: ArtColumn
   /**处理后的表头位置*/
   [pathIndexMetaSymbol]?: string
+  isDragColumn?: boolean
 }
 
 /** SpanRect 用于描述合并单元格的边界

@@ -1,5 +1,6 @@
-import { ArtColumn, BaseTable, useTablePipeline, features, protoMetaSymbol, pathIndexMetaSymbol, makeRecursiveMapperWithPathIndex, replaceColumns } from 'ali-react-table'
+import { ArtColumn, BaseTable, useTablePipeline, features, protoMetaSymbol, CheckBox as ACheckBox, pathIndexMetaSymbol, makeRecursiveMapperWithPathIndex, replaceColumns } from 'ali-react-table'
 import { Button, Radio, Switch, Typography, Checkbox } from 'antd'
+
 import cx from 'classnames'
 import numeral from 'numeral'
 import React, { createRef, useEffect, useReducer, useRef, useState } from 'react'
@@ -166,8 +167,8 @@ export function DemoApp() {
   const [dataList, setDataList] = useState([...dataSource])
 
   const [newColumns, setnewColumns] = useState<any[]>(([
-    { code: 'provinceName', name: '省份', width: 150, lock: leftLock, groupIndex: 0 },
-    { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, }, groupIndex: 1 },
+    { code: 'provinceName', name: '省份', width: 150, },
+    { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, } },
     { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
     { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
@@ -220,7 +221,7 @@ export function DemoApp() {
     return null
   }
 
-  const p = useTablePipeline({ components: { Checkbox } })
+  const p = useTablePipeline({ components: { Checkbox: ACheckBox } })
     .primaryKey('__id')
     .input({
       dataSource: data222,
@@ -229,7 +230,7 @@ export function DemoApp() {
     })
     .useWithColumns()
     .use(features.multiSelect())
-    // .use(features.dragRowGrouping())
+    .use(features.dragRowGrouping())
     .use(features.columnResize())
     // .use(features.columnDrag({
     //   onColumnDragStopped: (columnMoved, newColumns) => {
@@ -387,8 +388,8 @@ export function DemoApp() {
         {...dpp}
         useVirtual={{ header: false, vertical: true }}
         // overflowVerticalNumber={30}
-        // dragType="columnGroup"
-        dragType="column"
+        dragType="columnGroup"
+        // dragType="column"
         onColumnDragEnd={(param) => {
           const list = param.columns.filter((it) => it[protoMetaSymbol]).map((ite) => {
             return ({ ...ite[protoMetaSymbol] })

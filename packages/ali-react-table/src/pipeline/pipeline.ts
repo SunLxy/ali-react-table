@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react'
 import { BaseTableProps, PrimaryKey } from '../base-table'
-import { ArtColumn, TableTransform, Transform } from '../interfaces'
+import { ArtColumn, TableTransform, Transform, ArtColumnMergePath } from '../interfaces'
 import { mergeCellProps, makeRecursiveMapperWithPathIndex } from '../utils'
 
 type RowPropsGetter = BaseTableProps['getRowProps']
 
 interface PipelineSnapshot {
   dataSource: any[]
-  columns: ArtColumn[]
+  columns: ArtColumnMergePath[]
   rowPropsGetters: RowPropsGetter[]
 }
 
@@ -122,7 +122,7 @@ export class TablePipeline {
   }
 
   /** 设置流水线的输入数据 */
-  input(input: { dataSource: any[]; columns: ArtColumn[] }) {
+  input(input: { dataSource: any[]; columns: ArtColumnMergePath[] }) {
     if (this._dataSource != null || this._columns != null) {
       throw new Error('input 不能调用两次')
     }
@@ -148,7 +148,7 @@ export class TablePipeline {
   }
 
   /** 设置 columns */
-  columns(cols: ArtColumn[]) {
+  columns(cols: ArtColumnMergePath[]) {
     this._columns = cols
     return this
   }
@@ -190,7 +190,7 @@ export class TablePipeline {
   }
 
   /** 转换 columns */
-  mapColumns(mapper: Transform<ArtColumn[]>) {
+  mapColumns(mapper: Transform<ArtColumnMergePath[]>) {
     return this.columns(mapper(this.getColumns()))
   }
 
