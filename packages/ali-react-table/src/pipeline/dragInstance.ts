@@ -53,7 +53,6 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   /**注册实例*/
   register = (item: DragBodyInstance) => {
     this.listItemInstance.push(item)
-    console.log("注册实例", this.listItemInstance)
     return () => {
       this.listItemInstance = this.listItemInstance.filter(it => it !== item)
     }
