@@ -1,5 +1,6 @@
 
 import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from "../interfaces"
+import { pathIndexMetaSymbol } from "./makeRecursiveMapper"
 
 export const groupMetaSymbol = Symbol('groupMetaSymbol')
 export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
@@ -108,9 +109,10 @@ export function layeredGroup<T extends AbstractTreeNode>(
 export const replaceColumns = (columns: ArtColumnMergePath[], startPath: string, movePath: string) => {
   /**移动的数据下标*/
   /**需要移动的数据下标*/
-  const startColumn = columns.find((column) => column.__path === startPath);
-  const moveIndex = columns.findIndex((column) => column.__path === movePath);
-  const newColumns = columns.filter((column) => column.__path !== startPath);
+  const startColumn = columns.find((column) => column[pathIndexMetaSymbol] === startPath);
+  const moveIndex = columns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
+  const newColumns = columns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
+  console.log("replaceColumns===>", startColumn, moveIndex, newColumns)
   if (moveIndex === 0) {
     newColumns.unshift(startColumn)
   } else if (moveIndex === columns.length - 1) {

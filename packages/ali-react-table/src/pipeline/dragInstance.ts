@@ -1,6 +1,7 @@
 import { createRef, createContext, createElement, useRef, useContext, useEffect } from 'react';
 import { ArtColumnMergePath } from "../interfaces"
 import { BaseTableInstance } from "./instance"
+import { pathIndexMetaSymbol, protoMetaSymbol } from "../utils/makeRecursiveMapper"
 
 /**
  * 1. 可进行拖拽排序
@@ -60,7 +61,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
 
   /**过滤方法*/
   filter = <T extends ArtColumnMergePath = ArtColumnMergePath>(value: T, index: number, array: T[], itemData: T): boolean => {
-    return value?.__path !== itemData?.__path
+    return value?.[pathIndexMetaSymbol] !== itemData?.[pathIndexMetaSymbol]
   }
 
   /**清理操作数据*/
@@ -79,8 +80,8 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   /**设置分组下标*/
   setGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
     return columns.map((ite, groupIndex) => {
-      if (ite?.__o) {
-        ite.__o.groupIndex = groupIndex
+      if (ite?.[protoMetaSymbol]) {
+        ite[protoMetaSymbol].groupIndex = groupIndex
       }
       return ({ ...ite, groupIndex })
     })
@@ -90,8 +91,8 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   removeGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
     return columns.map((ite) => {
       const { groupIndex, ...rest } = ite;
-      if (ite?.__o) {
-        delete ite.__o.groupIndex
+      if (ite?.[protoMetaSymbol]) {
+        delete ite[protoMetaSymbol].groupIndex
       }
       return { ...rest }
     }) as T[]
@@ -219,7 +220,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       /**判断是移入分组区还是移除分组区域*/
       if (Array.isArray(newDataList) && dragItem) {
         /**原拖拽区域的数据处理*/
-        const oListData = [...(this.formDragInstance.itemListData || [])].filter((it) => it?.__path !== this.dragItem?.itemData?.__path) as T[]
+        const oListData = [...(this.formDragInstance.itemListData || [])].filter((it) => it?.[pathIndexMetaSymbol] !== this.dragItem?.itemData?.[pathIndexMetaSymbol]) as T[]
         let formDataList = [...oListData]
         let toDataList = [...newDataList] as T[]
         let columns = []

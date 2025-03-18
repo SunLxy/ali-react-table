@@ -1,4 +1,6 @@
 import React, { ReactNode } from 'react'
+import { pathIndexMetaSymbol, protoMetaSymbol } from "./utils/makeRecursiveMapper"
+
 
 export type ArtColumnAlign = 'left' | 'center' | 'right'
 
@@ -59,9 +61,9 @@ export interface ArtColumn extends ArtColumnStaticPart, ArtColumnDynamicPart {
 
 export interface ArtColumnMergePath extends ArtColumn {
   /**原始表头配置*/
-  __o?: ArtColumn
+  [protoMetaSymbol]?: ArtColumn
   /**处理后的表头位置*/
-  __path?: string
+  [pathIndexMetaSymbol]?: string
 }
 
 /** SpanRect 用于描述合并单元格的边界

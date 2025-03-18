@@ -1,6 +1,8 @@
 import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from '../interfaces'
 import isLeafNode from './isLeafNode'
 
+export const pathIndexMetaSymbol = Symbol('pathIndexMetaSymbol')
+export const protoMetaSymbol = Symbol('protoMetaSymbol')
 
 type RecursiveFlatMapInfo<T> = {
   startIndex: number
@@ -64,7 +66,8 @@ export const makeRecursiveMapperWithPathIndex = (columns: ArtColumn[]): ArtColum
       if (column.children) {
         return { ...column, children: dfs(column.children, newPath) }
       } else {
-        return { ...column, __path: newPath, __o: column }
+        return { ...column, [pathIndexMetaSymbol]: newPath, [protoMetaSymbol]: column }
+        // return { ...column, __path: newPath, __o: column }
       }
     })
   }

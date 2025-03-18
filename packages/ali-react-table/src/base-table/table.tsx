@@ -131,7 +131,9 @@ export interface BaseTableProps {
   topRightContent?: React.ReactNode
   /**头部渲染左侧内容*/
   topLeftContent?: React.ReactNode
-  /**拖拽类型*/
+  /**拖拽类型
+   * @description 使用的时候需要表头使用 makeRecursiveMapperWithPathIndex 方法进行转换
+  */
   dragType?: "column" | "columnGroup"
   /**表格实例*/
   instance?: BaseTableInstance
@@ -238,7 +240,6 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     this.baseTableInstance.baseTable = this;// 把当前实例进行存储
     this.baseTableInstance.dragInstance = this.dragInstance;
     this.dragInstance.tableInstance = this.baseTableInstance;
-    this.dragInstance.onUpdated = props.onColumnDragEnd
   }
 
   /** 自定义滚动条宽度为table宽度，使滚动条滑块宽度相同 */
@@ -491,6 +492,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   render() {
     const info = calculateRenderInfo(this)
     this.lastInfo = info
+    this.dragInstance.onUpdated = this.props.onColumnDragEnd
 
     const {
       dataSource,

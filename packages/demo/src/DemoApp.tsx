@@ -1,4 +1,4 @@
-import { ArtColumn, BaseTableImpl, BaseTable, useTablePipeline, features } from 'ali-react-table'
+import { ArtColumn, BaseTable, useTablePipeline, features, protoMetaSymbol, pathIndexMetaSymbol, makeRecursiveMapperWithPathIndex, replaceColumns } from 'ali-react-table'
 import { Button, Radio, Switch, Typography, Checkbox } from 'antd'
 import cx from 'classnames'
 import numeral from 'numeral'
@@ -165,7 +165,7 @@ export function DemoApp() {
   const [showControlGrid, toggle] = useReducer((s: boolean) => !s, true)
   const [dataList, setDataList] = useState([...dataSource])
 
-  const [newColumns, setnewColumns] = useState<any[]>([
+  const [newColumns, setnewColumns] = useState<any[]>(makeRecursiveMapperWithPathIndex([
     { code: 'provinceName', name: '省份', width: 150, lock: leftLock, groupIndex: 0 },
     { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, }, groupIndex: 1 },
     { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
@@ -179,7 +179,7 @@ export function DemoApp() {
     { code: 'deadCount5', name: '死亡5', width: 100, render: amount, align: 'right' },
     { code: 'deadCount6', name: '死亡6', width: 100, render: amount, align: 'right' },
     { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
-  ])
+  ]))
   const [mspa] = useState(new Map(newColumns.map((it) => [it.code, it.name])))
 
   const appDivRef = useRef<HTMLDivElement>()
@@ -389,11 +389,13 @@ export function DemoApp() {
         // dragType="columnGroup"
         dragType="column"
         onColumnDragEnd={(param) => {
-          const list = param.columns.filter((it) => it.__o).map((ite) => {
-            return ({ ...ite.__o })
-          })
-          console.log("list", list)
-          setnewColumns(list)
+          // const list = param.columns.filter((it) => it[protoMetaSymbol]).map((ite) => {
+          //   return ({ ...ite[protoMetaSymbol] })
+          // })
+          console.log(param.formItem, param.toItem, newColumns)
+          const newList = makeRecursiveMapperWithPathIndex(replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
+          console.log("list", newList)
+          setnewColumns(newList)
         }}
         // columns={[
         //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },

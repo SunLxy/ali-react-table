@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { BaseTableProps, PrimaryKey } from '../base-table'
 import { ArtColumn, TableTransform, Transform } from '../interfaces'
-import { mergeCellProps, makeRecursiveMapperWithPathIndex } from '../utils'
+import { mergeCellProps } from '../utils'
 
 type RowPropsGetter = BaseTableProps['getRowProps']
 
@@ -128,8 +128,8 @@ export class TablePipeline {
     }
     this._dataSource = input.dataSource
     // 添加原始数据存储
-    this._columns = makeRecursiveMapperWithPathIndex(input.columns);
-
+    this._columns = input.columns;
+    // this._columns = makeRecursiveMapperWithPathIndex(input.columns);
     this.snapshot('input')
 
     return this
