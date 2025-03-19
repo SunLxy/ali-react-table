@@ -102,7 +102,6 @@ export function multiSelect(opts: MultiSelectFeatureOptions = {}) {
       name: '是否选中',
       title: defaultCheckboxColumnTitle,
       width: 43,
-      align: 'center',
       lock: true,
       ...opts.checkboxColumn,
       getCellProps(value: any, row: any, rowIndex: number): CellProps {
