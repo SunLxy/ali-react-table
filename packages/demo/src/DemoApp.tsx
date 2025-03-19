@@ -179,7 +179,7 @@ export function DemoApp() {
     { code: 'deadCount4', name: '死亡4', width: 100, render: amount, align: 'right' },
     { code: 'deadCount5', name: '死亡5', width: 100, render: amount, align: 'right' },
     { code: 'deadCount6', name: '死亡6', width: 100, render: amount, align: 'right' },
-    { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
+    { code: 'updateTime', name: '更新时间', width: 150, lock: true },
   ]))
   const [mspa] = useState(new Map(newColumns.map((it) => [it.code, it.name])))
 
@@ -398,21 +398,21 @@ export function DemoApp() {
           // const newList = makeRecursiveMapperWithPathIndex(GroupUtils.replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
           setnewColumns(list)
         }}
-        // columns={[
-        //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
-        //   { code: 'cityName', name: '城市', width: 150 },
-        //   ...repeat<ArtColumn>(
-        //     [
-        //       { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
-        //       { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
-        //       { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
-        //     ],
-        //     useBigData ? 40 : 10,
-        //   ),
-        //   { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
-        // ]}
-        // dataSource={hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : []}
-        footerDataSource={hasFooter ? footerDataSource : []}
+      // columns={[
+      //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
+      //   { code: 'cityName', name: '城市', width: 150 },
+      //   ...repeat<ArtColumn>(
+      //     [
+      //       { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
+      //       { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
+      //       { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+      //     ],
+      //     useBigData ? 40 : 10,
+      //   ),
+      //   { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
+      // ]}
+      // dataSource={hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : []}
+      // footerDataSource={hasFooter ? footerDataSource : []}
       />
     </AppDivAppDiv>
   )

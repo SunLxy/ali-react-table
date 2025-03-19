@@ -45,6 +45,8 @@ export class TableDOMHelper {
   readonly tableBody: HTMLDivElement
   readonly tableFooter: HTMLDivElement
   readonly tableHeaderTop: HTMLDivElement
+  readonly tableHeaderLockShadowMaskWarp: HTMLDivElement
+  readonly tableFooterLockShadowMaskWarp: HTMLDivElement
 
   readonly stickyScroll: HTMLDivElement
   readonly stickyScrollItem: HTMLDivElement
@@ -56,6 +58,10 @@ export class TableDOMHelper {
     this.tableBody = this.artTable.querySelector(`:scope > .${Classes.tableBody}`)
     this.tableFooter = this.artTable.querySelector(`:scope > .${Classes.tableFooter}`)
     this.tableHeaderTop = this.artTable.querySelector(`:scope > .${Classes.tableHeaderTop}`)
+    if (this.tableHeader)
+      this.tableHeaderLockShadowMaskWarp = this.tableHeader.querySelector(`:scope > .${Classes.headerFooterLockShadowMaskWarp}`)
+    if (this.tableFooter)
+      this.tableFooterLockShadowMaskWarp = this.tableFooter.querySelector(`:scope > .${Classes.headerFooterLockShadowMaskWarp}`)
 
     const stickyScrollSelector = `.${Classes.artTable} + .${Classes.stickyScroll}`
     this.stickyScroll = artTableWrapper.querySelector<HTMLDivElement>(stickyScrollSelector)
@@ -83,6 +89,16 @@ export class TableDOMHelper {
   getRightLockShadow(): HTMLDivElement {
     const selector = `:scope > .${Classes.lockShadowMask} .${Classes.rightLockShadow}`
     return this.artTable.querySelector<HTMLDivElement>(selector)
+  }
+
+  getHeaderFooterLeftLockShadow(dom: HTMLDivElement): HTMLDivElement {
+    const selector = `:scope > .${Classes.headerFooterLockShadowMask} .${Classes.headerFooterLeftLockShadow}`
+    return dom.querySelector<HTMLDivElement>(selector)
+  }
+
+  getHeaderFooterRightLockShadow(dom: HTMLDivElement): HTMLDivElement {
+    const selector = `:scope > .${Classes.headerFooterLockShadowMask} .${Classes.headerFooterRightLockShadow}`
+    return dom.querySelector<HTMLDivElement>(selector)
   }
 
   getLoadingIndicator(): HTMLDivElement {

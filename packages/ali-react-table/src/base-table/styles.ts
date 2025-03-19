@@ -33,6 +33,12 @@ export const Classes = {
   leftLockShadow: `${prefix}left-lock-shadow`,
   rightLockShadow: `${prefix}right-lock-shadow`,
 
+  headerFooterLockShadowMaskWarp: `${prefix}header-lock-shadow-mask-warp`,
+  headerFooterLockShadowMask: `${prefix}header-lock-shadow-mask`,
+  headerFooterLockShadow: `${prefix}header-lock-shadow`,
+  headerFooterLeftLockShadow: `${prefix}header-left-lock-shadow`,
+  headerFooterRightLockShadow: `${prefix}header-right-lock-shadow`,
+
   /** 数据为空时表格内容的外层 div */
   emptyWrapper: `${prefix}empty-wrapper`,
 
@@ -43,9 +49,10 @@ export const Classes = {
 
 const Z = {
   lock: 5,
-  header: 15,
-  footer: 10,
-  lockShadow: 20,
+  header: 25,
+  footer: 25,
+  lockShadow: 15,
+  groupLock: 20,
   scrollItem: 30,
   loadingIndicator: 40,
 } as const
@@ -339,6 +346,57 @@ export const StyledArtTableWrapper = styled.div`
     }
   }
   //#endregion
+
+  .art_custom_group_lock_td{
+    z-index:${Z.groupLock};
+  }
+
+  //#region 锁列阴影
+  .${Classes.headerFooterLockShadowMaskWarp}{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    z-index:${Z.header};
+    pointer-events: none;
+  }
+
+  .${Classes.headerFooterLockShadowMask} {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: ${Z.header};
+    pointer-events: none;
+    overflow: hidden;
+
+    .${Classes.headerFooterLockShadow} {
+      height: 100%;
+    }
+
+    .${Classes.headerFooterLeftLockShadow} {
+      margin-right: ${LOCK_SHADOW_PADDING}px;
+      box-shadow: none;
+
+      &.show-shadow {
+        box-shadow: var(--lock-shadow);
+        border-right: var(--cell-border-vertical);
+      }
+    }
+
+    .${Classes.headerFooterRightLockShadow} {
+      margin-left: ${LOCK_SHADOW_PADDING}px;
+      box-shadow: none;
+
+      &.show-shadow {
+        box-shadow: var(--lock-shadow);
+        border-left: var(--cell-border-vertical);
+      }
+    }
+  }
+  //#endregion
+
+
+
 
   //#region 空表格展现
   .${Classes.emptyWrapper} {
