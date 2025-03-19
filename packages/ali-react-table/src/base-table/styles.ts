@@ -510,6 +510,7 @@ export const StyleArtPlaceArea = styled.div`
   align-items: center;
   gap: 12px;
   box-sizing: border-box;
+  min-height: 32px;
   .place-area-placeholder{
     color: var(--placeholder-color,#ccc);
   }

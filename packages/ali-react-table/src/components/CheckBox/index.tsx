@@ -113,7 +113,6 @@ export interface CheckBoxProps {
 
 export const CheckBox = (props: CheckBoxProps) => {
   const { checked = false, onClick, indeterminate = false, disabled = false, onChange } = props
-  console.log(props);
 
   const cls = useMemo(() => {
     return ['ali-simple-table-check-box', checked && 'checked', indeterminate && 'indeterminate'].filter(Boolean).join(' ')

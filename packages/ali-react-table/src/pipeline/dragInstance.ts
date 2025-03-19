@@ -2,7 +2,7 @@ import { createRef, createContext, createElement, useRef, useContext, useEffect 
 import { ArtColumnMergePath } from "../interfaces"
 import { BaseTableInstance } from "./instance"
 import { pathIndexMetaSymbol, protoMetaSymbol } from "../utils/makeRecursiveMapper"
-import { replaceColumns, replaceColumns2 } from "../utils/group"
+import { GroupUtils } from "../utils/group"
 
 /**
  * 1. 可进行拖拽排序
@@ -45,7 +45,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
   /**拖拽所在实例*/
   formDragInstance?: DragBodyInstance
   /**更新操作*/
-  onUpdated?: (parms: OnUpdatedOptions<T>) => void
+  onUpdated?: (parms: OnUpdatedOptions<T>, instance: DragInstance) => void
   /**注册实例*/
   register = (item: DragBodyInstance) => {
     this.listItemInstance.push(item)
@@ -71,29 +71,6 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
     this.toDragInstance = undefined
     this.formDragInstance = undefined
   }
-
-  /**设置分组下标*/
-  setGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
-    return columns.map((ite, groupIndex) => {
-      if (ite?.[protoMetaSymbol]) {
-        ite[protoMetaSymbol].groupIndex = groupIndex
-      }
-      return ({ ...ite, groupIndex })
-    })
-  }
-
-  /**移除分组下标*/
-  removeGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
-    return columns.map((ite) => {
-      const { groupIndex, ...rest } = ite;
-      if (ite?.[protoMetaSymbol]) {
-        delete ite[protoMetaSymbol].groupIndex
-      }
-      return { ...rest }
-    }) as T[]
-  }
-
-
 
   /**
    * 开始数据
@@ -125,15 +102,15 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         let groupListData = []
         let listData = []
 
-        const newList = replaceColumns(itemListData, this.dragItem?.itemData?.[pathIndexMetaSymbol], hoverItem.itemData?.[pathIndexMetaSymbol]);
+        const newList = GroupUtils.replaceColumns(itemListData, this.dragItem?.itemData?.[pathIndexMetaSymbol], hoverItem.itemData?.[pathIndexMetaSymbol]);
         /**判断是列表还是分组*/
         if (this.dragItem.isGroup) {
           //  如果是分组区域
-          groupListData = this.setGroupIndex(newList);
-          listData = this.removeGroupIndex([...(otherInstance?.itemListData || [])])
+          groupListData = GroupUtils.setGroupIndex(newList);
+          listData = GroupUtils.removeGroupIndex([...(otherInstance?.itemListData || [])])
         } else {
           //  如果是列表区域
-          listData = this.removeGroupIndex([...newList])
+          listData = GroupUtils.removeGroupIndex([...newList])
           groupListData = [...(groupInstance?.itemListData || [])]
         }
         if (this.onUpdated) {
@@ -147,7 +124,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             horizontalPosition,
             direction,
             position
-          })
+          }, this)
         }
       }
     } else if (this.toDragInstance && this.formDragInstance) {
@@ -166,11 +143,10 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
       const position = direction === 'horizontal' ? horizontalPosition : verticalPosition;
 
       // 如果放置区域是空情况
-      console.log("this", this, dragItem,)
       if (typeof hoverIndex === 'number' && dragItem && hoverItem && this.dragItem !== hoverItem) {
         let groupListData = []
         let listData = []
-        const result = replaceColumns2(
+        const result = GroupUtils.replaceColumns2(
           formItemListData,
           toItemListData,
           this.dragItem?.itemData?.[pathIndexMetaSymbol],
@@ -180,12 +156,12 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         /**判断是列表还是分组*/
         if (this.dragItem.isGroup) {
           //  如果是分组区域
-          groupListData = this.setGroupIndex(result.startColumns);
-          listData = this.removeGroupIndex(result.moveColumns);
+          groupListData = GroupUtils.setGroupIndex(result.startColumns);
+          listData = GroupUtils.removeGroupIndex(result.moveColumns);
         } else {
           //  如果是列表区域
-          listData = this.removeGroupIndex(result.startColumns);
-          groupListData = this.setGroupIndex(result.moveColumns);
+          listData = GroupUtils.removeGroupIndex(result.startColumns);
+          groupListData = GroupUtils.setGroupIndex(result.moveColumns);
         }
         if (this.onUpdated) {
           this.onUpdated?.({
@@ -198,7 +174,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             horizontalPosition,
             direction,
             position
-          })
+          }, this)
         }
       } else if (toItemListData.length === 0) {
         // 直接扔数据
@@ -208,12 +184,12 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         /**判断是列表还是分组*/
         if (this.toDragInstance.isGroup) {
           //  如果是分组区域
-          groupListData = this.setGroupIndex([dragItem.itemData]);
-          listData = this.removeGroupIndex(formItemListData.filter((it) => it[pathIndexMetaSymbol] !== dragItem.itemData[pathIndexMetaSymbol]));
+          groupListData = GroupUtils.setGroupIndex([dragItem.itemData]);
+          listData = GroupUtils.removeGroupIndex(formItemListData.filter((it) => it[pathIndexMetaSymbol] !== dragItem.itemData[pathIndexMetaSymbol]));
         } else {
           //  如果是列表区域
-          listData = this.removeGroupIndex([dragItem.itemData]);
-          groupListData = this.setGroupIndex(formItemListData.filter((it) => it[pathIndexMetaSymbol] !== dragItem.itemData[pathIndexMetaSymbol]));
+          listData = GroupUtils.removeGroupIndex([dragItem.itemData]);
+          groupListData = GroupUtils.setGroupIndex(formItemListData.filter((it) => it[pathIndexMetaSymbol] !== dragItem.itemData[pathIndexMetaSymbol]));
         }
         if (this.onUpdated) {
           this.onUpdated?.({
@@ -226,7 +202,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
             horizontalPosition,
             direction,
             position
-          })
+          }, this)
         }
       }
     }

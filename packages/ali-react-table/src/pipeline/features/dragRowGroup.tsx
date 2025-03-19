@@ -47,7 +47,6 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
     let openKeySet = new Set(openKeys)
 
     const onChangeOpenKeys = (nextKeys, key, action) => {
-      console.log(stateKey, nextKeys)
       pipeline.setStateAtKey(stateKey, nextKeys, { key, action })
     }
 

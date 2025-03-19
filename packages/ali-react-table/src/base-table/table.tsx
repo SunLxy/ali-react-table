@@ -138,10 +138,9 @@ export interface BaseTableProps {
   /**表格实例*/
   instance?: BaseTableInstance
   /**列拖拽结束*/
-  onColumnDragEnd?: (param: OnUpdatedOptions) => void
+  onColumnDragEnd?: (param: OnUpdatedOptions, instance: DragInstance) => void
   /**拖拽实例*/
   dragInstance?: DragInstance
-
 }
 
 interface BaseTableState {
@@ -612,7 +611,6 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
         fromResizeEvent(this.domHelper.tableHeaderTop).subscribe((entry: ResizeObserverEntry[]) => {
           if (entry && entry[0]) {
             const [borderBoxSize] = entry[0].borderBoxSize
-            // console.log(entry, entry[0].borderBoxSize)
             this.setState({ headerContentHeight: borderBoxSize.blockSize })
           }
         }),

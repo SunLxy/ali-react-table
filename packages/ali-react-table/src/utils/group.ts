@@ -1,9 +1,10 @@
 
 import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from "../interfaces"
-import { pathIndexMetaSymbol } from "./makeRecursiveMapper"
+import { pathIndexMetaSymbol, protoMetaSymbol } from "./makeRecursiveMapper"
 
 export const groupMetaSymbol = Symbol('groupMetaSymbol')
 export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
+
 
 function groupBy<T extends AbstractTreeNode>(array: T[], key: string) {
   const newList: Array<T[]> = []
@@ -105,37 +106,65 @@ export function layeredGroup<T extends AbstractTreeNode>(
   return array
 }
 
-/**对列进行替换处理*/
-export const replaceColumns = (columns: ArtColumnMergePath[], startPath: string, movePath: string) => {
-  /**移动的数据下标*/
-  /**需要移动的数据下标*/
-  const startColumn = columns.find((column) => column[pathIndexMetaSymbol] === startPath);
-  const moveIndex = columns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
-  const newColumns = columns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
-  if (moveIndex === 0) {
-    newColumns.unshift(startColumn)
-  } else if (moveIndex === columns.length - 1) {
-    newColumns.push(startColumn)
-  } else {
-    newColumns.splice(moveIndex, 0, startColumn)
+export class GroupUtils {
+  groupMetaSymbol = groupMetaSymbol;
+  groupLevelMetaSymbol = groupLevelMetaSymbol;
+  protoMetaSymbol = protoMetaSymbol;
+  pathIndexMetaSymbol = pathIndexMetaSymbol;
+  /**分组数据(转换成二维数组)*/
+  static groupBy = groupBy;
+  /**设置分组下标*/
+  static setGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
+    return columns.map((ite, groupIndex) => {
+      if (ite?.[protoMetaSymbol]) {
+        ite[protoMetaSymbol].groupIndex = groupIndex
+      }
+      return ({ ...ite, groupIndex })
+    })
   }
-  return [...newColumns]
-}
 
-
-/**对列进行替换处理2*/
-export const replaceColumns2 = (startColumns: ArtColumnMergePath[], moveColumns: ArtColumnMergePath[], startPath: string, movePath: string, isAdd1: boolean) => {
-  const startColumn = startColumns.find((column) => column[pathIndexMetaSymbol] === startPath);
-  const moveIndex = moveColumns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
-  const newStartColumns = startColumns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
-  const newMoveColumns = [...moveColumns]
-  if (isAdd1) {
-    newMoveColumns.splice(moveIndex + 1, 0, startColumn)
-  } else {
-    newMoveColumns.splice(moveIndex, 0, startColumn)
+  /**移除分组下标*/
+  static removeGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
+    return columns.map((ite) => {
+      const { groupIndex, ...rest } = ite;
+      if (ite?.[protoMetaSymbol]) {
+        delete ite[protoMetaSymbol].groupIndex
+      }
+      return { ...rest }
+    }) as T[]
   }
-  return {
-    moveColumns: [...newMoveColumns],
-    startColumns: [...newStartColumns],
+
+  /**一个数组中进行移动数据*/
+  static replaceColumns = (columns: ArtColumnMergePath[], startPath: string, movePath: string) => {
+    /**移动的数据下标*/
+    /**需要移动的数据下标*/
+    const startColumn = columns.find((column) => column[pathIndexMetaSymbol] === startPath);
+    const moveIndex = columns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
+    const newColumns = columns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
+    if (moveIndex === 0) {
+      newColumns.unshift(startColumn)
+    } else if (moveIndex === columns.length - 1) {
+      newColumns.push(startColumn)
+    } else {
+      newColumns.splice(moveIndex, 0, startColumn)
+    }
+    return [...newColumns]
+  }
+
+  /**两个个数组中进行移动数据*/
+  static replaceColumns2 = (startColumns: ArtColumnMergePath[], moveColumns: ArtColumnMergePath[], startPath: string, movePath: string, isAdd1: boolean) => {
+    const startColumn = startColumns.find((column) => column[pathIndexMetaSymbol] === startPath);
+    const moveIndex = moveColumns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
+    const newStartColumns = startColumns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
+    const newMoveColumns = [...moveColumns]
+    if (isAdd1) {
+      newMoveColumns.splice(moveIndex + 1, 0, startColumn)
+    } else {
+      newMoveColumns.splice(moveIndex, 0, startColumn)
+    }
+    return {
+      moveColumns: [...newMoveColumns],
+      startColumns: [...newStartColumns],
+    }
   }
 }

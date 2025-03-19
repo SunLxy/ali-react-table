@@ -1,4 +1,4 @@
-import { ArtColumn, BaseTable, useTablePipeline, features, protoMetaSymbol, CheckBox as ACheckBox, pathIndexMetaSymbol, makeRecursiveMapperWithPathIndex, replaceColumns } from 'ali-react-table'
+import { ArtColumn, BaseTable, useTablePipeline, features, protoMetaSymbol, CheckBox as ACheckBox, GroupUtils } from 'ali-react-table'
 import { Button, Radio, Switch, Typography, Checkbox } from 'antd'
 
 import cx from 'classnames'
@@ -395,8 +395,7 @@ export function DemoApp() {
             return ({ ...ite[protoMetaSymbol] })
           })
           // console.log(param.formItem, param.toItem, newColumns)
-          // const newList = makeRecursiveMapperWithPathIndex(replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
-          console.log("list", list)
+          // const newList = makeRecursiveMapperWithPathIndex(GroupUtils.replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
           setnewColumns(list)
         }}
         // columns={[
