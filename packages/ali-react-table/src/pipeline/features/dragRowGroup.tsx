@@ -104,7 +104,9 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       }
       const columnFlatCount = collectNodes(columns, 'leaf-only').length
       const [firstCol, ...others] = columns
-
+      if (typeof firstCol.groupIndex !== 'number' && !firstCol.isCheckBox) {
+        return columns
+      }
       const render = (value: any, row: any, rowIndex: number) => {
         const content = internals.safeRender(firstCol, row, rowIndex)
         const meta = getGroupingMeta(row)
@@ -157,7 +159,6 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
           style: { cursor: expandable ? 'pointer' : undefined },
         })
       }
-
 
       return [
         {
