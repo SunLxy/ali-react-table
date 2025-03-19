@@ -29,10 +29,12 @@ function rowGroupingRowPropsGetter(row: any) {
 }
 
 export interface DragRowGroupingFeatureOptions {
-
+  indentSize?: number
 }
 
 export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
+  const { indentSize = 0 } = opts
+
   return (pipeline: TablePipeline) => {
     const stateKey = 'dragGrouping'
     const indents = pipeline.ctx.indents
@@ -163,7 +165,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       return [
         {
           ...firstCol,
-          width: firstCol.isCheckBox ? firstCol.width : 0,
+          width: firstCol.isCheckBox ? firstCol.width : indentSize,
           render,
           getCellProps(value, row, rowIndex) {
             return mergeCellProps(getCellProps(value, row, rowIndex), {
@@ -187,7 +189,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         ...others.map((it) => {
           const newIte = { ...it }
           if (typeof it.groupIndex === 'number') {
-            newIte.width = 0;
+            newIte.width = indentSize;
             newIte.lock = true;
             newIte.getCellProps = function (value, row, rowIndex) {
               return mergeCellProps(it.getCellProps?.(value, row, rowIndex) || {}, {
