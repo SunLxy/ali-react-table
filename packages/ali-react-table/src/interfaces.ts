@@ -38,6 +38,8 @@ export interface ArtColumnStaticPart {
   groupIndex?: number;
   /**是否是多选列*/
   isCheckBox?: boolean;
+  /**是否显示列*/
+  visible?: boolean
 }
 
 export interface ArtColumnDynamicPart {

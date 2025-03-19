@@ -174,7 +174,7 @@ export function DemoApp() {
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
     { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
     { code: 'deadCount1', name: '死亡1', width: 100, render: amount, align: 'right' },
-    { code: 'deadCount2', name: '死亡2', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount2', name: '死亡2', width: 100, render: amount, align: 'right', visible: false },
     { code: 'deadCount3', name: '死亡3', width: 100, render: amount, align: 'right' },
     { code: 'deadCount4', name: '死亡4', width: 100, render: amount, align: 'right' },
     { code: 'deadCount5', name: '死亡5', width: 100, render: amount, align: 'right' },

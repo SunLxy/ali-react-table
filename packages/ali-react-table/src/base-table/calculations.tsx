@@ -162,18 +162,20 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
     dragType
   } = table.props
 
+  // 过滤掉隐藏的列
+  const _columns = columnsProp.filter((col) => col.visible !== false)
   /**处理列*/
-  const columns = processColumns(columnsProp, defaultColumnWidth)
+  const columns = processColumns(_columns, defaultColumnWidth)
   // 获取锁定列
   const leftNestedLockCount = getLeftNestedLockCount(columns)
   /***/
   const fullFlat = collectNodes(columns, 'leaf-only')
   /**分组数据*/
   let groupColumns = []
-  let otherColumns = [...columns]
+  let otherColumns = [...columnsProp]
   if (dragType === 'columnGroup') {
-    groupColumns = columns.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
-    otherColumns = columns.filter((col) => typeof col.groupIndex !== 'number')
+    groupColumns = columnsProp.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
+    otherColumns = columnsProp.filter((col) => typeof col.groupIndex !== 'number')
   }
 
   let flat: RenderInfo['flat']
