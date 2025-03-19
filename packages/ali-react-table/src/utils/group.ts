@@ -107,10 +107,10 @@ export function layeredGroup<T extends AbstractTreeNode>(
 }
 
 export class GroupUtils {
-  groupMetaSymbol = groupMetaSymbol;
-  groupLevelMetaSymbol = groupLevelMetaSymbol;
-  protoMetaSymbol = protoMetaSymbol;
-  pathIndexMetaSymbol = pathIndexMetaSymbol;
+  static groupMetaSymbol = groupMetaSymbol;
+  static groupLevelMetaSymbol = groupLevelMetaSymbol;
+  static protoMetaSymbol = protoMetaSymbol;
+  static pathIndexMetaSymbol = pathIndexMetaSymbol;
   /**分组数据(转换成二维数组)*/
   static groupBy = groupBy;
   /**设置分组下标*/
