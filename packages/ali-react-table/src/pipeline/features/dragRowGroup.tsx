@@ -189,7 +189,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         ...others.map((it) => {
           const newIte = { ...it }
           if (typeof it.groupIndex === 'number') {
-            newIte.width = indentSize;
+            newIte.width = firstCol.isCheckBox ? 0 : indentSize;
             newIte.lock = true;
             newIte.getCellProps = function (value, row, rowIndex) {
               return mergeCellProps(it.getCellProps?.(value, row, rowIndex) || {}, {

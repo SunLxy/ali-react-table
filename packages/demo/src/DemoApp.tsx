@@ -233,7 +233,7 @@ export function DemoApp() {
       onChange: (nextValue: string[], key: string, keys: string[], action: "check" | "uncheck" | "check-all" | "uncheck-all") => {
       }
     }))
-    .use(features.dragRowGrouping())
+    .use(features.dragRowGrouping({ indentSize: 8 }))
     .use(features.columnResize())
     // .use(features.columnDrag({
     //   onColumnDragStopped: (columnMoved, newColumns) => {
