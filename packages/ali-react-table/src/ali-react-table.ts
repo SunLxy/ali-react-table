@@ -5,4 +5,4 @@ export * from './transforms'
 export * from './pipeline'
 
 export * from './internals'
-export * from "./components/CheckBox"
+export * from "./components"

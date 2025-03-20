@@ -66,6 +66,7 @@ export interface ArtColumnMergePath extends ArtColumn {
   [protoMetaSymbol]?: ArtColumn
   /**处理后的表头位置*/
   [pathIndexMetaSymbol]?: string
+  /**是否是合并拖拽列的列*/
   isDragColumn?: boolean
 }
 

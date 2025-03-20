@@ -1,7 +1,8 @@
 import { createContext, useContext, useRef } from "react";
 import { BaseTable } from "../base-table/table"
 import { DragInstance } from "./dragInstance"
-import { ArtColumnMergePath, FilterItem, SortItem } from "../interfaces"
+import { TablePipeline } from "./pipeline"
+// import { ArtColumnMergePath, FilterItem, SortItem } from "../interfaces"
 
 /**整体数据实例
  * 1. 列数据(原始列+处理后的渲染列)
@@ -24,6 +25,9 @@ export class BaseTableInstance {
   baseTable: BaseTable;
   /**拖拽实例*/
   dragInstance: DragInstance;
+  /**表格数据处理流水线实例*/
+  pipeline: TablePipeline
+
   // /**原始数据*/
   // __dataList = []
   // /**过滤后的数据*/

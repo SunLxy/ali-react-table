@@ -103,6 +103,7 @@ export function multiSelect(opts: MultiSelectFeatureOptions = {}) {
       title: defaultCheckboxColumnTitle,
       width: 43,
       lock: true,
+      align: "center",
       ...opts.checkboxColumn,
       getCellProps(value: any, row: any, rowIndex: number): CellProps {
         const rowKey = internals.safeGetRowKey(primaryKey, row, rowIndex)

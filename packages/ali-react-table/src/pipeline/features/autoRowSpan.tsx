@@ -13,7 +13,8 @@ export function autoRowSpan() {
 
     return pipeline.mapColumns(
       makeRecursiveMapper((col, { startIndex, endIndex }) => {
-        if (!col.features?.autoRowSpan) {
+        // 如果是分组列节点，不做处理
+        if (!col.features?.autoRowSpan || typeof col.groupIndex === 'number' || col.isDragColumn) {
           return col
         }
 

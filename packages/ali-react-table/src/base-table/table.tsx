@@ -200,9 +200,9 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   private props$: BehaviorSubject<BaseTableProps>
 
   /**基础实例*/
-  private baseTableInstance: BaseTableInstance;
+  private baseTableInstance: BaseTableInstance = new BaseTableInstance();
   /**拖拽基础实例*/
-  private dragInstance: DragInstance;
+  private dragInstance: DragInstance = new DragInstance();
 
 
   /** @deprecated BaseTable.getDoms() 已经过时，请勿调用 */
@@ -225,16 +225,15 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       maxRenderWidth: 800,
       headerContentHeight: 0,// 头部高度
     }
+    this.setupInstance()
+  }
+  private setupInstance() {
     /**初始数据*/
-    if (props.dragInstance) {
-      this.dragInstance = props.dragInstance
-    } else {
-      this.dragInstance = new DragInstance();
+    if (this.props.dragInstance) {
+      this.dragInstance = this.props.dragInstance
     }
-    if (props.instance) {
-      this.baseTableInstance = props.instance
-    } else {
-      this.baseTableInstance = new BaseTableInstance();
+    if (this.props.instance) {
+      this.baseTableInstance = this.props.instance
     }
     this.baseTableInstance.baseTable = this;// 把当前实例进行存储
     this.baseTableInstance.dragInstance = this.dragInstance;

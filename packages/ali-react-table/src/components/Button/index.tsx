@@ -28,17 +28,17 @@ const ButtonBase = styled.button`
     background: #ffffff;
     border-color:#d9d9d9;
     color: rgba(0, 0, 0, 0.88);
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+    /* box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02); */
     &:hover{
-      color: #1677ff;
-      border-color:#1677ff;
+      color: var(--primary-color,#1677ff);
+      border-color:var(--primary-color,#1677ff);
     }
   }
 
   &.${preCls}-primary{
     color: #fff;
-    background: #1677ff;
-    box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+    background: var(--primary-color,#1677ff);
+    /* box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1); */
   }
 
   &.${preCls}-sm{
@@ -57,7 +57,6 @@ export interface ButtonProps extends Omit<React.DetailedHTMLProps<React.ButtonHT
   type?: "primary"
   size?: "sm"
 }
-
 
 export const Button = (props: ButtonProps) => {
   const { children, htmlType, type = 'default', className = '', size = 'sm', ...other } = props
