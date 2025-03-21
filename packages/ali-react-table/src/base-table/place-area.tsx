@@ -73,6 +73,9 @@ export const PlaceArea = (props: PlaceAreaProps) => {
       ref={dragInstance.dom}
     >
       {columns.map((item, index) => {
+        if (item.visible === false) {
+          return <Fragment key={`${item.code}_${index}`} />
+        }
         return <PlaceAreaItem sort={index} column={item} key={`${item.code}_${index}`} />
       })}
       <div className="place-area-placeholder">拖动列标题至此以进行列分组</div>

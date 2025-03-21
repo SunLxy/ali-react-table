@@ -4,7 +4,7 @@ import { pathIndexMetaSymbol, protoMetaSymbol } from "./makeRecursiveMapper"
 
 export const groupMetaSymbol = Symbol('groupMetaSymbol')
 export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
-export const groupColumnMetaSymbol = Symbol('groupColumnMetaSymbol')
+export const groupColumnNameMetaSymbol = Symbol('groupColumnNameMetaSymbol')
 
 
 function groupBy<T extends AbstractTreeNode>(array: T[], key: string) {
@@ -68,7 +68,7 @@ export function layeredGroup<T extends AbstractTreeNode>(
     for (let index = 0; index < lg; index++) {
       const itemList = groupData[index];
       const groupItemList = (itemList || []).map((item: T) => {
-        return { ...item, ___default_level: level }
+        return { ...item }
       })
       const value = groupItemList[0][firstGroupItem.code]
       const textValue = getValue(value)
@@ -87,7 +87,7 @@ export function layeredGroup<T extends AbstractTreeNode>(
           [rowKey]: newKeys,
           [groupLevelMetaSymbol]: level,
           [groupMetaSymbol]: true,
-          [groupColumnMetaSymbol]: firstGroupItem
+          [groupColumnNameMetaSymbol]: firstGroupItem.name
         } as undefined as T)
       } else {
         const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
@@ -96,7 +96,7 @@ export function layeredGroup<T extends AbstractTreeNode>(
           ...parentObj,
           children: groupItemList,
           groupTitle: textValue,
-          [groupColumnMetaSymbol]: firstGroupItem,
+          [groupColumnNameMetaSymbol]: firstGroupItem.name,
           [firstGroupItem.code]: value,
           [rowKey]: newKeys,
           [groupLevelMetaSymbol]: level,
@@ -114,7 +114,7 @@ export class GroupUtils {
   static groupLevelMetaSymbol = groupLevelMetaSymbol;
   static protoMetaSymbol = protoMetaSymbol;
   static pathIndexMetaSymbol = pathIndexMetaSymbol;
-  static groupColumnMetaSymbol = groupColumnMetaSymbol;
+  static groupColumnNameMetaSymbol = groupColumnNameMetaSymbol;
   /**分组数据(转换成二维数组)*/
   static groupBy = groupBy;
   /**设置分组下标*/

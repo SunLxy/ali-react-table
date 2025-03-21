@@ -39,7 +39,9 @@ export interface ArtColumnStaticPart {
   /**是否是多选列*/
   isCheckBox?: boolean;
   /**是否显示列*/
-  visible?: boolean
+  visible?: boolean;
+  /**列顺序*/
+  visibleIndex?: number;
 }
 
 export interface ArtColumnDynamicPart {
