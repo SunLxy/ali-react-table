@@ -1,13 +1,11 @@
 import cx from 'classnames'
 import React, { Fragment } from 'react'
-import { ExpansionCell, icons, InlineFlexCell } from '../../common-views'
+import { ExpansionCell, icons, } from '../../common-views'
 import { ArtColumn } from '../../interfaces'
 import { internals } from '../../internals'
 import { collectNodes, isLeafNode, mergeCellProps, layeredGroup } from '../../utils'
 import { TablePipeline } from '../pipeline'
-import { groupMetaSymbol, groupLevelMetaSymbol } from "../../utils/group"
-// export const groupMetaSymbol = Symbol('groupMetaSymbol')
-// export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
+import { groupColumnMetaSymbol, groupLevelMetaSymbol } from "../../utils/group"
 
 const groupingMetaSymbol = Symbol('row-grouping-meta')
 
@@ -112,6 +110,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       const render = (value: any, row: any, rowIndex: number) => {
         const content = internals.safeRender(firstCol, row, rowIndex)
         const meta = getGroupingMeta(row)
+        const col = row[groupColumnMetaSymbol];
 
         if (!meta.isGroupHeader || !meta.expandable) {
           return firstCol.render?.(value, row, rowIndex);
@@ -124,6 +123,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
           <ExpansionCell style={{ left: indent }} className={cx('expansion-cell', 'art_custom_group_lock_td_body', expandCls)}>
             <div className='art_custom_group_lock_td_body-content' style={{ left: indent }}>
               <icons.CaretRight className={cx('expansion-icon', expandCls)} style={{ marginRight: indents.iconGap }} />
+              {col ? <span>{col.name}：</span> : <Fragment />}
               {row.groupTitle ?? content}
             </div>
           </ExpansionCell>

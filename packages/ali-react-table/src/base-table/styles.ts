@@ -308,6 +308,7 @@ export const StyledArtTableWrapper = styled.div`
       right: 0px;
       .art_custom_group_lock_td_body-content{
         position: sticky;
+        display: inline-flex;
       }
     }
   }

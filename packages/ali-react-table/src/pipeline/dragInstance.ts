@@ -211,7 +211,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
 
 }
 
-interface ProviderProps<T = DragInstance> {
+export interface ProviderProps<T = DragInstance> {
   children?: React.ReactNode
   value?: T
 }
@@ -236,7 +236,7 @@ export const useDragInstanceProvider = <T extends ArtColumnMergePath = ArtColumn
 
 // ========================================拖拽=============================================
 
-interface DragInstanceOptions {
+export interface DragInstanceOptions {
   direction: "horizontal" | "vertical",
 }
 

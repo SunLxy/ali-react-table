@@ -4,6 +4,7 @@ import { pathIndexMetaSymbol, protoMetaSymbol } from "./makeRecursiveMapper"
 
 export const groupMetaSymbol = Symbol('groupMetaSymbol')
 export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
+export const groupColumnMetaSymbol = Symbol('groupColumnMetaSymbol')
 
 
 function groupBy<T extends AbstractTreeNode>(array: T[], key: string) {
@@ -86,6 +87,7 @@ export function layeredGroup<T extends AbstractTreeNode>(
           [rowKey]: newKeys,
           [groupLevelMetaSymbol]: level,
           [groupMetaSymbol]: true,
+          [groupColumnMetaSymbol]: firstGroupItem
         } as undefined as T)
       } else {
         const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
@@ -94,6 +96,7 @@ export function layeredGroup<T extends AbstractTreeNode>(
           ...parentObj,
           children: groupItemList,
           groupTitle: textValue,
+          [groupColumnMetaSymbol]: firstGroupItem,
           [firstGroupItem.code]: value,
           [rowKey]: newKeys,
           [groupLevelMetaSymbol]: level,
@@ -111,6 +114,7 @@ export class GroupUtils {
   static groupLevelMetaSymbol = groupLevelMetaSymbol;
   static protoMetaSymbol = protoMetaSymbol;
   static pathIndexMetaSymbol = pathIndexMetaSymbol;
+  static groupColumnMetaSymbol = groupColumnMetaSymbol;
   /**分组数据(转换成二维数组)*/
   static groupBy = groupBy;
   /**设置分组下标*/
