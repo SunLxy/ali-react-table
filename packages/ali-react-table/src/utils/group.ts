@@ -86,8 +86,11 @@ export function layeredGroup<T extends AbstractTreeNode>(
           [firstGroupItem.code]: value,
           [rowKey]: newKeys,
           [groupLevelMetaSymbol]: level,
+          __groupLevelMetaSymbol: level,
           [groupMetaSymbol]: true,
-          [groupColumnNameMetaSymbol]: firstGroupItem.name
+          __groupMetaSymbol: true,
+          [groupColumnNameMetaSymbol]: firstGroupItem.name,
+          __groupColumnNameMetaSymbol: firstGroupItem.name,
         } as undefined as T)
       } else {
         const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
@@ -96,11 +99,15 @@ export function layeredGroup<T extends AbstractTreeNode>(
           ...parentObj,
           children: groupItemList,
           groupTitle: textValue,
-          [groupColumnNameMetaSymbol]: firstGroupItem.name,
+
           [firstGroupItem.code]: value,
           [rowKey]: newKeys,
           [groupLevelMetaSymbol]: level,
+          __groupLevelMetaSymbol: level,
           [groupMetaSymbol]: true,
+          __groupMetaSymbol: true,
+          [groupColumnNameMetaSymbol]: firstGroupItem.name,
+          __groupColumnNameMetaSymbol: firstGroupItem.name,
         } as undefined as T)
       }
     }
