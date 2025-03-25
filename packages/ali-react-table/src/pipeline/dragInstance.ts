@@ -206,7 +206,7 @@ export class DragInstance<T extends ArtColumnMergePath = ArtColumnMergePath> {
         }
       }
     }
-    // this.clear()
+    this.clear()
   }
 
 }
@@ -365,6 +365,7 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
       }
     }
     if (this.hoverItem && this.dragItem) {
+      console.log("this.hoverItem", this.hoverItem, this.dragItem)
       if (this.hoverItem !== this.dragItem) {
         const hoverBox = this.hoverItem.parentDOM.current?.getBoundingClientRect()
         const dragBox = this.dragItem.parentDOM.current?.getBoundingClientRect()
