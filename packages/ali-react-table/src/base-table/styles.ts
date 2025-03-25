@@ -83,7 +83,6 @@ export type BaseTableCSSVariables = Partial<{
   /** 表头上单元格高亮时的背景色 */
   '--header-highlight-bgcolor': string
 
-
   /** 单元格 padding */
   '--cell-padding': string
   /** 单元格垂直 padding */
@@ -96,6 +95,7 @@ export type BaseTableCSSVariables = Partial<{
   '--line-height': string
   /** 锁列阴影，默认为 rgba(152, 152, 152, 0.5) 0 0 6px 2px */
   '--lock-shadow': string
+  '--lock-shadow-color': string;
 
   /** 单元格的边框颜色 */
   '--border-color': string
@@ -161,6 +161,7 @@ export const StyledArtTableWrapper = styled.div`
   --font-size: 12px;
   --line-height: 1.28571;
   --lock-shadow: rgba(152, 152, 152, 0.5) 0 0 6px 2px;
+  --lock-shadow-color: rgba(152, 152, 152, 0.5);
 
   --border-color: #dfe3e8;
   --cell-border: 1px solid var(--border-color);
@@ -332,7 +333,7 @@ export const StyledArtTableWrapper = styled.div`
 
   &.show-left-shadow .lock-left-last.lock-left:not(.art_custom_group_lock_td):after{
     position: absolute;
-    box-shadow: inset 10px 0 8px -8px rgba(5, 5, 5, 0.06);
+    box-shadow: inset 10px 0 8px -8px var(--lock-shadow-color);
     top: 0;
     right: 0;
     bottom: -1px;
@@ -353,7 +354,7 @@ export const StyledArtTableWrapper = styled.div`
     transition: box-shadow  0.3s;
     content: "";
     pointer-events: none;
-    box-shadow: inset -10px 0 8px -8px rgba(5,5,5,0.06);
+    box-shadow: inset -10px 0 8px -8px var(--lock-shadow-color);
   }
   //#endregion
 
