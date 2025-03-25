@@ -164,6 +164,8 @@ interface BaseTableState {
 
   /**头部内容高度*/
   headerContentHeight?: number
+
+
 }
 
 export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
@@ -298,34 +300,10 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     )
   }
 
-  private renderHeaderFooterLockShadows(info: RenderInfo) {
-    return (
-      <div className={Classes.headerFooterLockShadowMaskWarp}>
-        <div
-          className={Classes.headerFooterLockShadowMask}
-          style={{
-            left: 0,
-            width: info.leftLockTotalWidth + LOCK_SHADOW_PADDING,
-          }}
-        >
-          <div className={cx(Classes.headerFooterLockShadow, Classes.headerFooterLeftLockShadow)} />
-        </div>
-        <div
-          className={Classes.headerFooterLockShadowMask}
-          style={{
-            right: 0,
-            width: info.rightLockTotalWidth + LOCK_SHADOW_PADDING,
-          }}
-        >
-          <div className={cx(Classes.headerFooterLockShadow, Classes.headerFooterRightLockShadow)} />
-        </div>
-      </div>
-    )
-  }
-
   private renderTableHeader(info: RenderInfo) {
-    const { stickyTop, hasHeader } = this.props
+    const { stickyTop, hasHeader, } = this.props
     const { headerContentHeight = 0 } = this.state
+
     return (
       <div
         className={cx(Classes.tableHeader, 'no-scrollbar')}
@@ -335,7 +313,6 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
         }}
       >
         <TableHeader dragType={this.props.dragType} info={info} />
-        {this.renderHeaderFooterLockShadows(info)}
       </div >
     )
   }
@@ -352,61 +329,47 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     this.syncHorizontalScroll(this.domHelper.tableBody.scrollLeft)
   }
 
-
-  private syncShowShadow(x: number, dom: HTMLDivElement) {
-    const { tableBody } = this.domHelper
-    const { flat } = this.lastInfo
-    if (dom) {
-      dom.style.left = `${x}px`
-      const headerFooterLeftLockShadow = this.domHelper.getHeaderFooterLeftLockShadow(dom)
-      if (headerFooterLeftLockShadow) {
-        const shouldShowLeftLockShadow = flat.left.length > 0 && this.state.needRenderLock && x > 0
-        if (shouldShowLeftLockShadow) {
-          headerFooterLeftLockShadow.classList.add('show-shadow')
-        } else {
-          headerFooterLeftLockShadow.classList.remove('show-shadow')
-        }
-      }
-      const headerFooterRightLockShadow = this.domHelper.getHeaderFooterRightLockShadow(dom)
-      if (headerFooterRightLockShadow) {
-        const shouldShowRightLockShadow =
-          flat.right.length > 0 && this.state.needRenderLock && x < tableBody.scrollWidth - tableBody.clientWidth
-        if (shouldShowRightLockShadow) {
-          headerFooterRightLockShadow.classList.add('show-shadow')
-        } else {
-          headerFooterRightLockShadow.classList.remove('show-shadow')
-        }
-      }
-    }
-  }
-
   /** 同步横向滚动偏移量 */
   private syncHorizontalScroll(x: number) {
-    this.updateOffsetX(x)
-    const { tableBody, tableHeaderLockShadowMaskWarp, tableFooterLockShadowMaskWarp } = this.domHelper
+    const { tableBody, artTableWrapper } = this.domHelper
     const { flat } = this.lastInfo
-    this.syncShowShadow(x, tableHeaderLockShadowMaskWarp);
-    this.syncShowShadow(x, tableFooterLockShadowMaskWarp);
-    const leftLockShadow = this.domHelper.getLeftLockShadow()
-    if (leftLockShadow) {
+    this.updateOffsetX(x)
+    if (artTableWrapper) {
       const shouldShowLeftLockShadow = flat.left.length > 0 && this.state.needRenderLock && x > 0
       if (shouldShowLeftLockShadow) {
-        leftLockShadow.classList.add('show-shadow')
+        artTableWrapper.classList.add('show-left-shadow')
       } else {
-        leftLockShadow.classList.remove('show-shadow')
+        artTableWrapper.classList.remove('show-left-shadow')
       }
-    }
-
-    const rightLockShadow = this.domHelper.getRightLockShadow()
-    if (rightLockShadow) {
       const shouldShowRightLockShadow =
         flat.right.length > 0 && this.state.needRenderLock && x < tableBody.scrollWidth - tableBody.clientWidth
       if (shouldShowRightLockShadow) {
-        rightLockShadow.classList.add('show-shadow')
+        artTableWrapper.classList.add('show-right-shadow')
       } else {
-        rightLockShadow.classList.remove('show-shadow')
+        artTableWrapper.classList.remove('show-right-shadow')
       }
     }
+
+    // const leftLockShadow = this.domHelper.getLeftLockShadow()
+    // if (leftLockShadow) {
+    //   const shouldShowLeftLockShadow = flat.left.length > 0 && this.state.needRenderLock && x > 0
+    //   if (shouldShowLeftLockShadow) {
+    //     leftLockShadow.classList.add('show-shadow')
+    //   } else {
+    //     leftLockShadow.classList.remove('show-shadow')
+    //   }
+    // }
+
+    // const rightLockShadow = this.domHelper.getRightLockShadow()
+    // if (rightLockShadow) {
+    //   const shouldShowRightLockShadow =
+    //     flat.right.length > 0 && this.state.needRenderLock && x < tableBody.scrollWidth - tableBody.clientWidth
+    //   if (shouldShowRightLockShadow) {
+    //     rightLockShadow.classList.add('show-shadow')
+    //   } else {
+    //     rightLockShadow.classList.remove('show-shadow')
+    //   }
+    // }
 
   }
 
@@ -476,7 +439,8 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
   }
 
   private renderTableFooter(info: RenderInfo) {
-    const { footerDataSource = [], getRowProps, primaryKey, stickyBottom, components } = this.props
+    const { footerDataSource = [], getRowProps, primaryKey, stickyBottom, components, } = this.props
+
     return (
       <div
         className={cx(Classes.tableFooter, Classes.horizontalScrollContainer)}
@@ -496,33 +460,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
             limit: Infinity,
           }}
         />
-        {this.renderHeaderFooterLockShadows(info)}
       </div>
-    )
-  }
-
-  private renderLockShadows(info: RenderInfo) {
-    return (
-      <>
-        <div
-          className={Classes.lockShadowMask}
-          style={{
-            left: 0,
-            width: info.leftLockTotalWidth + LOCK_SHADOW_PADDING,
-          }}
-        >
-          <div className={cx(Classes.lockShadow, Classes.leftLockShadow)} />
-        </div>
-        <div
-          className={Classes.lockShadowMask}
-          style={{
-            right: 0,
-            width: info.rightLockTotalWidth + LOCK_SHADOW_PADDING,
-          }}
-        >
-          <div className={cx(Classes.lockShadow, Classes.rightLockShadow)} />
-        </div>
-      </>
     )
   }
 
@@ -560,7 +498,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       footerDataSource,
       components,
       flowRoot,
-      useArtTableBorder
+      useArtTableBorder,
     } = this.props
 
     if (flowRoot != null) {
@@ -602,7 +540,6 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
                 {this.renderTableHeader(info)}
                 {this.renderTableBody(info)}
                 {this.renderTableFooter(info)}
-                {this.renderLockShadows(info)}
               </div>
               {this.renderStickyScroll(info)}
             </Loading>

@@ -279,7 +279,9 @@ export default function TableHeader({ info, dragType }: { info: RenderInfo, drag
               first: colIndex === 0,
               last: colIndex + colSpan === fullFlatCount,
               'lock-left': colIndex < leftFlatCount,
+              'lock-left-last': colIndex === leftFlatCount - 1,
               'lock-right': colIndex >= fullFlatCount - rightFlatCount,
+              "lock-right-first": colIndex === fullFlatCount - rightFlatCount,
             })}
             colSpan={colSpan}
             rowSpan={isLeaf ? rowCount - level : undefined}

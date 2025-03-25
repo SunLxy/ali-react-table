@@ -175,6 +175,7 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
   let otherColumns = [...columnsProp]
   if (dragType === 'columnGroup') {
     groupColumns = columnsProp.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
+
     otherColumns = columnsProp.filter((col) => typeof col.groupIndex !== 'number')
   }
 

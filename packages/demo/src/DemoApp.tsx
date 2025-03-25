@@ -167,14 +167,15 @@ export function DemoApp() {
   const [dataList, setDataList] = useState([...dataSource])
 
   const [newColumns, setnewColumns] = useState<any[]>(([
+
+    { code: 'provinceName', name: '省份', width: 150, lock: true },
     {
-      code: 'cityName', name: '城市', width: 150, groupIndex: 0,
+      code: 'cityName', name: '城市', width: 150,
       features: { filter: true, sortable: true, },
       render: (value: any) => {
         return <span>{value}</span>
       }
     },
-    { code: 'provinceName', name: '省份', width: 150, lock: true },
     { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
     { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
@@ -399,6 +400,7 @@ export function DemoApp() {
         useVirtual={{ header: false, vertical: true }}
         // overflowVerticalNumber={30}
         dragType="columnGroup"
+        isLockShadow={false}
         // dragType="column"
         onColumnDragEnd={(param) => {
           const list = param.columns.filter((it) => it[protoMetaSymbol]).map((ite) => {

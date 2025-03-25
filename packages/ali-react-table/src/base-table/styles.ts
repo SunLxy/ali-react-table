@@ -310,7 +310,53 @@ export const StyledArtTableWrapper = styled.div`
   .lock-right {
     z-index: ${Z.lock};
   }
-  
+
+  //#region 锁列阴影
+  .lock-left-last {
+    border-right: var(--cell-border-vertical);
+  }
+  .art-table-header-cell.lock-left-last {
+    border-right: var(--header-cell-border-vertical);
+  }
+  .art-table-cell:not(.lock-right) + .lock-right {
+    border-left:var(--cell-border-vertical);
+  }
+  .art-table-header-cell:not(.lock-right) + .lock-right {
+    border-left:var(--header-cell-border-vertical);
+  }
+
+  .art-table-cell:has(+.lock-right-first),
+  .art-table-header-cell:has(+.lock-right-first){
+    border-right: 0;
+  }
+
+  &.show-left-shadow .lock-left-last.lock-left:not(.art_custom_group_lock_td):after{
+    position: absolute;
+    box-shadow: inset 10px 0 8px -8px rgba(5, 5, 5, 0.06);
+    top: 0;
+    right: 0;
+    bottom: -1px;
+    width: 30px;
+    transform: translateX(100%);
+    transition: box-shadow 0.3s;
+    content: "";
+    pointer-events: none;
+  }
+
+  &.show-right-shadow .lock-right-first:not(.art_custom_group_lock_td):after{
+    position: absolute;
+    top: 0;
+    bottom: -1px;
+    left: 0;
+    width: 30px;
+    transform: translateX(-100%);
+    transition: box-shadow  0.3s;
+    content: "";
+    pointer-events: none;
+    box-shadow: inset -10px 0 8px -8px rgba(5,5,5,0.06);
+  }
+  //#endregion
+
   .art_custom_group_lock_td{
     justify-content: flex-start!important;
     text-align: left !important;
@@ -332,89 +378,10 @@ export const StyledArtTableWrapper = styled.div`
     }
   }
 
-  //#region 锁列阴影
-  .${Classes.lockShadowMask} {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: ${Z.lockShadow};
-    pointer-events: none;
-    overflow: hidden;
-
-    .${Classes.lockShadow} {
-      height: 100%;
-    }
-
-    .${Classes.leftLockShadow} {
-      margin-right: ${LOCK_SHADOW_PADDING}px;
-      box-shadow: none;
-
-      &.show-shadow {
-        box-shadow: var(--lock-shadow);
-        border-right: var(--cell-border-vertical);
-      }
-    }
-
-    .${Classes.rightLockShadow} {
-      margin-left: ${LOCK_SHADOW_PADDING}px;
-      box-shadow: none;
-
-      &.show-shadow {
-        box-shadow: var(--lock-shadow);
-        border-left: var(--cell-border-vertical);
-      }
-    }
-  }
-  //#endregion
 
   .art_custom_group_lock_td{
     z-index:${Z.groupLock};
   }
-
-  //#region 锁列阴影
-  .${Classes.headerFooterLockShadowMaskWarp}{
-    width: 100%;
-    z-index:${Z.header};
-    pointer-events: none;
-  }
-
-
-  .${Classes.headerFooterLockShadowMask} {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: ${Z.header};
-    pointer-events: none;
-    overflow: hidden;
-
-    .${Classes.headerFooterLockShadow} {
-      height: 100%;
-    }
-
-    .${Classes.headerFooterLeftLockShadow} {
-      margin-right: ${LOCK_SHADOW_PADDING}px;
-      box-shadow: none;
-
-      &.show-shadow {
-        box-shadow: var(--lock-shadow);
-        border-right: var(--cell-border-vertical);
-      }
-    }
-
-    .${Classes.headerFooterRightLockShadow} {
-      margin-left: ${LOCK_SHADOW_PADDING}px;
-      box-shadow: none;
-
-      &.show-shadow {
-        box-shadow: var(--lock-shadow);
-        border-left: var(--cell-border-vertical);
-      }
-    }
-  }
-  //#endregion
-
-
-
 
   //#region 空表格展现
   .${Classes.emptyWrapper} {

@@ -46,12 +46,6 @@ const StyledBaseTable = (styled(BaseTable)`
     font-weight: 500;
   }
 
-  .${Classes.lockShadowMask} {
-    .${Classes.lockShadow} {
-      transition: box-shadow 0.3s;
-    }
-  }
-
   &:not(.bordered) {
     --cell-border-vertical: none;
     --header-cell-border-vertical: none;

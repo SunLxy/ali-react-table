@@ -144,7 +144,9 @@ export function HtmlTable({
         first: colIndex === 0,
         last: colIndex + colSpan === fullFlatCount,
         'lock-left': colIndex < leftFlatCount,
+        'lock-left-last': colIndex === leftFlatCount - 1,
         'lock-right': colIndex >= fullFlatCount - rightFlatCount,
+        "lock-right-first": colIndex === fullFlatCount - rightFlatCount,
       }),
       ...(hasSpan ? { colSpan, rowSpan } : null),
       style: {
