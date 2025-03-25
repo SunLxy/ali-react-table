@@ -33,11 +33,11 @@ export const Classes = {
   leftLockShadow: `${prefix}left-lock-shadow`,
   rightLockShadow: `${prefix}right-lock-shadow`,
 
-  headerFooterLockShadowMaskWarp: `${prefix}header-lock-shadow-mask-warp`,
-  headerFooterLockShadowMask: `${prefix}header-lock-shadow-mask`,
-  headerFooterLockShadow: `${prefix}header-lock-shadow`,
-  headerFooterLeftLockShadow: `${prefix}header-left-lock-shadow`,
-  headerFooterRightLockShadow: `${prefix}header-right-lock-shadow`,
+  headerFooterLockShadowMaskWarp: `${prefix}header-footer-lock-shadow-mask-warp`,
+  headerFooterLockShadowMask: `${prefix}header-footer-lock-shadow-mask`,
+  headerFooterLockShadow: `${prefix}header-footer-lock-shadow`,
+  headerFooterLeftLockShadow: `${prefix}header-footer-left-lock-shadow`,
+  headerFooterRightLockShadow: `${prefix}header-footer-right-lock-shadow`,
 
   /** 数据为空时表格内容的外层 div */
   emptyWrapper: `${prefix}empty-wrapper`,
@@ -118,7 +118,6 @@ const outerBorderStyleMixin = css`
   border-right: var(--cell-border-vertical);
   border-bottom: var(--cell-border-horizontal);
   border-left: var(--cell-border-vertical);
-
   td.first,
   th.first {
     border-left: none;
@@ -185,6 +184,22 @@ export const StyledArtTableWrapper = styled.div`
   // 表格外边框由 art-table-wrapper 提供，而不是由单元格提供
   &.use-outer-border {
     ${outerBorderStyleMixin};
+  }
+  &.use-art-table-border .art-table{
+    .${Classes.tableHeader},
+    .${Classes.tableBody},
+    .${Classes.tableFooter}{
+      border-right: var(--cell-border-vertical);
+      border-left: var(--cell-border-vertical);
+      td.first,
+      th.first {
+        border-left: none;
+      }
+      td.last,
+      th.last {
+        border-right: none;
+      }
+    }
   }
 
   .no-scrollbar {
@@ -300,6 +315,7 @@ export const StyledArtTableWrapper = styled.div`
     justify-content: flex-start!important;
     text-align: left !important;
     font-weight: 600;
+    border-right: 0;
     & > .art_custom_group_lock_td_body{
       position: absolute;
       left: 0px;
@@ -308,7 +324,10 @@ export const StyledArtTableWrapper = styled.div`
       right: 0px;
       .art_custom_group_lock_td_body-content{
         position: sticky;
-        display: inline-flex;
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: flex-start;
       }
     }
   }
@@ -354,13 +373,11 @@ export const StyledArtTableWrapper = styled.div`
 
   //#region 锁列阴影
   .${Classes.headerFooterLockShadowMaskWarp}{
-    position: absolute;
     width: 100%;
-    height: 100%;
-    top: 0px;
     z-index:${Z.header};
     pointer-events: none;
   }
+
 
   .${Classes.headerFooterLockShadowMask} {
     position: absolute;

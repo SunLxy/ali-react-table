@@ -111,17 +111,19 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
         const content = internals.safeRender(firstCol, row, rowIndex)
         const meta = getGroupingMeta(row)
         const colName = row[groupColumnNameMetaSymbol];
-
         if (!meta.isGroupHeader || !meta.expandable) {
-          return firstCol.render?.(value, row, rowIndex);
+          if (firstCol.isCheckBox) {
+            return firstCol.render?.(value, row, rowIndex);
+          }
+          return <Fragment />
         }
         const expanded = !openKeySet.has(row[primaryKey])
         const expandCls = expanded ? 'expanded' : 'collapsed'
-        const indent = indents.iconIndent + row[groupLevelMetaSymbol] * indents.iconWidth + 12
+        const indent = indents.iconIndent + row[groupLevelMetaSymbol] * indents.iconWidth + 12;
 
         return (
           <ExpansionCell style={{ left: indent }} className={cx('expansion-cell', 'art_custom_group_lock_td_body', expandCls)}>
-            <div className='art_custom_group_lock_td_body-content' style={{ left: indent }}>
+            <div className='art_custom_group_lock_td_body-content' style={{ left: indent + 1 } as any}>
               <icons.CaretRight className={cx('expansion-icon', expandCls)} style={{ marginRight: indents.iconGap }} />
               {colName ? <span>{colName}：</span> : <Fragment />}
               {row.groupTitle ?? content}

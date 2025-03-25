@@ -87,6 +87,7 @@ export interface BaseTableProps {
   stickyScrollHeight?: 'auto' | number
   /** 使用来自外层 div 的边框代替单元格的外边框 */
   useOuterBorder?: boolean
+  useArtTableBorder?: boolean
 
   /** 表格是否在加载中 */
   isLoading?: boolean
@@ -384,7 +385,8 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
     this.updateOffsetX(x)
     const { tableBody, tableHeaderLockShadowMaskWarp, tableFooterLockShadowMaskWarp } = this.domHelper
     const { flat } = this.lastInfo
-
+    this.syncShowShadow(x, tableHeaderLockShadowMaskWarp);
+    this.syncShowShadow(x, tableFooterLockShadowMaskWarp);
     const leftLockShadow = this.domHelper.getLeftLockShadow()
     if (leftLockShadow) {
       const shouldShowLeftLockShadow = flat.left.length > 0 && this.state.needRenderLock && x > 0
@@ -405,8 +407,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
         rightLockShadow.classList.remove('show-shadow')
       }
     }
-    this.syncShowShadow(x, tableHeaderLockShadowMaskWarp);
-    this.syncShowShadow(x, tableFooterLockShadowMaskWarp);
+
   }
 
   getVerticalRenderRange(useVirtual: ResolvedUseVirtual): VerticalRenderRange {
@@ -559,6 +560,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       footerDataSource,
       components,
       flowRoot,
+      useArtTableBorder
     } = this.props
 
     if (flowRoot != null) {
@@ -569,6 +571,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       Classes.artTableWrapper,
       {
         'use-outer-border': useOuterBorder,
+        "use-art-table-border": useArtTableBorder,
         empty: dataSource.length === 0,
         lock: info.hasLockColumn,
         'has-header': hasHeader,

@@ -163,12 +163,18 @@ export function DemoApp() {
   const [useScale, setUseScale] = useState(false)
   const [cellCount, setCellCount] = useState(20)
   const [theme, setTheme] = useState('default')
-  const [showControlGrid, toggle] = useReducer((s: boolean) => !s, true)
+  const [showControlGrid, toggle] = useReducer((s: boolean) => !s, false)
   const [dataList, setDataList] = useState([...dataSource])
 
   const [newColumns, setnewColumns] = useState<any[]>(([
-    { code: 'provinceName', name: '省份', width: 150, },
-    { code: 'cityName', name: '城市', width: 150, features: { filter: true, sortable: true, } },
+    {
+      code: 'cityName', name: '城市', width: 150, groupIndex: 0,
+      features: { filter: true, sortable: true, },
+      render: (value: any) => {
+        return <span>{value}</span>
+      }
+    },
+    { code: 'provinceName', name: '省份', width: 150, lock: true },
     { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
     { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
@@ -229,11 +235,11 @@ export function DemoApp() {
       columns: newColumns
     })
     .useWithColumns()
-    .use(features.multiSelect({
-      onChange: (nextValue: string[], key: string, keys: string[], action: "check" | "uncheck" | "check-all" | "uncheck-all") => {
-      }
-    }))
-    .use(features.dragRowGrouping({ indentSize: 8 }))
+    // .use(features.multiSelect({
+    //   onChange: (nextValue: string[], key: string, keys: string[], action: "check" | "uncheck" | "check-all" | "uncheck-all") => {
+    //   }
+    // }))
+    .use(features.dragRowGrouping({ indentSize: 0 }))
     .use(features.columnResize())
     // .use(features.columnDrag({
     //   onColumnDragStopped: (columnMoved, newColumns) => {
@@ -384,7 +390,8 @@ export function DemoApp() {
         isStickyFooter={isStickyFooter}
         isLoading={isLoading}
         style={{ ...style1, ...style2 }}
-        useOuterBorder
+        // useOuterBorder={false}
+        useArtTableBorder
         hasStickyScroll={hasStickyScroll}
         stickyScrollHeight={hasCustomScrollbar ? 10 : 'auto'}
         hasHeader={hasHeader}
@@ -401,21 +408,21 @@ export function DemoApp() {
           // const newList = makeRecursiveMapperWithPathIndex(GroupUtils.replaceColumns(newColumns, param.formItem.itemData[pathIndexMetaSymbol], param.toItem.itemData[pathIndexMetaSymbol]))
           setnewColumns(list)
         }}
-      // columns={[
-      //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
-      //   { code: 'cityName', name: '城市', width: 150 },
-      //   ...repeat<ArtColumn>(
-      //     [
-      //       { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
-      //       { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
-      //       { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
-      //     ],
-      //     useBigData ? 40 : 10,
-      //   ),
-      //   { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
-      // ]}
-      // dataSource={hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : []}
-      // footerDataSource={hasFooter ? footerDataSource : []}
+        // columns={[
+        //   { code: 'provinceName', name: '省份', width: 150, lock: leftLock },
+        //   { code: 'cityName', name: '城市', width: 150 },
+        //   ...repeat<ArtColumn>(
+        //     [
+        //       { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
+        //       { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
+        //       { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+        //     ],
+        //     useBigData ? 40 : 10,
+        //   ),
+        //   { code: 'updateTime', name: '更新时间', width: 150, lock: rightLock },
+        // ]}
+        // dataSource={hasData ? (useBigData ? repeat(dataSource, 5) : dataSource) : []}
+        footerDataSource={hasFooter ? footerDataSource : []}
       />
     </AppDivAppDiv>
   )
