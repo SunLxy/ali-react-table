@@ -65,7 +65,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
 
     const columns = pipeline.getColumns() // 获取列
     /**对列中的分组数据进行获取*/
-    const groupColumns = columns.filter((column) => typeof column.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
+    const groupColumns = columns.filter(item => item.visible !== false).filter((column) => typeof column.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
 
     return pipeline
       .mapDataSource(processPreData)
