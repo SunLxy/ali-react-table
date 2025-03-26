@@ -168,7 +168,7 @@ export function DemoApp() {
 
   const [newColumns, setnewColumns] = useState<any[]>(([
 
-    { code: 'provinceName', name: '省份', width: 150, lock: true },
+    { code: 'provinceName', name: '省份', width: 150 },
     {
       code: 'cityName', name: '城市', width: 150,
       features: { filter: true, sortable: true, },

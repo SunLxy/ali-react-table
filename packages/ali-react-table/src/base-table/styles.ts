@@ -313,9 +313,11 @@ export const StyledArtTableWrapper = styled.div`
   }
 
   //#region 锁列阴影
-  .lock-left-last {
+  .lock-left-last,
+  .lock-left:has(+ :not(.lock-left)){
     border-right: var(--cell-border-vertical);
   }
+
   .art-table-header-cell.lock-left-last {
     border-right: var(--header-cell-border-vertical);
   }
@@ -331,7 +333,12 @@ export const StyledArtTableWrapper = styled.div`
     border-right: 0;
   }
 
-  &.show-left-shadow .lock-left-last.lock-left:not(.art_custom_group_lock_td):after{
+  .art_custom_group_lock_tr .art_custom_group_lock_td.lock-left:after{
+    display: none !important;
+  }
+
+  &.show-left-shadow .lock-left-last.lock-left:after,
+  &.show-left-shadow .lock-left:has(+ :not(.lock-left)):after{
     position: absolute;
     box-shadow: inset 10px 0 8px -8px var(--lock-shadow-color);
     top: 0;
@@ -344,7 +351,7 @@ export const StyledArtTableWrapper = styled.div`
     pointer-events: none;
   }
 
-  &.show-right-shadow .lock-right-first:not(.art_custom_group_lock_td):after{
+  &.show-right-shadow .lock-right-first.lock-right:after{
     position: absolute;
     top: 0;
     bottom: -1px;
@@ -358,11 +365,12 @@ export const StyledArtTableWrapper = styled.div`
   }
   //#endregion
 
-  .art_custom_group_lock_td{
+  .art_custom_group_lock_tr .art_custom_group_lock_td{
+    z-index:${Z.groupLock};
     justify-content: flex-start!important;
     text-align: left !important;
     font-weight: 600;
-    border-right: 0;
+    border-right: 0px;
     & > .art_custom_group_lock_td_body{
       position: absolute;
       left: 0px;
@@ -377,11 +385,6 @@ export const StyledArtTableWrapper = styled.div`
         justify-content: flex-start;
       }
     }
-  }
-
-
-  .art_custom_group_lock_td{
-    z-index:${Z.groupLock};
   }
 
   //#region 空表格展现

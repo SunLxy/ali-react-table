@@ -27,11 +27,12 @@ function rowGroupingRowPropsGetter(row: any) {
 }
 
 export interface DragRowGroupingFeatureOptions {
-  indentSize?: number
+  indentSize?: number;
+  isMerged?: boolean;
 }
 
 export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
-  const { indentSize = 0 } = opts
+  const { indentSize = 0, isMerged = true } = opts
 
   return (pipeline: TablePipeline) => {
     const stateKey = 'dragGrouping'
@@ -183,7 +184,8 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
             if (getGroupingMeta(row).isGroupHeader) {
               return { top: rowIndex, bottom: rowIndex + 1, left: 0, right: columnFlatCount }
             } else {
-              return { top: rowIndex, bottom: rowIndex + 1, left: 0, right: groupColumns.length + (firstCol.isCheckBox ? 1 : 0) }
+              if (isMerged)
+                return { top: rowIndex, bottom: rowIndex + 1, left: 0, right: groupColumns.length + (firstCol.isCheckBox ? 1 : 0) }
             }
           },
           isDragColumn: true
