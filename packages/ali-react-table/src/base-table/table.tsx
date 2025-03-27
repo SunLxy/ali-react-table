@@ -40,14 +40,6 @@ function warnEmptyContentIsDeprecated() {
   }
 }
 
-let flowRootDeprecatedWarned = false
-function warnFlowRootIsDeprecated() {
-  if (!flowRootDeprecatedWarned) {
-    flowRootDeprecatedWarned = true
-    console.warn('[ali-react-table] BaseTable v2.4 版本之后已经不再需要指定 flowRoot')
-  }
-}
-
 export type PrimaryKey = string | ((row: any) => string)
 
 export interface BaseTableProps {
@@ -114,12 +106,6 @@ export interface BaseTableProps {
 
   /** 列的默认宽度 */
   defaultColumnWidth?: number
-
-  /**
-   * @deprecated
-   * flowRoot 在表格 v2.4 后不再需要提供，请移除该属性
-   * */
-  flowRoot?: never
 
   /** 虚拟滚动调试标签，用于表格内部调试使用 */
   virtualDebugLabel?: string
@@ -275,6 +261,7 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
 
   private renderTableHeaderTop(info: RenderInfo) {
     const { stickyTop, hasHeader, topRightContent, topLeftContent, dragType } = this.props
+
     if (dragType !== "columnGroup" && !topLeftContent && !topRightContent) {
       return <Fragment />
     }
@@ -497,13 +484,8 @@ export class BaseTable extends React.Component<BaseTableProps, BaseTableState> {
       isLoading,
       footerDataSource,
       components,
-      flowRoot,
       useArtTableBorder,
     } = this.props
-
-    if (flowRoot != null) {
-      warnFlowRootIsDeprecated()
-    }
 
     const artTableWrapperClassName = cx(
       Classes.artTableWrapper,

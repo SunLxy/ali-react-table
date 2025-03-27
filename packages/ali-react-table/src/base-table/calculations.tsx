@@ -56,6 +56,8 @@ function processColumns(columns: ArtColumn[], defaultColumnWidth: number) {
         if (column.hidden) {
           // 被隐藏的列 会在这里被剔除
           warnColumnHiddenDeprecated(column)
+        } else if (column.visible) {
+          // 隐藏的列 会在这里被剔除
         } else {
           result.push(column)
         }
@@ -163,9 +165,9 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
   } = table.props
 
   // 过滤掉隐藏的列
-  const _columns = columnsProp.filter((col) => col.visible !== false)
+  // const _columns = columnsProp.filter((col) => col.visible !== false)
   /**处理列*/
-  const columns = processColumns(_columns, defaultColumnWidth)
+  const columns = processColumns(columnsProp, defaultColumnWidth)
   // 获取锁定列
   const leftNestedLockCount = getLeftNestedLockCount(columns)
   /***/
@@ -175,7 +177,6 @@ export function calculateRenderInfo(table: BaseTable): RenderInfo {
   let otherColumns = [...columnsProp]
   if (dragType === 'columnGroup') {
     groupColumns = columnsProp.filter((col) => typeof col.groupIndex === 'number').sort((a, b) => a.groupIndex - b.groupIndex)
-
     otherColumns = columnsProp.filter((col) => typeof col.groupIndex !== 'number')
   }
 
