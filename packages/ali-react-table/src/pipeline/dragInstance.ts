@@ -343,6 +343,8 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
   /**计算所在位置*/
   calc = (x: number, y: number,) => {
     const list = this.list.sort((a, b) => a.sort - b.sort)
+    const isDragLock = this.dragItem?.itemData?.lock
+
     /**原始位置*/
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
@@ -357,15 +359,24 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
       const startH = (box?.top || 0);
       const endH = (box?.top || 0) + (box?.height || 0);
       if (startW <= x && endW >= x && startH <= y && endH >= y) {
-        this.hoverItem = element;
-        this.hoverIndex = index;
+        // 拖拽和放置的 lock 要相同
+        if (isDragLock === true) {
+          if (element.itemData?.lock === true) {
+            this.hoverItem = element;
+            this.hoverIndex = index;
+          }
+        } else {
+          if (element.itemData.lock !== true) {
+            this.hoverItem = element;
+            this.hoverIndex = index;
+          }
+        }
         this.removeClassList(element.parentDOM.current)
       } else {
         this.removeClassList(element.parentDOM.current)
       }
     }
     if (this.hoverItem && this.dragItem) {
-      console.log("this.hoverItem", this.hoverItem, this.dragItem)
       if (this.hoverItem !== this.dragItem) {
         const hoverBox = this.hoverItem.parentDOM.current?.getBoundingClientRect()
         const dragBox = this.dragItem.parentDOM.current?.getBoundingClientRect()
@@ -394,7 +405,10 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
       if (this.direction === 'horizontal') {
         const startW = (hoverBox?.left || 0);
         const endW = (hoverBox?.left || 0) + (hoverBox?.width || 0);
-        const middleW = endW / 2
+        let middleW = hoverBox?.left || 0;
+        if (hoverBox?.width) {
+          middleW = (hoverBox?.left || 0) + (hoverBox?.width / 2);
+        }
         if (x >= startW && endW >= x) {
           if (x >= middleW) {
             this.horizontalPosition = "right"
@@ -403,10 +417,14 @@ export class DragBodyInstance<T extends ArtColumnMergePath = ArtColumnMergePath>
           }
           this.hoverItem?.parentDOM.current?.classList.add(`draggover-${this.horizontalPosition}`)
         }
+
       } else if (this.direction === 'vertical') {
         const startH = (hoverBox?.top || 0);
         const endH = (hoverBox?.top || 0) + (hoverBox?.height || 0);
-        const middleH = endH / 2
+        let middleH = hoverBox?.top || 0;
+        if (hoverBox?.height) {
+          middleH = (hoverBox?.top || 0) + (hoverBox?.height / 2);
+        }
         if (y >= startH && endH >= y) {
           if (y >= middleH) {
             this.verticalPosition = "bottom"

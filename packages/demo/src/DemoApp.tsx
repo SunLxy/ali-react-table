@@ -168,24 +168,34 @@ export function DemoApp() {
 
   const [newColumns, setnewColumns] = useState<any[]>(([
 
-    { code: 'provinceName', name: '省份', width: 150 },
+    { code: 'provinceName', name: '省份', width: 150, lock: true },
     {
-      code: 'cityName', name: '城市', width: 150,
+      code: 'cityName', name: '城市', width: 150, lock: true,
       features: { filter: true, sortable: true, },
       render: (value: any) => {
         return <span>{value}</span>
       }
     },
-    { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, } },
-    { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right' },
+    { code: '_temp', name: '_temp', width: 150, features: { filter: true, sortable: true, }, lock: true },
+    { code: 'confirmedCount', name: '确诊', width: 100, render: amount, align: 'right', lock: true },
     { code: 'curedCount', name: '治愈', width: 100, render: amount, align: 'right' },
-    { code: 'deadCount', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount12', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount23', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount34', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount54', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount65', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount76', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount87', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount763', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount234', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount434', name: '死亡', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount55', name: '死亡', width: 100, render: amount, align: 'right' },
     { code: 'deadCount1', name: '死亡1', width: 100, render: amount, align: 'right' },
     { code: 'deadCount2', name: '死亡2', width: 100, render: amount, align: 'right', visible: false },
     { code: 'deadCount3', name: '死亡3', width: 100, render: amount, align: 'right' },
     { code: 'deadCount4', name: '死亡4', width: 100, render: amount, align: 'right' },
     { code: 'deadCount5', name: '死亡5', width: 100, render: amount, align: 'right' },
-    { code: 'deadCount6', name: '死亡6', width: 100, render: amount, align: 'right' },
+    { code: 'deadCount6', name: '死亡6', width: 100, render: amount, align: 'right', lock: true },
     { code: 'updateTime', name: '更新时间', width: 150, lock: true },
   ]))
   const [mspa] = useState(new Map(newColumns.map((it) => [it.code, it.name])))
@@ -390,7 +400,7 @@ export function DemoApp() {
         isStickyHeader={isStickyHeader}
         isStickyFooter={isStickyFooter}
         isLoading={isLoading}
-        style={{ ...style1, ...style2 }}
+        // style={{ ...style1, ...style2 }}
         // useOuterBorder={false}
         useArtTableBorder
         hasStickyScroll={hasStickyScroll}
