@@ -75,7 +75,7 @@ export function dragRowGrouping(opts: DragRowGroupingFeatureOptions = {}) {
       .appendRowPropsGetter(rowGroupingRowPropsGetter)
 
     function processPreData(dataSource: any[]) {
-      return layeredGroup(dataSource, groupColumns, primaryKey, []);
+      return layeredGroup(dataSource, groupColumns, primaryKey);
     }
 
     function processDataSource(input: any[]) {
