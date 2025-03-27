@@ -113,6 +113,82 @@ export function layeredGroup<T extends AbstractTreeNode>(
   return array
 }
 
+
+/** 对树状结构的数据进行分组.
+ * layeredGroup 是一个递归的过程，
+ * */
+export function layeredGroup2<T extends AbstractTreeNode>(
+  array: T[],
+  oldGroup: ArtColumn[],
+  primaryKey: string | ((row: any) => string),
+): T[] {
+  const newListData = []
+  const loop = (
+    array: T[],
+    oldGroup: ArtColumn[],
+    primaryKey: string | ((row: any) => string),
+    parentKey: string = '',
+    level: number = 0,
+    parentObj = {}
+  ) => {
+    const group = [...oldGroup]
+    // 每次取第一个进行分组，剩余的进行二次循环
+    const firstGroupItem = group.shift()
+    if (firstGroupItem) {
+      const newParentKey = parentKey ? parentKey + "_" + firstGroupItem.code : firstGroupItem.code
+      const groupData = groupBy<T>(array, firstGroupItem.code)
+      const lg = groupData.length
+      const newArray: T[] = []
+      for (let index = 0; index < lg; index++) {
+        const itemList = groupData[index];
+        const groupItemList = (itemList || []).map((item: T) => {
+          return { ...item }
+        })
+        const value = groupItemList[0][firstGroupItem.code]
+        const textValue = getValue(value)
+        const rowKey = typeof primaryKey === "function" ? primaryKey(groupItemList[0]) : primaryKey
+        const valueKey = groupItemList[0][rowKey]
+        if (group.length) {
+          const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
+          const newItem = {
+            ...parentObj,
+            groupTitle: textValue,
+            [firstGroupItem.code]: value,
+            [rowKey]: newKeys,
+            __groupLevelMetaSymbol: level,
+            __groupMetaSymbol: true,
+            __groupColumnNameMetaSymbol: firstGroupItem.name,
+          } as unknown as T
+          newListData.push(newItem)
+          newArray.push(newItem)
+          const list = loop(groupItemList, group, primaryKey, newParentKey, level + 1, { ...parentObj, [firstGroupItem.code]: value, })
+          newItem.children = list;
+        } else {
+          const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
+          const newItem = {
+            ...parentObj,
+            children: groupItemList,
+            groupTitle: textValue,
+            [firstGroupItem.code]: value,
+            [rowKey]: newKeys,
+            __groupLevelMetaSymbol: level,
+            __groupMetaSymbol: true,
+            __groupColumnNameMetaSymbol: firstGroupItem.name,
+          } as undefined as T
+          newArray.push(newItem)
+          newListData.push(newItem)
+          newListData.push(...groupItemList);
+        }
+      }
+      return newArray
+    }
+  }
+  loop(array, oldGroup, primaryKey)
+  return newListData
+}
+
+
+
 export class GroupUtils {
   static groupMetaSymbol = groupMetaSymbol;
   static groupLevelMetaSymbol = groupLevelMetaSymbol;
