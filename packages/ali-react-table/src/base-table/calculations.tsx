@@ -56,7 +56,7 @@ function processColumns(columns: ArtColumn[], defaultColumnWidth: number) {
         if (column.hidden) {
           // 被隐藏的列 会在这里被剔除
           warnColumnHiddenDeprecated(column)
-        } else if (column.visible) {
+        } else if (column.visible === false) {
           // 隐藏的列 会在这里被剔除
         } else {
           result.push(column)
