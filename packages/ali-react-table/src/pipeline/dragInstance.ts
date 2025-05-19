@@ -488,7 +488,7 @@ export const DragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColum
   return createElement(ContextDragBodyInstance.Provider, { value: instance, children: props.children })
 }
 
-export const useDragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext<DragBodyInstance<T>>(ContextDragBodyInstance)
+export const useDragBodyInstanceProvider = <T extends ArtColumnMergePath = ArtColumnMergePath>() => useContext(ContextDragBodyInstance) as DragBodyInstance<T>
 
 // ====================================拖拽项=================================================
 

@@ -3,7 +3,7 @@
   "private": true,
   "sideEffects": false,
   "module": "../esm/ali-react-table-pivot.esm.js",
-  "main": "../cjs/ali-react-table-pivot.js",
+  "main": "../lib/ali-react-table-pivot.js",
   "types": "../esm/ali-react-table-pivot.d.ts",
   "license": "MIT"
 }
