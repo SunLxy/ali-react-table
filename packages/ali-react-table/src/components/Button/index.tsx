@@ -4,7 +4,7 @@ import styled from "styled-components"
 const preCls = 'ali-simple-table-button'
 
 const ButtonBase = styled.button`
-  font-size: 14px;
+  font-size: 12px;
   height: 32px;
   padding: 4px 15px;
   border-radius: 6px;
@@ -26,27 +26,31 @@ const ButtonBase = styled.button`
 
   &.${preCls}-default{
     background: #ffffff;
-    border-color:#d9d9d9;
     color: rgba(0, 0, 0, 0.88);
-    /* box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02); */
     &:hover{
       color: var(--primary-color,#1677ff);
-      border-color:var(--primary-color,#1677ff);
     }
   }
 
   &.${preCls}-primary{
     color: #fff;
     background: var(--primary-color,#1677ff);
-    /* box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1); */
   }
 
   &.${preCls}-sm{
-    font-size: 14px;
+    font-size: 12px;
     height: 24px;
     padding: 0px 7px;
     border-radius: 4px;
   }
+  &.${preCls}-bordered {
+    border-color:#d9d9d9;
+    &:hover{
+      border-color:var(--primary-color,#1677ff);
+    }
+  }
+
+
 `
 const ButtonTextBase = styled.span`
   
@@ -56,13 +60,14 @@ export interface ButtonProps extends Omit<React.DetailedHTMLProps<React.ButtonHT
   htmlType?: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>['type']
   type?: "primary"
   size?: "sm"
+  bordered?: boolean
 }
 
 export const Button = (props: ButtonProps) => {
-  const { children, htmlType, type = 'default', className = '', size = 'sm', ...other } = props
+  const { children, htmlType, type = 'default', className = '', size = 'sm', bordered = true, ...other } = props
 
   const cls = useMemo(() => {
-    return [preCls, type && `${preCls}-${type}`, size && `${preCls}-${size}`,].filter(Boolean).join(' ')
+    return [preCls, type && `${preCls}-${type}`, size && `${preCls}-${size}`, bordered && `${preCls}-bordered`,].filter(Boolean).join(' ')
   }, [type, size])
 
   return <ButtonBase {...other} type={htmlType} className={`${cls} ${className}`} >

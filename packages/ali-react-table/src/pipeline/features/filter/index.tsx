@@ -7,6 +7,7 @@ import { HTMLAttributes, useMemo, useState } from "react"
 import RcTooltip from "rc-tooltip"
 import "rc-tooltip/assets/bootstrap.css"
 import { CheckBoxGroup } from "../../../components/CheckBox"
+import { Button } from "../../../components/Button"
 
 
 const ListGroupBase = styled.div`
@@ -46,6 +47,10 @@ const ListGroupFooterBase = styled.div`
   border-top: 1px solid #d9d9d9;
   padding: 8px 10px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 12px;
 `
 const Svg = styled.svg`
   margin-left: 5px;
@@ -98,7 +103,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   // 通过 justify-content 来与 col.align 保持对齐方向一致
   const justifyContent = column.align === 'right' ? 'flex-end' : column.align === 'center' ? 'center' : 'flex-start'
 
-  const [tempValue, setTempValue] = useState(value)
+  const [tempValue, setTempValue] = useState<ValueType[]>(value)
   const activeStyle = useMemo(() => {
     if (Array.isArray(value) && value.length) {
       return { color: "var(--primary-color,#1677ff)" }
@@ -148,6 +153,14 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     }
   }
 
+  const onSelectAll = () => {
+    setTempValue(() => searchValue ? [{ isSearch: true, text: searchValue }, ...items] : [...items])
+  }
+
+  const onSelectUnAll = () => {
+    setTempValue(() => searchValue ? [{ isSearch: true, text: searchValue }] : [])
+  }
+
   return <FilterHeaderCell
     style={{ justifyContent }}
     onClick={(event) => {
@@ -178,6 +191,10 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
             onChange={(list) => setTempValue(list)}
           />
         </ListGroupBodyBase>
+        <ListGroupFooterBase>
+          <Button bordered={false} onClick={onSelectAll} >全选</Button>
+          <Button bordered={false} onClick={onSelectUnAll} >反选</Button>
+        </ListGroupFooterBase>
       </ListGroupBase>)}
     >
       <FilterIcon style={activeStyle} />

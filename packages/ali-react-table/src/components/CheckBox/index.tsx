@@ -141,7 +141,9 @@ export const CheckBox = (props: CheckBoxProps) => {
 }
 
 const CheckBoxGroupBase = styled.div`
-
+  display: flex;
+  flex-direction: column;
+  gap: 2px 0px;
 `
 const CheckBoxGroupItemBase = styled.div<{ $checked: boolean }>`
   display: flex;
