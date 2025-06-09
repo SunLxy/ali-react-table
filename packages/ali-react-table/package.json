@@ -4,7 +4,7 @@
   "description": "高性能 React 表格组件",
   "sideEffects": false,
   "module": "esm/ali-react-table.js",
-  "main": "lib/ali-react-table.js",
+  "main": "cjs/ali-react-table.js",
   "types": "esm/ali-react-table.d.ts",
   "license": "MIT",
   "repository": {
@@ -20,8 +20,12 @@
     "email": "842351815@qq.com"
   },
   "scripts": {
-    "watch": "carefrees-rslib build --watch",
-    "build": "carefrees-rslib build"
+    "watch": "tsc --watch",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "preversion": "npm run build",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "esm",
