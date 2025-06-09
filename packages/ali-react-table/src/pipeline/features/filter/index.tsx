@@ -161,6 +161,11 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     setTempValue(() => searchValue ? [{ isSearch: true, text: searchValue }] : [])
   }
 
+  const isItems = useMemo(() => {
+    return Array.isArray(items) && !!items.length
+  }, [items])
+
+
   return <FilterHeaderCell
     style={{ justifyContent }}
     onClick={(event) => {
@@ -191,10 +196,10 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
             onChange={(list) => setTempValue(list)}
           />
         </ListGroupBodyBase>
-        <ListGroupFooterBase>
+        {isItems ? <ListGroupFooterBase>
           <Button bordered={false} onClick={onSelectAll} >全选</Button>
           <Button bordered={false} onClick={onSelectUnAll} >反选</Button>
-        </ListGroupFooterBase>
+        </ListGroupFooterBase> : <Fragment />}
       </ListGroupBase>)}
     >
       <FilterIcon style={activeStyle} />
