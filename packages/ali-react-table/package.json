@@ -20,12 +20,8 @@
     "email": "842351815@qq.com"
   },
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc",
-    "build:esm": "tsc --project tsconfig.esm.json",
-    "preversion": "npm run build",
-    "prepublishOnly": "npm run build"
+    "watch": "carefrees-rslib build --watch",
+    "build": "carefrees-rslib build"
   },
   "files": [
     "esm",

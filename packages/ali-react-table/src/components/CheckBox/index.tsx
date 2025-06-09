@@ -1,6 +1,6 @@
 import React, { useMemo } from "react"
 import styled, { css } from "styled-components"
-import { ValueType } from "./../../interfaces"
+import type { ValueType } from "./../../interfaces"
 
 const CheckBoxWarp = styled.label<{ $checked: boolean, $indeterminate: boolean, $disabled: boolean }>`
   box-sizing: border-box;

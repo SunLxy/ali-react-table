@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { TableTransform } from '../interfaces'
+import { useState } from 'react'
+import type { TableTransform } from '../interfaces'
 import { isLeafNode, mergeCellProps, traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'
 

@@ -1,14 +1,17 @@
 import React from 'react'
 import { noop } from 'rxjs'
-import { BaseTableProps } from '../../base-table'
+import type { BaseTableProps } from '../../base-table'
 import { features, TablePipeline } from '../../pipeline'
 import { isLeafNode as standardIsLeafNode } from '../../utils'
-import { ArtColumn } from '../../interfaces'
+import type { ArtColumn } from '../../interfaces'
 import {
+  ROW_KEY,
+} from '../cross-table'
+
+import type {
   BuildCrossTableOptions,
   CrossTableLeftMetaColumn,
   LeftCrossTreeNode,
-  ROW_KEY,
   TopCrossTreeNode,
 } from '../cross-table'
 

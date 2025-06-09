@@ -1,6 +1,7 @@
-import React, { CSSProperties, ReactNode } from 'react'
+import React from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import styled from 'styled-components'
-import { ArtColumn, SortItem, SortOrder } from '../../interfaces'
+import type { ArtColumn, SortItem, SortOrder } from '../../interfaces'
 import { internals } from '../../internals'
 import { collectNodes, isLeafNode, layeredSort, mergeCellProps, smartCompare } from '../../utils'
 import { TablePipeline } from '../pipeline'
@@ -175,10 +176,10 @@ export function sort(opts: SortFeatureOptions = {}) {
       mode === 'multiple'
         ? onChangeSortsInMultipleMode
         : (nextSorts: SortItem[]) => {
-            // 单字段排序的情况下，nextSorts 中只有最后一个排序字段才会生效
-            const len = nextSorts.length
-            onChangeSortsInMultipleMode(nextSorts.slice(len - 1))
-          }
+          // 单字段排序的情况下，nextSorts 中只有最后一个排序字段才会生效
+          const len = nextSorts.length
+          onChangeSortsInMultipleMode(nextSorts.slice(len - 1))
+        }
 
     const sortOptions: SortHeaderCellProps['sortOptions'] = {
       sorts,

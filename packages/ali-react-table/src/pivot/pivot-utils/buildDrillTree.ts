@@ -1,6 +1,6 @@
 import { groupBy2 } from '../../utils'
 import { always } from '../../utils/others'
-import { DrillNode } from './interfaces'
+import type { DrillNode } from './interfaces'
 import simpleEncode from './simpleEncode'
 
 export interface BuildDrillTreeOptions<T extends DrillNode> {

@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React, { Fragment } from 'react'
 import { ExpansionCell, icons, } from '../../common-views'
-import { ArtColumn } from '../../interfaces'
+import type { ArtColumn } from '../../interfaces'
 import { internals } from '../../internals'
 import { collectNodes, isLeafNode, mergeCellProps, layeredGroup } from '../../utils'
 import { TablePipeline } from '../pipeline'

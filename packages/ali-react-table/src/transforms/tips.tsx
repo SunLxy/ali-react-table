@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { icons } from '../common-views'
-import { TableTransform } from '../interfaces'
+import type { TableTransform } from '../interfaces'
 import { internals } from '../internals'
 import { traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'

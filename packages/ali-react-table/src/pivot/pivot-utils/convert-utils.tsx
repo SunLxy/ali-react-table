@@ -3,8 +3,8 @@ import { noop } from 'rxjs'
 import styled from 'styled-components'
 import { icons } from '../../common-views'
 import { isLeafNode } from '../../utils'
-import { CrossTableIndicator, CrossTreeNode } from '../cross-table'
-import { DrillNode } from './interfaces'
+import type { CrossTableIndicator, CrossTreeNode } from '../cross-table'
+import type { DrillNode } from './interfaces'
 import simpleEncode from './simpleEncode'
 
 const ExpandSpan = styled.span`

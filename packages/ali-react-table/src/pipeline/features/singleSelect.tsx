@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArtColumn, ArtColumnStaticPart, CellProps } from '../../interfaces'
+import type { ArtColumn, ArtColumnStaticPart, CellProps } from '../../interfaces'
 import { internals } from '../../internals'
 import { always } from '../../utils/others'
 import { TablePipeline } from '../pipeline'
@@ -74,11 +74,11 @@ export function singleSelect(opts: SingleSelectFeatureOptions = {}) {
             onClick: disabled
               ? undefined
               : (e) => {
-                  if (opts.stopClickEventPropagation) {
-                    e.stopPropagation()
-                  }
-                  onChange(rowKey)
-                },
+                if (opts.stopClickEventPropagation) {
+                  e.stopPropagation()
+                }
+                onChange(rowKey)
+              },
           }
         }
       },
@@ -91,12 +91,12 @@ export function singleSelect(opts: SingleSelectFeatureOptions = {}) {
             onChange={
               clickArea === 'radio'
                 ? (arg1: any, arg2: any) => {
-                    const nativeEvent: MouseEvent = arg2?.nativeEvent ?? arg1?.nativeEvent
-                    if (nativeEvent && opts.stopClickEventPropagation) {
-                      nativeEvent.stopPropagation()
-                    }
-                    onChange(rowKey)
+                  const nativeEvent: MouseEvent = arg2?.nativeEvent ?? arg1?.nativeEvent
+                  if (nativeEvent && opts.stopClickEventPropagation) {
+                    nativeEvent.stopPropagation()
                   }
+                  onChange(rowKey)
+                }
                 : undefined
             }
           />

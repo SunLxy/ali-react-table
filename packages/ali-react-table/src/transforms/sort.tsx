@@ -1,6 +1,6 @@
 import React, { CSSProperties, ReactNode, useState } from 'react'
 import styled from 'styled-components'
-import { ArtColumn, SortItem, SortOrder, TableTransform } from '../interfaces'
+import type { ArtColumn, SortItem, SortOrder, TableTransform } from '../interfaces'
 import { internals } from '../internals'
 import { collectNodes, isLeafNode, layeredSort, mergeCellProps, smartCompare } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'
@@ -138,10 +138,10 @@ export function makeSortTransform({
     mode === 'multiple'
       ? inputOnChangeSorts
       : (nextSorts: SortItem[]) => {
-          // 单字段排序的情况下，nextSorts 中只有最后一个排序字段才会生效
-          const len = nextSorts.length
-          inputOnChangeSorts(nextSorts.slice(len - 1))
-        }
+        // 单字段排序的情况下，nextSorts 中只有最后一个排序字段才会生效
+        const len = nextSorts.length
+        inputOnChangeSorts(nextSorts.slice(len - 1))
+      }
 
   const sortOptions = {
     sorts,

@@ -4,7 +4,7 @@ import {
   useDragItemInstance, useDragBodyInstanceProvider
 } from "../pipeline/dragInstance"
 import { StyleArtPlaceArea, StyleArtPlaceAreaItem } from "./styles"
-import { ArtColumnMergePath } from "../interfaces"
+import type { ArtColumnMergePath } from "../interfaces"
 
 
 interface PlaceAreaItemProps {

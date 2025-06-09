@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React, { useState } from 'react'
 import { ExpansionCell, icons, InlineFlexCell } from '../common-views'
-import { ArtColumn, TableTransform } from '../interfaces'
+import type { ArtColumn, TableTransform } from '../interfaces'
 import { internals } from '../internals'
 import { treeMetaSymbol } from '../pipeline/features'
 import { isLeafNode as standardIsLeafNode, mergeCellProps } from '../utils'

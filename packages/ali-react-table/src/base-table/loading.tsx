@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
+import type { ReactNode } from 'react'
 import { Classes } from './styles'
 
 const DefaultLoadingIcon = React.memo(() => (

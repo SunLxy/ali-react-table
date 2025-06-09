@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CellProps, HoverRange, TableTransform } from '../interfaces'
+import type { CellProps, HoverRange, TableTransform } from '../interfaces'
 import { isLeafNode, mergeCellProps, traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'
 

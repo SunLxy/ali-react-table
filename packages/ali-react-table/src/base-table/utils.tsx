@@ -1,4 +1,3 @@
-import React from 'react'
 import { asyncScheduler, BehaviorSubject, defer, fromEvent, Subscription } from 'rxjs'
 import { map, throttleTime } from 'rxjs/operators'
 import * as styledComponents from 'styled-components'

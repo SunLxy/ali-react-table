@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArtColumn, CellProps } from '../../interfaces'
+import type { ArtColumn, CellProps } from '../../interfaces'
 import { always } from '../../utils/others'
 import StrictTreeDataHelper from '../../utils/tree-data-helpers/StrictTreeDataHelper'
 import TreeDataHelper from '../../utils/tree-data-helpers/TreeDataHelper'
@@ -77,12 +77,12 @@ export function treeSelect(opts: TreeSelectFeatureOptions) {
     const treeDataHelper = opts.checkStrictly
       ? new StrictTreeDataHelper({ value, getNodeValue, tree })
       : new TreeDataHelper({
-          value,
-          getNodeValue,
-          isDetached,
-          tree,
-          checkedStrategy: opts.checkedStrategy ?? 'parent',
-        })
+        value,
+        getNodeValue,
+        isDetached,
+        tree,
+        checkedStrategy: opts.checkedStrategy ?? 'parent',
+      })
 
     const onToggleKey = (key: string) => {
       const nextValue = treeDataHelper.getValueAfterToggle(key)

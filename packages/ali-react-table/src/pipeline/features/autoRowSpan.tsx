@@ -1,4 +1,4 @@
-import { SpanRect } from '../../interfaces'
+import type { SpanRect } from '../../interfaces'
 import { internals } from '../../internals'
 import { isLeafNode, makeRecursiveMapper } from '../../utils'
 import { TablePipeline } from '../pipeline'

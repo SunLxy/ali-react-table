@@ -1,8 +1,9 @@
 import cx from 'classnames'
-import React, { CSSProperties, Fragment, ReactNode, forwardRef, useImperativeHandle } from 'react'
+import React, { Fragment, } from 'react'
+import type { CSSProperties, ReactNode, } from 'react'
 import { BehaviorSubject, combineLatest, noop, Subscription } from 'rxjs'
 import * as op from 'rxjs/operators'
-import { ArtColumn } from '../interfaces'
+import type { ArtColumn } from '../interfaces'
 import { calculateRenderInfo } from './calculations'
 import { EmptyHtmlTable } from './empty'
 import TableHeader from './header'
@@ -11,8 +12,17 @@ import { getFullRenderRange, makeRowHeightManager } from './helpers/rowHeightMan
 import { TableDOMHelper } from './helpers/TableDOMUtils'
 import { HtmlTable } from './html-table'
 import { RenderInfo, ResolvedUseVirtual, VerticalRenderRange, VirtualEnum } from './interfaces'
-import Loading, { LoadingContentWrapperProps } from './loading'
-import { BaseTableCSSVariables, Classes, LOCK_SHADOW_PADDING, StyleArtTableHeaderTopLayout, StyleArtTableHeaderTopLayoutLeft, StyleArtTableHeaderTopLayoutMiddle, StyleArtTableHeaderTopLayoutRight, StyledArtTableWrapper } from './styles'
+import Loading from './loading'
+import type { LoadingContentWrapperProps } from './loading'
+import {
+  Classes,
+  StyleArtTableHeaderTopLayout,
+  StyleArtTableHeaderTopLayoutLeft,
+  StyleArtTableHeaderTopLayoutMiddle,
+  StyleArtTableHeaderTopLayoutRight,
+  StyledArtTableWrapper
+} from './styles'
+import type { BaseTableCSSVariables, } from "./styles"
 import {
   getScrollbarSize,
   OVERSCAN_SIZE,
@@ -23,11 +33,15 @@ import {
   throttledWindowResize$,
 } from './utils'
 import {
-  BaseTableContext, useBaseTableInstance, BaseTableInstance,
+  BaseTableContext,
+  useBaseTableInstance,
+  BaseTableInstance,
 } from "../pipeline/instance"
+
 import { fromEvent } from 'rxjs'
 
-import { DragInstanceProvider, useDragInstance, OnUpdatedOptions, DragInstance } from "../pipeline/dragInstance"
+import { DragInstanceProvider, useDragInstance, DragInstance } from "../pipeline/dragInstance"
+import type { OnUpdatedOptions } from "../pipeline/dragInstance"
 import { PlaceArea } from './place-area'
 
 let emptyContentDeprecatedWarned = false

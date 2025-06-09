@@ -1,4 +1,4 @@
-import { ArtColumn } from '../../interfaces'
+import type { ArtColumn } from '../../interfaces'
 
 export interface CrossTableLeftColumn extends ArtColumn {
   columnType: 'left'

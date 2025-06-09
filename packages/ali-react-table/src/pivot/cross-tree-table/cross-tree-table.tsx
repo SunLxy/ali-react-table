@@ -1,8 +1,10 @@
 import React from 'react'
 import { noop } from 'rxjs'
-import { BaseTable, BaseTableProps } from '../../base-table'
-import { CellProps } from '../../interfaces'
-import { CrossTableLeftMetaColumn, LeftCrossTreeNode, ROW_KEY, TopCrossTreeNode } from '../cross-table'
+import { BaseTable } from '../../base-table'
+import type { BaseTableProps } from '../../base-table'
+import type { CellProps } from '../../interfaces'
+import { ROW_KEY } from '../cross-table'
+import type { CrossTableLeftMetaColumn, LeftCrossTreeNode, TopCrossTreeNode } from '../cross-table'
 import buildCrossTreeTable from './buildCrossTreeTable'
 
 export interface CrossTreeTableProps extends Omit<BaseTableProps, 'dataSource' | 'columns' | 'primaryKey'> {

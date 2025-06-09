@@ -1,4 +1,4 @@
-import { SpanRect, TableTransform } from '../interfaces'
+import type { SpanRect, TableTransform } from '../interfaces'
 import { internals } from '../internals'
 import { isLeafNode, traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'

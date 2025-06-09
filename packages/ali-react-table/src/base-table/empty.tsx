@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 import { Colgroup } from './colgroup'
-import { VisibleColumnDescriptor } from './interfaces'
+import type { VisibleColumnDescriptor } from './interfaces'
 import { Classes } from './styles'
 
 const DefaultEmptyContent = React.memo(() => (

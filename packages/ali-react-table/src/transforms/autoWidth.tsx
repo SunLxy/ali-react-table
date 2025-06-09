@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { BaseTable, Classes } from '../base-table'
-import { TableTransform } from '../interfaces'
+import type { TableTransform } from '../interfaces'
 import { internals } from '../internals'
 import { isLeafNode, mergeCellProps, traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'
@@ -110,23 +110,23 @@ export function useAutoWidthTransform(
     return {
       columns: options?.appendExpander
         ? columns.concat([
-            {
-              name: '',
-              headerCellProps: {
-                className: AUTO_WIDTH_EXPANDER_CLS,
-                style: {
-                  background: expanderVisibility === 'hidden' ? 'var(--bgcolor)' : undefined,
-                  border: expanderVisibility === 'hidden' ? 'none' : undefined,
-                },
-              },
-              getCellProps() {
-                return {
-                  className: AUTO_WIDTH_EXPANDER_CLS,
-                  style: { visibility: expanderVisibility },
-                }
+          {
+            name: '',
+            headerCellProps: {
+              className: AUTO_WIDTH_EXPANDER_CLS,
+              style: {
+                background: expanderVisibility === 'hidden' ? 'var(--bgcolor)' : undefined,
+                border: expanderVisibility === 'hidden' ? 'none' : undefined,
               },
             },
-          ])
+            getCellProps() {
+              return {
+                className: AUTO_WIDTH_EXPANDER_CLS,
+                style: { visibility: expanderVisibility },
+              }
+            },
+          },
+        ])
         : columns,
       dataSource,
     }

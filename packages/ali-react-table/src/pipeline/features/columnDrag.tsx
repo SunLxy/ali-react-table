@@ -1,6 +1,6 @@
 import { TablePipeline } from '../pipeline'
 import { makeRecursiveMapper, mergeCellProps, collectNodes, isLeafNode, isSelectColumn } from '../../utils'
-import { ArtColumn, CellProps } from '../../interfaces'
+import type { ArtColumn, CellProps } from '../../interfaces'
 
 export const FILL_COLUMN_CODE = '$_fill_column_&'
 

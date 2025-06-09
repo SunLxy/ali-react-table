@@ -1,7 +1,7 @@
 import { groupBy2, isLeafNode } from '../../utils'
 import { always, fromEntries } from '../../utils/others'
 import buildDrillTree from './buildDrillTree'
-import { DrillNode, RecordMatrix } from './interfaces'
+import type { DrillNode, RecordMatrix } from './interfaces'
 import simpleEncode from './simpleEncode'
 
 export interface BuildingCtx {

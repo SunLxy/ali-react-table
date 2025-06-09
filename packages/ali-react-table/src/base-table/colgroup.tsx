@@ -1,5 +1,5 @@
 import React from 'react'
-import { VisibleColumnDescriptor } from './interfaces'
+import type { VisibleColumnDescriptor } from './interfaces'
 
 export function Colgroup({ descriptors }: { descriptors: VisibleColumnDescriptor[] }) {
   return (

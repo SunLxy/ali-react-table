@@ -1,4 +1,4 @@
-import { CellProps, HoverRange } from '../../interfaces'
+import type { CellProps, HoverRange } from '../../interfaces'
 import { isLeafNode, makeRecursiveMapper, mergeCellProps } from '../../utils'
 import { TablePipeline } from '../pipeline'
 

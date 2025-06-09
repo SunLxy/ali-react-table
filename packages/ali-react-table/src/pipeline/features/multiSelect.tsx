@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArtColumn, ArtColumnStaticPart, CellProps } from '../../interfaces'
+import type { ArtColumn, ArtColumnStaticPart, CellProps } from '../../interfaces'
 import { internals } from '../../internals'
 import { always, arrayUtils } from '../../utils/others'
 import { TablePipeline } from '../pipeline'

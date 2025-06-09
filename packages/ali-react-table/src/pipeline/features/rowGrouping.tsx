@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 import { ExpansionCell, icons, InlineFlexCell } from '../../common-views'
-import { ArtColumn } from '../../interfaces'
+import type { ArtColumn } from '../../interfaces'
 import { internals } from '../../internals'
 import { collectNodes, isLeafNode, mergeCellProps } from '../../utils'
 import { flatMap } from '../../utils/others'

@@ -1,11 +1,11 @@
-import React from 'react'
-import { BaseTableProps } from '../../base-table'
-import { ArtColumn, SpanRect } from '../../interfaces'
+
+import type { BaseTableProps } from '../../base-table'
+import type { ArtColumn, SpanRect } from '../../interfaces'
 import { getTreeDepth, isLeafNode } from '../../utils'
 import { always } from '../../utils/others'
 import { ROW_KEY } from './constants'
-import { CrossTableProps } from './cross-table'
-import { CrossTableLeftMetaColumn, LeftCrossTreeNode, TopCrossTreeNode } from './interfaces'
+import type { CrossTableProps } from './cross-table'
+import type { CrossTableLeftMetaColumn, LeftCrossTreeNode, TopCrossTreeNode } from './interfaces'
 import {
   CrossTableDataColumn,
   CrossTableDataParentColumn,

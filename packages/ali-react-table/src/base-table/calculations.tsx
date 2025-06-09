@@ -1,6 +1,6 @@
-import { ArtColumn } from '../interfaces'
+import type { ArtColumn } from '../interfaces'
 import { collectNodes, isLeafNode } from '../utils'
-import {
+import type {
   HorizontalRenderRange,
   RenderInfo,
   ResolvedUseVirtual,

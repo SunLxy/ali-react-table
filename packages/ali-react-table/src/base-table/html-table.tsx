@@ -1,12 +1,13 @@
 import cx from 'classnames'
-import React, { CSSProperties, ReactNode } from 'react'
-import { ArtColumn } from '../interfaces'
+import React from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import type { ArtColumn } from '../interfaces'
 import { internals } from '../internals'
 import { Colgroup } from './colgroup'
 import SpanManager from './helpers/SpanManager'
-import { RenderInfo } from './interfaces'
+import type { RenderInfo } from './interfaces'
 import { Classes } from './styles'
-import { BaseTableProps } from './table'
+import type { BaseTableProps } from './table'
 
 export interface HtmlTableProps extends Required<Pick<BaseTableProps, 'getRowProps' | 'primaryKey' | 'components'>> {
   tbodyHtmlTag: 'tbody' | 'tfoot'

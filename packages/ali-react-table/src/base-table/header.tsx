@@ -1,14 +1,14 @@
 import cx from 'classnames'
 import React, { CSSProperties, Fragment, useEffect, useRef } from 'react'
-import { ArtColumn, ArtColumnMergePath } from '../interfaces'
+import type { ArtColumn, ArtColumnMergePath } from '../interfaces'
 import { getTreeDepth, isLeafNode } from '../utils'
-import { HorizontalRenderRange, RenderInfo } from './interfaces'
+import type { HorizontalRenderRange, RenderInfo } from './interfaces'
 import { Classes, StyleArtTableTh } from './styles'
 import {
   useDragBodyInstance, DragBodyInstanceProvider,
   useDragItemInstance, useDragBodyInstanceProvider
 } from "../pipeline/dragInstance"
-import { BaseTableProps } from "./table"
+import type { BaseTableProps } from "./table"
 
 
 function range(n: number) {

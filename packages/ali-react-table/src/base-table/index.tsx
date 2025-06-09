@@ -1,3 +1,5 @@
-export { BaseTable, BaseTableProps, PrimaryKey } from './table'
-export { LoadingContentWrapperProps } from './loading'
-export { Classes, BaseTableCSSVariables } from './styles'
+export { BaseTable } from './table'
+export type { BaseTableProps, PrimaryKey } from './table'
+export type { LoadingContentWrapperProps } from './loading'
+export { Classes, } from './styles'
+export type { BaseTableCSSVariables } from "./styles"

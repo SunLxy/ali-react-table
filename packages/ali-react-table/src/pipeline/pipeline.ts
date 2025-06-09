@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
-import { BaseTableProps, PrimaryKey } from '../base-table'
-import { ArtColumn, TableTransform, Transform, ArtColumnMergePath } from '../interfaces'
+import type { BaseTableProps, PrimaryKey } from '../base-table'
+import type { TableTransform, Transform, ArtColumnMergePath } from '../interfaces'
 import { mergeCellProps, makeRecursiveMapperWithPathIndex } from '../utils'
 
 type RowPropsGetter = BaseTableProps['getRowProps']

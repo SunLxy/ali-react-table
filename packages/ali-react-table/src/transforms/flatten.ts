@@ -1,4 +1,4 @@
-import { TableTransform } from '../interfaces'
+import type { TableTransform } from '../interfaces'
 import { isLeafNode, traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'
 

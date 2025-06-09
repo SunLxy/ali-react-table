@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { fromEvent } from 'rxjs'
 import * as op from 'rxjs/operators'
 import styled from 'styled-components'
-import { TableTransform } from '../interfaces'
+import type { TableTransform } from '../interfaces'
 import { internals } from '../internals'
 import { isLeafNode, traverseColumn } from '../utils'
 import { warnTransformsDeprecated } from './warnTransformsDeprecated'
@@ -123,23 +123,23 @@ export function makeColumnResizeTransform({
     return {
       columns: appendExpander
         ? columns.concat([
-            {
-              name: '',
-              headerCellProps: {
-                className: RESIZE_EXPANDER_CLS,
-                style: {
-                  background: expanderVisibility === 'hidden' ? 'var(--bgcolor)' : undefined,
-                  border: expanderVisibility === 'hidden' ? 'none' : undefined,
-                },
-              },
-              getCellProps() {
-                return {
-                  className: RESIZE_EXPANDER_CLS,
-                  style: { visibility: expanderVisibility },
-                }
+          {
+            name: '',
+            headerCellProps: {
+              className: RESIZE_EXPANDER_CLS,
+              style: {
+                background: expanderVisibility === 'hidden' ? 'var(--bgcolor)' : undefined,
+                border: expanderVisibility === 'hidden' ? 'none' : undefined,
               },
             },
-          ])
+            getCellProps() {
+              return {
+                className: RESIZE_EXPANDER_CLS,
+                style: { visibility: expanderVisibility },
+              }
+            },
+          },
+        ])
         : columns,
       dataSource,
     }

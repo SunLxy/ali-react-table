@@ -1,7 +1,7 @@
 import { createRef, createContext, createElement, useRef, useContext, useEffect } from 'react';
-import { ArtColumnMergePath } from "../interfaces"
+import type { ArtColumnMergePath } from "../interfaces"
 import { BaseTableInstance } from "./instance"
-import { pathIndexMetaSymbol, protoMetaSymbol } from "../utils/makeRecursiveMapper"
+import { pathIndexMetaSymbol } from "../utils/makeRecursiveMapper"
 import { GroupUtils } from "../utils/group"
 
 /**
