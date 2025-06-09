@@ -26,6 +26,7 @@
   "files": [
     "esm",
     "cjs",
+    "lib",
     "src",
     "pivot"
   ],
