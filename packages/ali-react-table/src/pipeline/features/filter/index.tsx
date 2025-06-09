@@ -101,7 +101,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   const [tempValue, setTempValue] = useState(value)
   const activeStyle = useMemo(() => {
     if (Array.isArray(value) && value.length) {
-      return { color: "var(--primary-color-active,#1677ff)" }
+      return { color: "var(--primary-color,#1677ff)" }
     }
     return { color: "var(--primary-color-unactive,#bfbfbf)" }
   }, [props.value])
