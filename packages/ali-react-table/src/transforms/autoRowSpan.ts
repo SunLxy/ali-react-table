@@ -20,8 +20,7 @@ export function makeAutoRowSpanTransform(): TableTransform {
       return col
     }
 
-    const isFunc = typeof col.features.autoRowSpan === 'function'
-    const shouldMergeCell = isFunc ? col.features.autoRowSpan : isIdentity
+    const shouldMergeCell = typeof col.features.autoRowSpan === 'function' ? col.features.autoRowSpan : isIdentity
 
     const spanRects: SpanRect[] = []
     let lastBottom = 0

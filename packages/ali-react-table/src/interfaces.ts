@@ -46,7 +46,7 @@ export interface ArtColumnStaticPart {
       /**选择项*/
       items?: string[]
     }
-    sortable?: boolean | ((xValue: any, yValue: any, x: any, y: any) => boolean)
+    sortable?: boolean | ((xValue: any, yValue: any, x?: any, y?: any) => number)
     tips: ReactNode | (() => ReactNode)
     [key: string]: any
   }
