@@ -3,7 +3,12 @@ import { internals } from '../../internals'
 import { isLeafNode, makeRecursiveMapper } from '../../utils'
 import { TablePipeline } from '../pipeline'
 
-function isIdentity(x: any, y: any) {
+function isIdentity(x: any, y: any, prevRow: any, row: any, keys?: string[]) {
+  if (Array.isArray(keys) && keys.length) {
+    const prevValues = keys.map((key) => prevRow[key]).join('_')
+    const values = keys.map((key) => row[key]).join('_')
+    return prevValues === values
+  }
   return x === y
 }
 
@@ -21,9 +26,9 @@ export function autoRowSpan() {
         if (!isLeafNode(col)) {
           return col
         }
-
-        const isFunc = typeof col.features.autoRowSpan === 'function'
-        const shouldMergeCell = isFunc ? col.features.autoRowSpan : isIdentity
+        /**判断哪些值相等才进行合并*/
+        const keys = col.features.autoRowSpanKeys as string[]
+        const shouldMergeCell = typeof col.features.autoRowSpan === 'function' ? col.features.autoRowSpan : isIdentity
 
         const spanRects: SpanRect[] = []
         let lastBottom = 0
@@ -34,7 +39,7 @@ export function autoRowSpan() {
           const row = dataSource[rowIndex]
           const value = internals.safeGetValue(col, row, rowIndex)
 
-          if (rowIndex === 0 || !shouldMergeCell(prevValue, value, prevRow, row)) {
+          if (rowIndex === 0 || !shouldMergeCell(prevValue, value, prevRow, row, keys)) {
             const spanRect: SpanRect = {
               top: lastBottom,
               bottom: rowIndex,

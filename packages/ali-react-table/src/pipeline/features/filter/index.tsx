@@ -300,7 +300,7 @@ export function filter(options: FilterFeatureOptions = {}) {
     function processColumns(columns: ArtColumn[]) {
       // 对数据进行处理
       const filterColumns: [string, ArtColumn][] = collectNodes(columns, 'leaf-only')
-        .filter((col) => !!col.features?.filter && !col.features?.filter?.items)
+        .filter((col: any) => !!col.features?.filter && !col.features?.filter?.items)
         .map((col) => [col.code, col])
 
       const codeItemsMap: Map<string, (string | number | undefined | boolean)[]> = filterItemsMap || new Map([])
@@ -340,11 +340,18 @@ export function filter(options: FilterFeatureOptions = {}) {
         const filterTable = col.code && col.features?.filter;
         if (filterTable) {
           /**格式化*/
-          const formate = col?.features?.filter?.formate
-          const isFuzzySearch = col?.features?.filter?.isFuzzySearch
+          let formate = undefined
+          let isFuzzySearch = undefined
           let valueItem = inputFilter.find(ite => ite.code === col.code)
-          let items = filterTable?.items || []
-          if (!filterTable?.items) {
+          let items = []
+          let filterTableItems = undefined
+          if (typeof filterTable !== "boolean") {
+            formate = filterTable?.formate
+            isFuzzySearch = filterTable?.isFuzzySearch
+            items = filterTable?.items || []
+            filterTableItems = filterTable?.items
+          }
+          if (!filterTableItems) {
             items = Array.from(new Set(codeItemsMap.get(col.code) || []))
             if (valueItem) {
               // 判断一下数据是否还存在，不存在直接删除
@@ -380,5 +387,4 @@ export function filter(options: FilterFeatureOptions = {}) {
       }
     }
   }
-
 }

@@ -32,7 +32,24 @@ export interface ArtColumnStaticPart {
   headerCellProps?: CellProps
 
   /** 功能开关 */
-  features?: { [key: string]: any }
+  features?: {
+    /** 是否开启自动合并行 */
+    autoRowSpan?: boolean | ((prevValue: any, value: any, prevRow: any, row: any, keys?: string[]) => boolean)
+    /** 自定义合并行的判断数据字段 */
+    autoRowSpanKeys?: string[]
+    /**过滤*/
+    filter?: boolean | {
+      /**选择渲染格式化*/
+      formate?: (value: string) => React.ReactNode,
+      /**是否显示模糊查询*/
+      isFuzzySearch?: boolean
+      /**选择项*/
+      items?: string[]
+    }
+    sortable?: boolean | ((xValue: any, yValue: any, x: any, y: any) => boolean)
+    tips: ReactNode | (() => ReactNode)
+    [key: string]: any
+  }
 
   /**分组下标*/
   groupIndex?: number;
