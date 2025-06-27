@@ -17,6 +17,11 @@ export function layeredFilter<T extends AbstractTreeNode>(array: T[], compare: (
         }
         return { ...row, children: dfs(row.children as T[]) }
       })
-      .filter(compare)
+      .filter((item) => {
+        if (isLeafNode(item)) {
+          return compare(item)
+        }
+        return item.children?.length
+      })
   }
 }
