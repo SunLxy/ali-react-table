@@ -110,6 +110,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     }
     return { color: "var(--primary-color-unactive,#bfbfbf)" }
   }, [props.value])
+
   const onVisibleChange = (visible: boolean) => {
     if (!visible) {
       if (tempValue !== value) {
@@ -117,6 +118,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
       }
     }
   }
+
   const searchValue = useMemo(() => {
     if (Array.isArray(tempValue)) {
       // @ts-ignore
@@ -211,7 +213,10 @@ export interface FilterFeatureOptions {
   /** 更新过滤字段列表的回调函数 */
   onChangeFilter?(nextFilter: FilterItem[], code: string): void
   filterItems?: FilterItem[]
-
+  /**过滤属性值取值子节点*/
+  isFilterChildren?: boolean
+  /**字段对应的过滤数据*/
+  filterItemsMap?: Map<string, (string | undefined | number | boolean)[]>
 }
 
 export type ArtColumnFeaturesFilter =
@@ -227,6 +232,9 @@ export function filter(options: FilterFeatureOptions = {}) {
 
   return (pipeline: TablePipeline) => {
     const Tooltip = pipeline.ctx.components.Tooltip
+    const isFilterChildren = options.isFilterChildren;
+    const filterItemsMap = options.filterItemsMap;
+
     /**获取过滤参数  */
     const inputFilter: FilterItem[] = pipeline.getStateAtKey("filter") || options?.filterItems || []
     const dataSource = pipeline.getDataSource() // 获取数据
@@ -290,7 +298,43 @@ export function filter(options: FilterFeatureOptions = {}) {
 
     /**列处理*/
     function processColumns(columns: ArtColumn[]) {
+      // 对数据进行处理
+      const filterColumns: [string, ArtColumn][] = collectNodes(columns, 'leaf-only')
+        .filter((col) => !!col.features?.filter && !col.features?.filter?.items)
+        .map((col) => [col.code, col])
+
+      const codeItemsMap: Map<string, (string | number | undefined | boolean)[]> = filterItemsMap || new Map([])
+      const loopdfs = (list: any[]) => {
+        for (let index = 0; index < list.length; index++) {
+          const element = list[index];
+          // 如果是树结构，只取最
+          if (isFilterChildren && !isLeafNode(element)) {
+            loopdfs(element.children)
+          } else {
+            for (let k = 0; k < filterColumns.length; k++) {
+              const [code] = filterColumns[k];
+              const l = codeItemsMap.get(code)
+              let value = element[code]
+              if (value === undefined || value === null) {
+                value = undefined
+              }
+              if (Array.isArray(l)) {
+                l.push(value)
+              } else {
+                codeItemsMap.set(code, [value])
+              }
+            }
+            if (!isLeafNode(element)) {
+              loopdfs(element.children)
+            }
+          }
+        }
+      }
+      if (!filterItemsMap)
+        loopdfs(dataSource);
+
       return columns.map(dfs)
+
       function dfs(col: ArtColumn): ArtColumn {
         const result = { ...col }
         const filterTable = col.code && col.features?.filter;
@@ -301,13 +345,7 @@ export function filter(options: FilterFeatureOptions = {}) {
           let valueItem = inputFilter.find(ite => ite.code === col.code)
           let items = filterTable?.items || []
           if (!filterTable?.items) {
-            items = Array.from(new Set(dataSource.map((ite) => {
-              const value = ite[col.code]
-              if (value === undefined || value === null) {
-                return undefined
-              }
-              return value
-            })))
+            items = Array.from(new Set(codeItemsMap.get(col.code) || []))
             if (valueItem) {
               // 判断一下数据是否还存在，不存在直接删除
               // 把数据中不存在的删除
