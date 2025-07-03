@@ -23,15 +23,13 @@ const ButtonBase = styled.button`
   touch-action: manipulation;
   color: rgba(0, 0, 0, 0.88);
   box-sizing: border-box;
-
   &.${preCls}-default{
-    background: #ffffff;
-    color: rgba(0, 0, 0, 0.88);
+    background: var(--ali-table-overlay-inner-btn-bg,#ffffff);
+    color:var(--ali-table-overlay-inner-btn-color,rgba(0, 0, 0, 0.88));
     &:hover{
       color: var(--primary-color,#1677ff);
     }
   }
-
   &.${preCls}-primary{
     color: #fff;
     background: var(--primary-color,#1677ff);
@@ -44,7 +42,7 @@ const ButtonBase = styled.button`
     border-radius: 4px;
   }
   &.${preCls}-bordered {
-    border-color:#d9d9d9;
+    border-color:var(--ali-table-overlay-inner-border-color,#d9d9d9);
     &:hover{
       border-color:var(--primary-color,#1677ff);
     }
