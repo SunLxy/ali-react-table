@@ -29,6 +29,8 @@
     "trailingComma": "all"
   },
   "devDependencies": {
+    "@types/minimatch": "~6.0.0",
+    "minimatch": "~10.0.3",
     "@carefrees/rslib": "~0.0.11",
     "copyfiles": "^2.4.0",
     "prettier": "^2.1.2",
