@@ -12,7 +12,7 @@ import { Button } from "../../../components/Button"
 
 const ListGroupBase = styled.div`
   max-height: 300px;
-  background-color: #fff;
+  background-color: var(--ali-table-overlay-inner-bg,#ffffff);
   display: flex;
   flex-direction: column;
   min-width: 200px;
@@ -20,7 +20,7 @@ const ListGroupBase = styled.div`
 `
 const InputBase = styled.input`
   outline: none;
-  border: 1px solid #d9d9d9;
+  border: 1px solid  var(--ali-table-list-checkbox-border-color,#d9d9d9);
   width: 100%;
   border-radius: 4px;
   padding: 5px;
@@ -44,7 +44,7 @@ const ListGroupBodyBase = styled.div`
   flex: 1;
 `
 const ListGroupFooterBase = styled.div`
-  border-top: 1px solid #d9d9d9;
+  border-top: 1px solid  var(--ali-table-list-checkbox-border-color,#d9d9d9);
   padding: 8px 10px;
   box-sizing: border-box;
   display: flex;
@@ -182,8 +182,8 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
       trigger={['click']}
       overlayStyle={{ opacity: 1 }}
       overlayInnerStyle={{
-        background: "#fff",
-        color: "#000",
+        background: "var(--ali-table-overlay-inner-bg,#ffffff)",
+        color: "var(--ali-table-overlay-inner-color,#000)",
         padding: 0,
       }}
       overlay={(<ListGroupBase>

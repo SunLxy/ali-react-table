@@ -25,8 +25,8 @@ const CheckBoxWarp = styled.label<{ $checked: boolean, $indeterminate: boolean, 
   `}
   ${props => props.$indeterminate && css`
     ${CheckBoxInner}{
-      background-color: #ffffff;
-      border-color: #d9d9d9;
+      background-color: var(--ali-table-overlay-inner-bg,#ffffff);
+      border-color:var(--ali-table-list-checkbox-border-color,#d9d9d9) ;
       &::after{
         inset-inline-start: 50%;
         width: calc(16px / 2);
@@ -74,8 +74,8 @@ const CheckBoxInner = styled.span`
   width:16px;
   height:16px;
   direction: ltr;
-  background-color: #fff;
-  border: 1px solid #d9d9d9;
+  background-color:  var(--ali-table-overlay-inner-bg,#ffffff);
+  border: 1px solid var(--ali-table-list-checkbox-border-color,#d9d9d9);
   border-radius: 4px;
   border-collapse: separate;
   transition: all 0.3s;
