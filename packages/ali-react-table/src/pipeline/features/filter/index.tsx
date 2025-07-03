@@ -21,6 +21,7 @@ const ListGroupBase = styled.div`
 const InputBase = styled.input`
   outline: none;
   border: 1px solid  var(--ali-table-list-checkbox-border-color,#d9d9d9);
+  color: var(--ali-table-overlay-inner-btn-color,#1d2129);
   width: 100%;
   border-radius: 4px;
   padding: 5px;
@@ -28,7 +29,7 @@ const InputBase = styled.input`
   font-size: 12px;
   background-color: transparent;
   &::placeholder {
-    color: #ccc;
+    color: var(--ali-table-overlay-inner-btn-color,#1d2129)
   }
 `
 
