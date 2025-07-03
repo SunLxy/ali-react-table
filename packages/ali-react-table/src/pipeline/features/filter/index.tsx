@@ -26,6 +26,7 @@ const InputBase = styled.input`
   padding: 5px;
   box-sizing: border-box;
   font-size: 12px;
+  background-color: transparent;
   &::placeholder {
     color: #ccc;
   }
