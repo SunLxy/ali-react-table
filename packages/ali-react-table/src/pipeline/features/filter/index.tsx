@@ -51,8 +51,16 @@ const ListGroupFooterBase = styled.div`
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 4px;
+  .ali-react-table-filter-footer{
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
 `
 const Svg = styled.svg`
   margin-left: 5px;
@@ -106,6 +114,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   const justifyContent = column.align === 'right' ? 'flex-end' : column.align === 'center' ? 'center' : 'flex-start'
 
   const [tempValue, setTempValue] = useState<ValueType[]>(value)
+  const [open, setOpen] = useState<boolean>(false)
   const activeStyle = useMemo(() => {
     if (Array.isArray(value) && value.length) {
       return { color: "var(--primary-color,#1677ff)" }
@@ -116,9 +125,10 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   const onVisibleChange = (visible: boolean) => {
     if (!visible) {
       if (tempValue !== value) {
-        onSave?.([...tempValue])
+        setTempValue?.(value)
       }
     }
+    setOpen(visible)
   }
 
   const searchValue = useMemo(() => {
@@ -169,6 +179,11 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
     return Array.isArray(items) && !!items.length
   }, [items])
 
+  /**查询*/
+  const onClickSave = () => {
+    onSave?.([...(tempValue || [])])
+    setOpen(false)
+  }
 
   return <FilterHeaderCell
     style={{ justifyContent }}
@@ -179,6 +194,7 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
   >
     {children}
     <Tooltip
+      visible={open}
       onVisibleChange={onVisibleChange}
       placement="bottom"
       trigger={['click']}
@@ -200,10 +216,15 @@ function DefaultFilterHeaderCell(props: FilterHeaderCellProps) {
             onChange={(list) => setTempValue(list)}
           />
         </ListGroupBodyBase>
-        {isItems ? <ListGroupFooterBase>
-          <Button bordered={false} onClick={onSelectAll} >全选</Button>
-          <Button bordered={false} onClick={onSelectUnAll} >反选</Button>
-        </ListGroupFooterBase> : <Fragment />}
+        <ListGroupFooterBase>
+          <div className="ali-react-table-filter-footer">
+            {isItems ? <Fragment>
+              <Button bordered={false} onClick={onSelectAll} >全选</Button>
+              <Button bordered={false} onClick={onSelectUnAll} >反选</Button>
+            </Fragment> : <Fragment />}
+          </div>
+          <Button type='primary' bordered={false} onClick={onClickSave} >确认</Button>
+        </ListGroupFooterBase>
       </ListGroupBase>)}
     >
       <FilterIcon style={activeStyle} />
