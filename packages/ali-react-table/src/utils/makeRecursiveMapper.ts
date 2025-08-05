@@ -1,75 +1,91 @@
-import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from '../interfaces'
-import isLeafNode from './isLeafNode'
+import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from "../interfaces";
+import isLeafNode from "./isLeafNode";
 
-export const pathIndexMetaSymbol = Symbol('pathIndexMetaSymbol')
-export const protoMetaSymbol = Symbol('protoMetaSymbol')
+export const pathIndexMetaSymbol = Symbol("pathIndexMetaSymbol");
+export const protoMetaSymbol = Symbol("protoMetaSymbol");
 
 type RecursiveFlatMapInfo<T> = {
-  startIndex: number
-  endIndex: number
-  path: T[]
-  isLeaf: boolean
-}
+  startIndex: number;
+  endIndex: number;
+  path: T[];
+  isLeaf: boolean;
+};
 
 export default function makeRecursiveMapper<T extends AbstractTreeNode>(
-  fn: (node: T, info: RecursiveFlatMapInfo<T>) => null | T | T[],
+  fn: (node: T, info: RecursiveFlatMapInfo<T>) => null | T | T[]
 ) {
   return (tree: T[]) => {
-    return dfs(tree, 0, []).result
-
-    function dfs(nodes: T[], parentStartIndex: number, path: T[]): { flatCount: number; result: T[] } {
-      let flatCount = 0
-      const result: T[] = []
+    // 过滤掉不可见的列
+    const list = tree.filter((item: any) => item.visible !== false);
+    return dfs(list, 0, []).result;
+    function dfs(
+      nodes: T[],
+      parentStartIndex: number,
+      path: T[]
+    ): { flatCount: number; result: T[] } {
+      let flatCount = 0;
+      const result: T[] = [];
 
       for (const node of nodes) {
-        path.push(node)
+        path.push(node);
 
-        const startIndex = parentStartIndex + flatCount
+        const startIndex = parentStartIndex + flatCount;
 
-        let subResult
+        let subResult;
         if (isLeafNode(node)) {
           subResult = fn(node, {
             startIndex,
             endIndex: startIndex + 1,
             path: path.slice(),
             isLeaf: true,
-          })
-          flatCount += 1
+          });
+          flatCount += 1;
         } else {
-          const dfsResult = dfs(node.children as T[], startIndex, path)
+          const dfsResult = dfs(node.children as T[], startIndex, path);
           subResult = fn(
             { ...node, children: dfsResult.result },
-            { startIndex, endIndex: startIndex + dfsResult.flatCount, path: path.slice(), isLeaf: false },
-          )
-          flatCount += dfsResult.flatCount
+            {
+              startIndex,
+              endIndex: startIndex + dfsResult.flatCount,
+              path: path.slice(),
+              isLeaf: false,
+            }
+          );
+          flatCount += dfsResult.flatCount;
         }
 
         if (Array.isArray(subResult)) {
-          result.push(...subResult)
+          result.push(...subResult);
         } else if (subResult != null) {
-          result.push(subResult)
+          result.push(subResult);
         }
 
-        path.pop()
+        path.pop();
       }
 
-      return { result, flatCount }
+      return { result, flatCount };
     }
-  }
+  };
 }
 
 /**添加表头下标位置*/
-export const makeRecursiveMapperWithPathIndex = (columns: ArtColumn[]): ArtColumnMergePath[] => {
-  function dfs(columns: ArtColumn[], path: string = '') {
+export const makeRecursiveMapperWithPathIndex = (
+  columns: ArtColumn[]
+): ArtColumnMergePath[] => {
+  function dfs(columns: ArtColumn[], path: string = "") {
     return columns.map((column, index) => {
-      const newPath = path ? `${path}.${index}` : `${index}`
+      const newPath = path ? `${path}.${index}` : `${index}`;
       if (column.children) {
-        return { ...column, children: dfs(column.children, newPath) }
+        return { ...column, children: dfs(column.children, newPath) };
       } else {
-        return { ...column, [pathIndexMetaSymbol]: newPath, [protoMetaSymbol]: column }
+        return {
+          ...column,
+          [pathIndexMetaSymbol]: newPath,
+          [protoMetaSymbol]: column,
+        };
         // return { ...column, __path: newPath, __o: column }
       }
-    })
+    });
   }
-  return dfs(columns)
-}
+  return dfs(columns);
+};

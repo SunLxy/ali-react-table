@@ -22,7 +22,6 @@ export function autoRowSpan() {
         if (!col.features?.autoRowSpan || typeof col.groupIndex === 'number' || col.isDragColumn) {
           return col
         }
-
         if (!isLeafNode(col)) {
           return col
         }
