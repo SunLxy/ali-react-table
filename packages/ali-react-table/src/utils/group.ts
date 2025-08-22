@@ -1,25 +1,23 @@
+import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from "../interfaces";
+import { pathIndexMetaSymbol, protoMetaSymbol } from "./makeRecursiveMapper";
 
-import { AbstractTreeNode, ArtColumn, ArtColumnMergePath } from "../interfaces"
-import { pathIndexMetaSymbol, protoMetaSymbol } from "./makeRecursiveMapper"
-
-export const groupMetaSymbol = Symbol('groupMetaSymbol')
-export const groupLevelMetaSymbol = Symbol('groupLevelMetaSymbol')
-export const groupColumnNameMetaSymbol = Symbol('groupColumnNameMetaSymbol')
-
+export const groupMetaSymbol = Symbol("groupMetaSymbol");
+export const groupLevelMetaSymbol = Symbol("groupLevelMetaSymbol");
+export const groupColumnNameMetaSymbol = Symbol("groupColumnNameMetaSymbol");
 
 function groupBy<T extends AbstractTreeNode>(array: T[], key: string) {
-  const newList: Array<T[]> = []
-  const keyMap: Map<string | number | boolean, number> = new Map([])
+  const newList: Array<T[]> = [];
+  const keyMap: Map<string | number | boolean, number> = new Map([]);
   for (let index = 0; index < array.length; index++) {
     const itemData = array[index];
     const value = itemData[key];
     if (keyMap.has(value)) {
       const ind = keyMap.get(value);
-      newList[ind].push(itemData)
+      newList[ind].push(itemData);
     } else {
-      const length = newList.length
-      keyMap.set(value, length)
-      newList[length] = [itemData]
+      const length = newList.length;
+      keyMap.set(value, length);
+      newList[length] = [itemData];
     }
   }
   return newList;
@@ -27,22 +25,22 @@ function groupBy<T extends AbstractTreeNode>(array: T[], key: string) {
 
 const getValue = (value) => {
   if (typeof value === "string") {
-    return value
+    return value;
   }
   if (typeof value === "number") {
-    return value.toString()
+    return value.toString();
   }
   if (typeof value === "boolean") {
-    return value.toString()
+    return value.toString();
   }
   if (value === undefined) {
-    return `${undefined}`
+    return `${undefined}`;
   }
   if (value === null) {
-    return `${null}`
+    return `${null}`;
   }
-  return value
-}
+  return value;
+};
 
 /** 对树状结构的数据进行分组.
  * layeredGroup 是一个递归的过程，
@@ -51,32 +49,50 @@ export function layeredGroup<T extends AbstractTreeNode>(
   array: T[],
   oldGroup: ArtColumn[],
   primaryKey: string | ((row: any) => string),
-  parentKey: string = '',
+  parentKey: string = "",
   level: number = 0,
   parentObj = {}
 ): T[] {
-  const group = [...oldGroup]
+  const group = [...oldGroup];
   // 每次取第一个进行分组，剩余的进行二次循环
-  const firstGroupItem = group.shift()
+  const firstGroupItem = group.shift();
   if (firstGroupItem) {
-    const newParentKey = parentKey ? parentKey + "_" + firstGroupItem.code : firstGroupItem.code
-    const groupData = groupBy<T>(array, firstGroupItem.code)
-    const lg = groupData.length
-    const newArray: T[] = []
+    const enumData = firstGroupItem.enumData;
+
+    const newParentKey = parentKey
+      ? parentKey + "_" + firstGroupItem.code
+      : firstGroupItem.code;
+    const groupData = groupBy<T>(array, firstGroupItem.code);
+    const lg = groupData.length;
+    const newArray: T[] = [];
 
     for (let index = 0; index < lg; index++) {
       const itemList = groupData[index];
       const groupItemList = (itemList || []).map((item: T) => {
-        return { ...item }
-      })
-      const value = groupItemList[0][firstGroupItem.code]
-      const textValue = getValue(value)
-      const rowKey = typeof primaryKey === "function" ? primaryKey(groupItemList[0]) : primaryKey
-      const valueKey = groupItemList[0][rowKey]
+        return { ...item };
+      });
+      const value = groupItemList[0][firstGroupItem.code];
+      let textValue = getValue(value);
+      if (enumData[textValue]) {
+        textValue = enumData[textValue];
+      }
+      const rowKey =
+        typeof primaryKey === "function"
+          ? primaryKey(groupItemList[0])
+          : primaryKey;
+      const valueKey = groupItemList[0][rowKey];
 
       if (group.length) {
-        const list = layeredGroup<T>(groupItemList, group, primaryKey, newParentKey, level + 1, { ...parentObj, [firstGroupItem.code]: value, })
-        const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
+        const list = layeredGroup<T>(
+          groupItemList,
+          group,
+          primaryKey,
+          newParentKey,
+          level + 1,
+          { ...parentObj, [firstGroupItem.code]: value }
+        );
+        const newKeys =
+          valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
         newArray.push({
           ...parentObj,
           children: list,
@@ -89,9 +105,10 @@ export function layeredGroup<T extends AbstractTreeNode>(
           __groupMetaSymbol: true,
           [groupColumnNameMetaSymbol]: firstGroupItem.name,
           __groupColumnNameMetaSymbol: firstGroupItem.name,
-        } as undefined as T)
+        } as undefined as T);
       } else {
-        const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
+        const newKeys =
+          valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
         newArray.push({
           ...parentObj,
           children: groupItemList,
@@ -105,14 +122,13 @@ export function layeredGroup<T extends AbstractTreeNode>(
           __groupMetaSymbol: true,
           [groupColumnNameMetaSymbol]: firstGroupItem.name,
           __groupColumnNameMetaSymbol: firstGroupItem.name,
-        } as undefined as T)
+        } as undefined as T);
       }
     }
-    return newArray
+    return newArray;
   }
-  return array
+  return array;
 }
-
 
 /** 对树状结构的数据进行分组.
  * layeredGroup 是一个递归的过程，
@@ -120,36 +136,46 @@ export function layeredGroup<T extends AbstractTreeNode>(
 export function layeredGroup2<T extends AbstractTreeNode>(
   array: T[],
   oldGroup: ArtColumn[],
-  primaryKey: string | ((row: any) => string),
+  primaryKey: string | ((row: any) => string)
 ): T[] {
-  const newListData = []
+  const newListData = [];
   const loop = (
     array: T[],
     oldGroup: ArtColumn[],
     primaryKey: string | ((row: any) => string),
-    parentKey: string = '',
+    parentKey: string = "",
     level: number = 0,
     parentObj = {}
   ) => {
-    const group = [...oldGroup]
+    const group = [...oldGroup];
     // 每次取第一个进行分组，剩余的进行二次循环
-    const firstGroupItem = group.shift()
+    const firstGroupItem = group.shift();
     if (firstGroupItem) {
-      const newParentKey = parentKey ? parentKey + "_" + firstGroupItem.code : firstGroupItem.code
-      const groupData = groupBy<T>(array, firstGroupItem.code)
-      const lg = groupData.length
-      const newArray: T[] = []
+      const enumData = firstGroupItem.enumData;
+      const newParentKey = parentKey
+        ? parentKey + "_" + firstGroupItem.code
+        : firstGroupItem.code;
+      const groupData = groupBy<T>(array, firstGroupItem.code);
+      const lg = groupData.length;
+      const newArray: T[] = [];
       for (let index = 0; index < lg; index++) {
         const itemList = groupData[index];
         const groupItemList = (itemList || []).map((item: T) => {
-          return { ...item }
-        })
-        const value = groupItemList[0][firstGroupItem.code]
-        const textValue = getValue(value)
-        const rowKey = typeof primaryKey === "function" ? primaryKey(groupItemList[0]) : primaryKey
-        const valueKey = groupItemList[0][rowKey]
+          return { ...item };
+        });
+        const value = groupItemList[0][firstGroupItem.code];
+        let textValue = getValue(value);
+        if (enumData[textValue]) {
+          textValue = enumData[textValue];
+        }
+        const rowKey =
+          typeof primaryKey === "function"
+            ? primaryKey(groupItemList[0])
+            : primaryKey;
+        const valueKey = groupItemList[0][rowKey];
         if (group.length) {
-          const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
+          const newKeys =
+            valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
           const newItem = {
             ...parentObj,
             groupTitle: textValue,
@@ -158,13 +184,21 @@ export function layeredGroup2<T extends AbstractTreeNode>(
             __groupLevelMetaSymbol: level,
             __groupMetaSymbol: true,
             __groupColumnNameMetaSymbol: firstGroupItem.name,
-          } as unknown as T
-          newListData.push(newItem)
-          newArray.push(newItem)
-          const list = loop(groupItemList, group, primaryKey, newParentKey, level + 1, { ...parentObj, [firstGroupItem.code]: value, })
+          } as unknown as T;
+          newListData.push(newItem);
+          newArray.push(newItem);
+          const list = loop(
+            groupItemList,
+            group,
+            primaryKey,
+            newParentKey,
+            level + 1,
+            { ...parentObj, [firstGroupItem.code]: value }
+          );
           newItem.children = list;
         } else {
-          const newKeys = valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
+          const newKeys =
+            valueKey + "_" + textValue + "_" + newParentKey + "_" + level;
           const newItem = {
             ...parentObj,
             children: groupItemList,
@@ -174,20 +208,18 @@ export function layeredGroup2<T extends AbstractTreeNode>(
             __groupLevelMetaSymbol: level,
             __groupMetaSymbol: true,
             __groupColumnNameMetaSymbol: firstGroupItem.name,
-          } as undefined as T
-          newArray.push(newItem)
-          newListData.push(newItem)
+          } as undefined as T;
+          newArray.push(newItem);
+          newListData.push(newItem);
           newListData.push(...groupItemList);
         }
       }
-      return newArray
+      return newArray;
     }
-  }
-  loop(array, oldGroup, primaryKey)
-  return newListData
+  };
+  loop(array, oldGroup, primaryKey);
+  return newListData;
 }
-
-
 
 export class GroupUtils {
   static groupMetaSymbol = groupMetaSymbol;
@@ -198,57 +230,83 @@ export class GroupUtils {
   /**分组数据(转换成二维数组)*/
   static groupBy = groupBy;
   /**设置分组下标*/
-  static setGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
+  static setGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(
+    columns: T[]
+  ): T[] => {
     return columns.map((ite, groupIndex) => {
       if (ite?.[protoMetaSymbol]) {
-        ite[protoMetaSymbol].groupIndex = groupIndex
+        ite[protoMetaSymbol].groupIndex = groupIndex;
       }
-      return ({ ...ite, groupIndex })
-    })
-  }
+      return { ...ite, groupIndex };
+    });
+  };
 
   /**移除分组下标*/
-  static removeGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(columns: T[]): T[] => {
+  static removeGroupIndex = <T extends ArtColumnMergePath = ArtColumnMergePath>(
+    columns: T[]
+  ): T[] => {
     return columns.map((ite) => {
       const { groupIndex, ...rest } = ite;
       if (ite?.[protoMetaSymbol]) {
-        delete ite[protoMetaSymbol].groupIndex
+        delete ite[protoMetaSymbol].groupIndex;
       }
-      return { ...rest }
-    }) as T[]
-  }
+      return { ...rest };
+    }) as T[];
+  };
 
   /**一个数组中进行移动数据*/
-  static replaceColumns = (columns: ArtColumnMergePath[], startPath: string, movePath: string) => {
+  static replaceColumns = (
+    columns: ArtColumnMergePath[],
+    startPath: string,
+    movePath: string
+  ) => {
     /**移动的数据下标*/
     /**需要移动的数据下标*/
-    const startColumn = columns.find((column) => column[pathIndexMetaSymbol] === startPath);
-    const moveIndex = columns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
-    const newColumns = columns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
+    const startColumn = columns.find(
+      (column) => column[pathIndexMetaSymbol] === startPath
+    );
+    const moveIndex = columns.findIndex(
+      (column) => column[pathIndexMetaSymbol] === movePath
+    );
+    const newColumns = columns.filter(
+      (column) => column[pathIndexMetaSymbol] !== startPath
+    );
     if (moveIndex === 0) {
-      newColumns.unshift(startColumn)
+      newColumns.unshift(startColumn);
     } else if (moveIndex === columns.length - 1) {
-      newColumns.push(startColumn)
+      newColumns.push(startColumn);
     } else {
-      newColumns.splice(moveIndex, 0, startColumn)
+      newColumns.splice(moveIndex, 0, startColumn);
     }
-    return [...newColumns]
-  }
+    return [...newColumns];
+  };
 
   /**两个个数组中进行移动数据*/
-  static replaceColumns2 = (startColumns: ArtColumnMergePath[], moveColumns: ArtColumnMergePath[], startPath: string, movePath: string, isAdd1: boolean) => {
-    const startColumn = startColumns.find((column) => column[pathIndexMetaSymbol] === startPath);
-    const moveIndex = moveColumns.findIndex((column) => column[pathIndexMetaSymbol] === movePath);
-    const newStartColumns = startColumns.filter((column) => column[pathIndexMetaSymbol] !== startPath);
-    const newMoveColumns = [...moveColumns]
+  static replaceColumns2 = (
+    startColumns: ArtColumnMergePath[],
+    moveColumns: ArtColumnMergePath[],
+    startPath: string,
+    movePath: string,
+    isAdd1: boolean
+  ) => {
+    const startColumn = startColumns.find(
+      (column) => column[pathIndexMetaSymbol] === startPath
+    );
+    const moveIndex = moveColumns.findIndex(
+      (column) => column[pathIndexMetaSymbol] === movePath
+    );
+    const newStartColumns = startColumns.filter(
+      (column) => column[pathIndexMetaSymbol] !== startPath
+    );
+    const newMoveColumns = [...moveColumns];
     if (isAdd1) {
-      newMoveColumns.splice(moveIndex + 1, 0, startColumn)
+      newMoveColumns.splice(moveIndex + 1, 0, startColumn);
     } else {
-      newMoveColumns.splice(moveIndex, 0, startColumn)
+      newMoveColumns.splice(moveIndex, 0, startColumn);
     }
     return {
       moveColumns: [...newMoveColumns],
       startColumns: [...newStartColumns],
-    }
-  }
+    };
+  };
 }

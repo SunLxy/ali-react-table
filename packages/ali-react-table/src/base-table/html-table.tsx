@@ -103,8 +103,9 @@ export function HtmlTable({
     let cellContent: ReactNode = value
     if (column.render) {
       cellContent = column.render(value, row, rowIndex)
+    } else if (column.enumData) {
+      cellContent = column.enumData[`${value}`] || value
     }
-
     let colSpan = 1
     let rowSpan = 1
     if (column.getSpanRect) {

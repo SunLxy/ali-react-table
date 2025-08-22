@@ -1,55 +1,69 @@
-import React, { ReactNode } from 'react'
-import { pathIndexMetaSymbol, protoMetaSymbol } from "./utils/makeRecursiveMapper"
+import React, { ReactNode } from "react";
+import {
+  pathIndexMetaSymbol,
+  protoMetaSymbol,
+} from "./utils/makeRecursiveMapper";
 
+export type ArtColumnAlign = "left" | "center" | "right";
 
-export type ArtColumnAlign = 'left' | 'center' | 'right'
-
-export type CellProps = React.TdHTMLAttributes<HTMLTableCellElement>
+export type CellProps = React.TdHTMLAttributes<HTMLTableCellElement>;
 
 export interface ArtColumnStaticPart {
   /** 列的名称 */
-  name: string
+  name: string;
 
   /** 在数据中的字段 code */
-  code?: string
+  code?: string;
 
   /** 列标题的展示名称；在页面中进行展示时，该字段将覆盖 name 字段 */
-  title?: ReactNode
+  title?: ReactNode;
 
   /** 列的宽度，如果该列是锁定的，则宽度为必传项 */
-  width?: number
+  width?: number;
 
   /** 单元格中的文本或内容的 对其方向 */
-  align?: ArtColumnAlign
+  align?: ArtColumnAlign;
 
   /** @deprecated 是否隐藏 */
-  hidden?: boolean
+  hidden?: boolean;
 
   /** 是否锁列 */
-  lock?: boolean
+  lock?: boolean;
 
   /** 表头单元格的 props */
-  headerCellProps?: CellProps
+  headerCellProps?: CellProps;
 
   /** 功能开关 */
   features?: {
     /** 是否开启自动合并行 */
-    autoRowSpan?: boolean | ((prevValue: any, value: any, prevRow: any, row: any, keys?: string[]) => boolean)
+    autoRowSpan?:
+      | boolean
+      | ((
+          prevValue: any,
+          value: any,
+          prevRow: any,
+          row: any,
+          keys?: string[]
+        ) => boolean);
     /** 自定义合并行的判断数据字段 */
-    autoRowSpanKeys?: string[]
+    autoRowSpanKeys?: string[];
     /**过滤*/
-    filter?: boolean | {
-      /**选择渲染格式化*/
-      formate?: (value: string) => React.ReactNode,
-      /**是否显示模糊查询*/
-      isFuzzySearch?: boolean
-      /**选择项*/
-      items?: string[]
-    }
-    sortable?: boolean | ((xValue: any, yValue: any, x?: any, y?: any) => number)
-    tips: ReactNode | (() => ReactNode)
-    [key: string]: any
-  }
+    filter?:
+      | boolean
+      | {
+          /**选择渲染格式化*/
+          formate?: (value: string) => React.ReactNode;
+          /**是否显示模糊查询*/
+          isFuzzySearch?: boolean;
+          /**选择项*/
+          items?: string[];
+        };
+    sortable?:
+      | boolean
+      | ((xValue: any, yValue: any, x?: any, y?: any) => number);
+    tips: ReactNode | (() => ReactNode);
+    [key: string]: any;
+  };
 
   /**分组下标*/
   groupIndex?: number;
@@ -63,66 +77,73 @@ export interface ArtColumnStaticPart {
 
 export interface ArtColumnDynamicPart {
   /** 自定义取数方法 */
-  getValue?(row: any, rowIndex: number): any
+  getValue?(row: any, rowIndex: number): any;
 
   /** 自定义渲染方法 */
-  render?(value: any, row: any, rowIndex: number): ReactNode
+  render?(value: any, row: any, rowIndex: number): ReactNode;
 
   /** 自定义的获取单元格 props 的方法 */
-  getCellProps?(value: any, row: any, rowIndex: number): CellProps
+  getCellProps?(value: any, row: any, rowIndex: number): CellProps;
 
   /** 自定义的获取单元格 SpanRect 方法 */
-  getSpanRect?(value: any, row: any, rowIndex: number): SpanRect
+  getSpanRect?(value: any, row: any, rowIndex: number): SpanRect;
 }
 
 export interface ArtColumn extends ArtColumnStaticPart, ArtColumnDynamicPart {
   /** 该列的子节点 */
-  children?: ArtColumn[]
+  children?: ArtColumn[];
+  /**枚举数据渲染*/
+  enumData?: Record<string, string>;
 }
 
 export interface ArtColumnMergePath extends ArtColumn {
   /**原始表头配置*/
-  [protoMetaSymbol]?: ArtColumn
+  [protoMetaSymbol]?: ArtColumn;
   /**处理后的表头位置*/
-  [pathIndexMetaSymbol]?: string
+  [pathIndexMetaSymbol]?: string;
   /**是否是合并拖拽列的列*/
-  isDragColumn?: boolean
+  isDragColumn?: boolean;
 }
 
 /** SpanRect 用于描述合并单元格的边界
  * 注意 top/left 为 inclusive，而 bottom/right 为 exclusive */
 export interface SpanRect {
-  top: number
-  bottom: number
-  left: number
-  right: number
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
 }
 
 export interface AbstractTreeNode {
-  children?: AbstractTreeNode[]
+  children?: AbstractTreeNode[];
 }
 
-export type SortOrder = 'desc' | 'asc' | 'none'
+export type SortOrder = "desc" | "asc" | "none";
 
-export type SortItem = { code: string; order: SortOrder }
+export type SortItem = { code: string; order: SortOrder };
 
-export type Transform<T> = (input: T) => T
+export type Transform<T> = (input: T) => T;
 
 /** @deprecated transform */
 export type TableTransform = Transform<{
-  columns: ArtColumn[]
-  dataSource: any[]
-}>
+  columns: ArtColumn[];
+  dataSource: any[];
+}>;
 
 export interface HoverRange {
-  start: number
-  end: number
+  start: number;
+  end: number;
 }
 
-
-export type ValueType = string | number | boolean | null | undefined | { isSearch: boolean, text: string }
+export type ValueType =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | { isSearch: boolean; text: string };
 
 export interface FilterItem {
-  code: string,
-  value: ValueType[]
+  code: string;
+  value: ValueType[];
 }
