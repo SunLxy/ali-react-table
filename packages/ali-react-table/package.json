@@ -9,12 +9,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alibaba/ali-react-table.git"
+    "url": "git+https://github.com/SunLxy/ali-react-table.git"
   },
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/alibaba/ali-react-table",
+  "homepage": "https://github.com/SunLxy/ali-react-table",
   "author": {
     "name": "Shi Feichao",
     "email": "842351815@qq.com"
