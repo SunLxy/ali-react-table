@@ -19,7 +19,7 @@ export interface TreeModeFeatureOptions {
   onChangeOpenKeys?(nextKeys: string[], key: string, action: 'expand' | 'collapse'): void
 
   /** 自定义叶子节点的判定逻辑 */
-  isLeafNode?(node: any, nodeMeta: { depth: number; expanded: boolean; rowKey: string }): boolean
+  isLeafNode?(node: any, nodeMeta: { depth: number; expanded: boolean; rowKey: string, childFiled?: string }): boolean
 
   /** icon 的缩进值。一般为负数，此时 icon 将向左偏移，默认从 pipeline.ctx.indents 中获取 */
   iconIndent?: number
@@ -44,12 +44,31 @@ export interface TreeModeFeatureOptions {
    * 默认第一项
   */
   positionKey?: string | number;
+
+  /**根据层级进行处理展开节点*/
+  positionKeysMap?: {
+    /**
+     * 第几层对应渲染字段，
+     * */
+    [s: number]: {
+      /**那个字段进行渲染图标*/
+      code: string;
+      /**子集获取数据字段
+       * @default children
+      */
+      childFiled?: string
+    }
+  }
 }
 
 export function treeMode(opts: TreeModeFeatureOptions = {}) {
+
   return function treeModeStep(pipeline: TablePipeline) {
     const stateKey = 'treeMode'
     const ctx = pipeline.ctx
+    const positionKeysMap = opts.positionKeysMap ?? {};
+    // 对这个数据进行处理成需要的格式
+    const fieldMaps = Array.from(new Set(Object.entries(positionKeysMap).map(([_, value]) => value.code)))
 
     const primaryKey = pipeline.ensurePrimaryKey('treeMode') as string
     if (typeof primaryKey !== 'string') {
@@ -100,13 +119,17 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
         for (const node of nodes) {
           const rowKey = node[primaryKey]
           const expanded = openKeySet.has(rowKey)
+          const item = positionKeysMap?.[depth];
 
-          const isLeaf = isLeafNode(node, { depth, expanded, rowKey })
+          const isLeaf = isLeafNode(node, { depth, expanded, rowKey, childFiled: item?.childFiled || "children" })
           const treeMeta = { depth, isLeaf, expanded, rowKey }
           result.push({ [treeMetaKey]: treeMeta, ...node })
-
           if (!isLeaf && expanded) {
-            dfs(node.children, depth + 1)
+            if (item && item?.childFiled) {
+              dfs(node[item.childFiled], depth + 1)
+            } else {
+              dfs(node.children, depth + 1)
+            }
           }
         }
       }
@@ -134,23 +157,32 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           firstCol = colItem
         }
       }
-      const render = (value: any, record: any, recordIndex: number) => {
+      const render = (value: any, record: any, recordIndex: number, firstCol: ArtColumn) => {
         const content = internals.safeRender(firstCol, record, recordIndex)
         if (record[treeMetaKey] == null) {
           // 没有 treeMeta 信息的话，就返回原先的渲染结果
           return content
         }
-
         const { rowKey, depth, isLeaf, expanded } = record[treeMetaKey]
-
         const indent = iconIndent + depth * indentSize
-
         if (isLeaf) {
           return (
             <InlineFlexCell className="expansion-cell leaf">
               <span style={{ marginLeft: indent + iconWidth + iconGap }}>{content}</span>
             </InlineFlexCell>
           )
+        }
+
+        const item = positionKeysMap?.[depth]
+        if (item) {
+          // 判断当前是否是渲染字段，如果是则进行渲染图标，否则不进行渲染
+          if (item.code !== firstCol.code) {
+            return (
+              <InlineFlexCell className="expansion-cell leaf">
+                <span style={{ marginLeft: indent + iconWidth + iconGap }}>{content}</span>
+              </InlineFlexCell>
+            )
+          }
         }
 
         const onClick = (e: React.MouseEvent) => {
@@ -182,7 +214,7 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           </ExpansionCell>
         )
       }
-      const getCellProps = (value: any, record: any, rowIndex: number) => {
+      const getCellProps = (value: any, record: any, rowIndex: number, firstCol: ArtColumn) => {
         const prevProps = internals.safeGetCellProps(firstCol, record, rowIndex)
         if (record[treeMetaKey] == null) {
           // 没有 treeMeta 信息的话，就返回原先的 cellProps
@@ -204,16 +236,34 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           style: { cursor: 'pointer' },
         })
       }
-
-      const newItem = {
-        ...firstCol,
-        title: (
-          <span style={{ marginLeft: iconIndent + iconWidth + iconGap }}>{internals.safeRenderHeader(firstCol)}</span>
-        ),
-        render,
-        getCellProps: clickArea === 'cell' ? getCellProps : firstCol.getCellProps,
+      /**多个字段映射时使用*/
+      if (fieldMaps.length > 1) {
+        for (const field of fieldMaps) {
+          const colItemIndex = newColumns.findIndex((ite) => ite.code === field);
+          if (colItemIndex >= 0) {
+            const firstCol = newColumns[colItemIndex]
+            const newItem = {
+              ...firstCol,
+              title: (
+                <span style={{ marginLeft: iconIndent + iconWidth + iconGap }}>{internals.safeRenderHeader(firstCol)}</span>
+              ),
+              render: (value: any, record: any, recordIndex: number) => render(value, record, recordIndex, firstCol),
+              getCellProps: (value: any, record: any, rowIndex: number) => clickArea === 'cell' ? getCellProps(value, record, rowIndex, firstCol) : firstCol.getCellProps?.(value, record, rowIndex),
+            }
+            newColumns[colItemIndex] = { ...newItem }
+          }
+        }
+      } else {
+        const newItem = {
+          ...firstCol,
+          title: (
+            <span style={{ marginLeft: iconIndent + iconWidth + iconGap }}>{internals.safeRenderHeader(firstCol)}</span>
+          ),
+          render: (value: any, record: any, recordIndex: number) => render(value, record, recordIndex, firstCol),
+          getCellProps: (value: any, record: any, rowIndex: number) => clickArea === 'cell' ? getCellProps(value, record, rowIndex, firstCol) : firstCol.getCellProps?.(value, record, rowIndex),
+        }
+        newColumns[positionIndex] = { ...newItem }
       }
-      newColumns[positionIndex] = { ...newItem }
       return [...newColumns];
     }
   }
