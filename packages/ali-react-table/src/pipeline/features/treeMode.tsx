@@ -221,9 +221,16 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           return prevProps
         }
 
-        const { isLeaf, rowKey } = record[treeMetaKey]
+        const { isLeaf, rowKey, depth } = record[treeMetaKey]
         if (isLeaf) {
           return prevProps
+        }
+        const item = positionKeysMap?.[depth]
+        if (item) {
+          // 判断当前是否是渲染字段，如果是则进行渲染图标，否则不进行渲染
+          if (item.code !== firstCol.code) {
+            return prevProps
+          }
         }
 
         return mergeCellProps(prevProps, {
