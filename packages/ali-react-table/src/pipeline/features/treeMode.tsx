@@ -244,7 +244,7 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
         })
       }
       /**多个字段映射时使用*/
-      if (fieldMaps.length > 1) {
+      if (fieldMaps.length > 0) {
         for (const field of fieldMaps) {
           const colItemIndex = newColumns.findIndex((ite) => ite.code === field);
           if (colItemIndex >= 0) {
