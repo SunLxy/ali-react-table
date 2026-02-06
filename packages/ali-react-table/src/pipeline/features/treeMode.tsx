@@ -239,7 +239,7 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
             const newItem = {
               ...firstCol,
               title: (
-                <span style={{ marginLeft: iconIndent + iconWidth + iconGap }}>{internals.safeRenderHeader(firstCol)}</span>
+                <span style={{ marginLeft: iconIndent + iconWidth + iconGap, display: "inline-block" }}>{internals.safeRenderHeader(firstCol)}</span>
               ),
               render: (value: any, record: any, recordIndex: number) => render(value, record, recordIndex, firstCol),
               getCellProps: (value: any, record: any, rowIndex: number) => clickArea === 'cell' ? getCellProps(value, record, rowIndex, firstCol) : firstCol.getCellProps?.(value, record, rowIndex),
