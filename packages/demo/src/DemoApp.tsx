@@ -132,10 +132,21 @@ const AppDivAppDiv = styled.div.withConfig({
   }
 `
 
+const positionKeysMap = {
+  0: {
+    code: 'provinceName',
+    childField: 'children'
+  },
+  1: {
+    code: 'city',
+    childField: 'childinfo'
+  },
+}
+
 export function DemoApp() {
   const [newColumns,] = useState<any[]>(([
-    { code: 'provinceName', name: '省份', width: 150, lock: true },
-    { code: 'city', name: '城市', width: 100, },
+    { code: 'provinceName', name: '省份', width: 150, lock: true, features: { filter: true } },
+    { code: 'city', name: '城市', width: 100, features: { filter: true } },
     { code: 'time', name: '时间', width: 100, },
     { code: 'count', name: '总数', width: 100, },
   ]))
@@ -146,18 +157,8 @@ export function DemoApp() {
       dataSource: dataSource,
       columns: newColumns
     })
-    .use(features.treeMode({
-      positionKeysMap: {
-        0: {
-          code: 'provinceName',
-          childFiled: 'children'
-        },
-        1: {
-          code: 'city',
-          childFiled: 'childinfo'
-        },
-      }
-    }))
+    .use(features.filter({ positionKeysMap }))
+    .use(features.treeMode({ positionKeysMap }))
 
   const dpp = { ...p.getProps() }
 

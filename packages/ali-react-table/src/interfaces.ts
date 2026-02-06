@@ -37,30 +37,30 @@ export interface ArtColumnStaticPart {
   features?: {
     /** 是否开启自动合并行 */
     autoRowSpan?:
-      | boolean
-      | ((
-          prevValue: any,
-          value: any,
-          prevRow: any,
-          row: any,
-          keys?: string[]
-        ) => boolean);
+    | boolean
+    | ((
+      prevValue: any,
+      value: any,
+      prevRow: any,
+      row: any,
+      keys?: string[]
+    ) => boolean);
     /** 自定义合并行的判断数据字段 */
     autoRowSpanKeys?: string[];
     /**过滤*/
     filter?:
-      | boolean
-      | {
-          /**选择渲染格式化*/
-          formate?: (value: string) => React.ReactNode;
-          /**是否显示模糊查询*/
-          isFuzzySearch?: boolean;
-          /**选择项*/
-          items?: string[];
-        };
+    | boolean
+    | {
+      /**选择渲染格式化*/
+      formate?: (value: string) => React.ReactNode;
+      /**是否显示模糊查询*/
+      isFuzzySearch?: boolean;
+      /**选择项*/
+      items?: string[];
+    };
     sortable?:
-      | boolean
-      | ((xValue: any, yValue: any, x?: any, y?: any) => number);
+    | boolean
+    | ((xValue: any, yValue: any, x?: any, y?: any) => number);
     tips: ReactNode | (() => ReactNode);
     [key: string]: any;
   };
@@ -146,4 +146,19 @@ export type ValueType =
 export interface FilterItem {
   code: string;
   value: ValueType[];
+}
+
+/**根据层级进行处理展开节点*/
+export interface PositionKeysMapType {
+  /**
+   * 第几层对应渲染字段，
+   * */
+  [s: number]: {
+    /**那个字段进行渲染图标*/
+    code?: string;
+    /**子集获取数据字段
+     * @default children
+    */
+    childField?: string
+  }
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import styled from 'styled-components'
-import type { ArtColumn, SortItem, SortOrder } from '../../interfaces'
+import type { ArtColumn, SortItem, SortOrder, PositionKeysMapType } from '../../interfaces'
 import { internals } from '../../internals'
 import { collectNodes, isLeafNode, layeredSort, mergeCellProps, smartCompare } from '../../utils'
 import { TablePipeline } from '../pipeline'
@@ -96,7 +96,7 @@ const TableHeaderCell = styled.div`
 
 export interface SortHeaderCellProps {
   /** 调用 makeSortTransform(...) 时的参数 */
-  sortOptions: Required<Omit<SortFeatureOptions, 'SortHeaderCell' | 'defaultSorts'>>
+  sortOptions: Required<Omit<SortFeatureOptions, 'SortHeaderCell' | 'defaultSorts' | 'positionKeysMap'>>
 
   /** 在添加排序相关的内容之前 表头原有的渲染内容 */
   children: ReactNode
@@ -147,6 +147,8 @@ export interface SortFeatureOptions {
 
   /** 点击事件的响应区域，默认为 content */
   clickArea?: 'content' | 'icon'
+  /**根据层级进行处理展开节点*/
+  positionKeysMap?: PositionKeysMapType
 }
 
 const stateKey = 'sort'
@@ -162,7 +164,7 @@ export function sort(opts: SortFeatureOptions = {}) {
       stopClickEventPropagation,
       clickArea = 'content',
     } = opts
-
+    const positionKeysMap = opts.positionKeysMap ?? {}
     const inputSorts = opts.sorts ?? pipeline.getStateAtKey(stateKey) ?? opts.defaultSorts ?? []
     const activeSorts = inputSorts.filter((s) => s.order !== 'none')
     // 单字段排序的情况下 sorts 中只有第一个排序字段才会生效
@@ -239,7 +241,7 @@ export function sort(opts: SortFeatureOptions = {}) {
           }
         }
         return 0
-      })
+      }, positionKeysMap)
     }
 
     // 在「升序 - 降序 - 不排序」之间不断切换

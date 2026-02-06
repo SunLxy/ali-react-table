@@ -1,7 +1,7 @@
 import React, { Fragment, useRef } from "react"
 import { TablePipeline, ArtColumn, isLeafNode, collectNodes, internals } from "../../../ali-react-table"
 import { layeredFilter } from "../../../utils"
-import { FilterItem, ValueType } from "../../../interfaces"
+import type { FilterItem, ValueType, PositionKeysMapType } from "../../../interfaces"
 import styled from "styled-components"
 import { HTMLAttributes, useMemo, useState } from "react"
 import RcTooltip from "rc-tooltip"
@@ -240,6 +240,8 @@ export interface FilterFeatureOptions {
   isFilterChildren?: boolean
   /**字段对应的过滤数据*/
   filterItemsMap?: Map<string, (string | undefined | number | boolean)[]>
+  /**根据层级进行处理展开节点*/
+  positionKeysMap?: PositionKeysMapType
 }
 
 export type ArtColumnFeaturesFilter =
@@ -257,6 +259,7 @@ export function filter(options: FilterFeatureOptions = {}) {
     const Tooltip = pipeline.ctx.components.Tooltip
     const isFilterChildren = options.isFilterChildren;
     const filterItemsMap = options.filterItemsMap;
+    const positionKeysMap = options.positionKeysMap ?? {};
 
     /**获取过滤参数  */
     const inputFilter: FilterItem[] = pipeline.getStateAtKey("filter") || options?.filterItems || []
@@ -287,7 +290,7 @@ export function filter(options: FilterFeatureOptions = {}) {
           .map((col) => [col.code, col]),
       )
 
-      return layeredFilter(dataSource, (item) => {
+      return layeredFilter(dataSource, positionKeysMap, (item) => {
         let newItem = { ...item }
         for (let index = 0; index < newFilter.length; index++) {
           const element = newFilter[index];
@@ -327,12 +330,15 @@ export function filter(options: FilterFeatureOptions = {}) {
         .map((col) => [col.code, col])
 
       const codeItemsMap: Map<string, (string | number | undefined | boolean)[]> = filterItemsMap || new Map([])
-      const loopdfs = (list: any[]) => {
+
+      const loopdfs = (list: any[], depth: number = 0) => {
+        const positionItem = positionKeysMap?.[depth];
+        const childField = positionItem?.childField || 'children';
         for (let index = 0; index < list.length; index++) {
           const element = list[index];
           // 如果是树结构，只取最
-          if (isFilterChildren && !isLeafNode(element)) {
-            loopdfs(element.children)
+          if (isFilterChildren && !isLeafNode(element, { childField })) {
+            loopdfs(element[childField], depth + 1)
           } else {
             for (let k = 0; k < filterColumns.length; k++) {
               const [code] = filterColumns[k];
@@ -347,14 +353,14 @@ export function filter(options: FilterFeatureOptions = {}) {
                 codeItemsMap.set(code, [value])
               }
             }
-            if (!isLeafNode(element)) {
-              loopdfs(element.children)
+            if (!isLeafNode(element, { childField })) {
+              loopdfs(element[childField], depth + 1)
             }
           }
         }
       }
       if (!filterItemsMap)
-        loopdfs(dataSource);
+        loopdfs(dataSource, 0);
 
       return columns.map(dfs)
 

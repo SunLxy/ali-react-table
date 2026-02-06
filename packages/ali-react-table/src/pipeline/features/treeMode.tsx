@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 import { ExpansionCell, icons, InlineFlexCell } from '../../common-views'
-import type { ArtColumn } from '../../interfaces'
+import type { ArtColumn, PositionKeysMapType } from '../../interfaces'
 import { internals } from '../../internals'
 import { isLeafNode as standardIsLeafNode, mergeCellProps } from '../../utils'
 import { TablePipeline } from '../pipeline'
@@ -19,7 +19,7 @@ export interface TreeModeFeatureOptions {
   onChangeOpenKeys?(nextKeys: string[], key: string, action: 'expand' | 'collapse'): void
 
   /** 自定义叶子节点的判定逻辑 */
-  isLeafNode?(node: any, nodeMeta: { depth: number; expanded: boolean; rowKey: string, childFiled?: string }): boolean
+  isLeafNode?(node: any, nodeMeta: { depth: number; expanded: boolean; rowKey: string, childField?: string }): boolean
 
   /** icon 的缩进值。一般为负数，此时 icon 将向左偏移，默认从 pipeline.ctx.indents 中获取 */
   iconIndent?: number
@@ -44,21 +44,8 @@ export interface TreeModeFeatureOptions {
    * 默认第一项
   */
   positionKey?: string | number;
-
   /**根据层级进行处理展开节点*/
-  positionKeysMap?: {
-    /**
-     * 第几层对应渲染字段，
-     * */
-    [s: number]: {
-      /**那个字段进行渲染图标*/
-      code: string;
-      /**子集获取数据字段
-       * @default children
-      */
-      childFiled?: string
-    }
-  }
+  positionKeysMap?: PositionKeysMapType
 }
 
 export function treeMode(opts: TreeModeFeatureOptions = {}) {
@@ -121,12 +108,12 @@ export function treeMode(opts: TreeModeFeatureOptions = {}) {
           const expanded = openKeySet.has(rowKey)
           const item = positionKeysMap?.[depth];
 
-          const isLeaf = isLeafNode(node, { depth, expanded, rowKey, childFiled: item?.childFiled || "children" })
+          const isLeaf = isLeafNode(node, { depth, expanded, rowKey, childField: item?.childField || "children" })
           const treeMeta = { depth, isLeaf, expanded, rowKey }
           result.push({ [treeMetaKey]: treeMeta, ...node })
           if (!isLeaf && expanded) {
-            if (item && item?.childFiled) {
-              dfs(node[item.childFiled], depth + 1)
+            if (item && item?.childField) {
+              dfs(node[item.childField], depth + 1)
             } else {
               dfs(node.children, depth + 1)
             }
